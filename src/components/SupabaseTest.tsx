@@ -9,15 +9,24 @@ const SupabaseTest: React.FC = () => {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        // Testa a conexão com o Supabase
-        const { data, error } = await supabase.from('_test').select('*').limit(1);
+        // Testa a conexão com o Supabase usando uma query simples
+        const { error } = await supabase.from('_test').select('*').limit(1);
         
-        if (error && error.code !== 'PGRST116') {
-          // PGRST116 é "table not found" - isso é esperado se não temos tabelas ainda
-          throw error;
+        // Se o erro for "table not found", significa que a conexão está OK
+        if (error && error.code === 'PGRST116') {
+          setConnectionStatus('success');
+          return;
         }
         
-        setConnectionStatus('success');
+        // Se não há erro, a conexão está OK
+        if (!error) {
+          setConnectionStatus('success');
+          return;
+        }
+        
+        // Outros erros indicam problema de conexão
+        throw error;
+        
       } catch (error: any) {
         console.error('Erro de conexão:', error);
         setConnectionStatus('error');
@@ -29,7 +38,7 @@ const SupabaseTest: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 max-w-sm">
+    <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 max-w-sm z-50">
       <div className="flex items-center space-x-3">
         <Database size={20} className="text-green-deep" />
         <div>
@@ -57,7 +66,7 @@ const SupabaseTest: React.FC = () => {
             )}
           </div>
           {connectionStatus === 'error' && (
-            <p className="font-roboto text-xs text-red-500 mt-1">
+            <p className="font-roboto text-xs text-red-500 mt-1 break-words">
               {errorMessage}
             </p>
           )}
