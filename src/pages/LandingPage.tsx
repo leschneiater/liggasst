@@ -122,7 +122,7 @@ const LandingPage: React.FC = () => {
                     onClick={() => setIsCadastroProfissionalOpen(true)}
                     variant="outline"
                     size="lg"
-                    className="border-white text-green-deep hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
+                    className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
                     icon={Users}
                   >
                     Sou Profissional
@@ -137,23 +137,6 @@ const LandingPage: React.FC = () => {
                     alt="Profissionais de Segurança do Trabalho"
                     className="rounded-2xl shadow-2xl w-full h-auto"
                   />
-                  <div className="absolute -bottom-4 -left-4 bg-white p-4 md:p-6 rounded-xl shadow-lg animate-bounce-soft">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-green-deep rounded-full flex items-center justify-center">
-                        <Shield className="text-white" size={20} />
-                      </div>
-                      <div>
-                        <p className="font-poppins font-semibold text-green-deep text-lg md:text-xl">+5.000</p>
-                        <p className="font-roboto text-sm text-gray-600">Profissionais</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute -top-4 -right-4 bg-green-medium p-3 rounded-xl shadow-lg">
-                    <div className="flex items-center space-x-2">
-                      <Star className="text-white fill-current" size={16} />
-                      <span className="text-white font-roboto font-semibold">Verificado</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -196,12 +179,9 @@ const LandingPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
               {steps.map((step, index) => (
                 <div key={index} className="bg-white p-8 rounded-2xl text-center group hover:shadow-xl transition-all duration-300">
-                  <div className="relative mb-6">
+                  <div className="mb-6">
                     <div className="w-16 h-16 md:w-20 md:h-20 bg-green-light rounded-full flex items-center justify-center mx-auto group-hover:bg-green-deep transition-colors duration-300">
                       <step.icon size={28} className="text-green-deep group-hover:text-white" />
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-green-deep text-white rounded-full flex items-center justify-center font-poppins font-bold text-sm">
-                      {index + 1}
                     </div>
                   </div>
                   <h3 className="font-poppins font-semibold text-lg md:text-xl text-soft-black mb-3">

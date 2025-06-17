@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Search, 
   Filter, 
@@ -630,10 +631,11 @@ const BuscaProfissionais: React.FC = () => {
               Publique sua demanda e receba propostas de profissionais qualificados
             </p>
             <Button 
+              as={Link}
+              to="/publique-demanda"
               size="lg"
               className="bg-green-light text-green-deep hover:bg-white font-semibold"
               icon={Plus}
-              onClick={() => setIsCadastroEmpresaOpen(true)}
             >
               Publicar Demanda
             </Button>

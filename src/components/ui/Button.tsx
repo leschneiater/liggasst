@@ -28,9 +28,9 @@ const Button: React.FC<ButtonProps> = ({
   const baseClasses = 'inline-flex items-center justify-center font-roboto font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed border transform hover:scale-105 active:scale-95';
 
   const variantClasses = {
-    primary: 'bg-green-deep text-white border-green-deep hover:bg-green-medium hover:border-green-medium focus:ring-green-deep shadow-lg hover:shadow-xl',
+    primary: 'bg-green-deep text-white border-green-deep hover:bg-white hover:text-green-deep hover:border-green-deep focus:ring-green-deep shadow-lg hover:shadow-xl',
     secondary: 'bg-green-light text-green-deep border-green-light hover:bg-green-deep hover:text-white hover:border-green-deep focus:ring-green-light shadow-md hover:shadow-lg',
-    outline: 'border-green-deep text-green-deep bg-transparent hover:bg-green-deep hover:text-white focus:ring-green-deep shadow-sm hover:shadow-md',
+    outline: 'border-green-deep text-green-deep bg-white hover:bg-green-deep hover:text-white focus:ring-green-deep shadow-sm hover:shadow-md',
     ghost: 'text-green-deep bg-transparent border-transparent hover:bg-green-light focus:ring-green-light'
   };
 

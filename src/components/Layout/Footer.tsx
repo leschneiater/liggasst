@@ -34,13 +34,13 @@ const Footer: React.FC = () => {
             
             <div className="flex space-x-4">
               <a href="#" className="text-green-light hover:text-white transition-colors duration-200 p-2 bg-green-medium bg-opacity-30 rounded-lg hover:bg-opacity-50">
-                <Facebook size={20} />
+                <Facebook size={20} fill="currentColor" />
               </a>
               <a href="#" className="text-green-light hover:text-white transition-colors duration-200 p-2 bg-green-medium bg-opacity-30 rounded-lg hover:bg-opacity-50">
-                <Instagram size={20} />
+                <Instagram size={20} fill="currentColor" />
               </a>
               <a href="#" className="text-green-light hover:text-white transition-colors duration-200 p-2 bg-green-medium bg-opacity-30 rounded-lg hover:bg-opacity-50">
-                <Linkedin size={20} />
+                <Linkedin size={20} fill="currentColor" />
               </a>
             </div>
           </div>
@@ -83,6 +83,24 @@ const Footer: React.FC = () => {
                 <Link to="/contato" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
                   <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
                   Contato
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard-profissional" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
+                  <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
+                  Dashboard Profissional
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard-empresa" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
+                  <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
+                  Dashboard Empresa
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
+                  <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
+                  Dashboard Admin
                 </Link>
               </li>
             </ul>
@@ -135,7 +153,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-green-medium mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="font-roboto text-green-light text-sm">
-              © 2024 LiggaSST. Todos os direitos reservados.
+              © 2025 LiggaSST. Todos os direitos reservados.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link 
