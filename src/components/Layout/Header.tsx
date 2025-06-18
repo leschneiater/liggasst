@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, Building2, LogOut, Bell } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import LoginModal from '../LoginModal';
 import CadastroEmpresaModal from '../CadastroEmpresaModal';
 import CadastroProfissionalModal from '../CadastroProfissionalModal';
@@ -12,13 +13,24 @@ const Header: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
+  
+  // Firebase Auth (sistema original)
   const { currentUser, userType, logout } = useAuth();
+  
+  // Supabase Auth (sistema de teste)
+  const { user: supabaseUser, signOut } = useSupabaseAuth();
+  
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      if (currentUser) {
+        await logout();
+      }
+      if (supabaseUser) {
+        await signOut();
+      }
       navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
@@ -36,6 +48,12 @@ const Header: React.FC = () => {
   ];
 
   const getDashboardLink = () => {
+    // Se tem usuário Supabase, vai para dashboard Supabase
+    if (supabaseUser) {
+      return '/dashboard';
+    }
+    
+    // Se tem usuário Firebase, vai para dashboard específico
     switch (userType) {
       case 'professional':
         return '/dashboard-profissional';
@@ -47,6 +65,8 @@ const Header: React.FC = () => {
         return '/';
     }
   };
+
+  const isLoggedIn = currentUser || supabaseUser;
 
   return (
     <>
@@ -85,7 +105,7 @@ const Header: React.FC = () => {
 
             {/* User Actions */}
             <div className="hidden md:flex items-center space-x-3">
-              {currentUser ? (
+              {isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   {/* Notifications */}
                   <button className="p-2 text-gray-600 hover:text-green-deep transition-colors duration-300 relative">
@@ -97,7 +117,7 @@ const Header: React.FC = () => {
                     to={getDashboardLink()}
                     className="flex items-center space-x-2 px-4 py-2 bg-green-light text-green-deep rounded-lg hover:bg-green-deep hover:text-white transition-all duration-300 font-semibold border border-green-light shadow-sm hover:shadow-md"
                   >
-                    {userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
+                    {supabaseUser ? <User size={16} /> : userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
                     <span>Dashboard</span>
                   </Link>
                   <button
@@ -118,6 +138,17 @@ const Header: React.FC = () => {
                   >
                     Entrar
                   </Button>
+                  
+                  {/* Botão para teste Supabase */}
+                  <Button
+                    as={Link}
+                    to="/auth/login"
+                    size="sm"
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    Login Teste
+                  </Button>
+                  
                   <div className="relative group">
                     <Button
                       size="sm"
@@ -174,14 +205,14 @@ const Header: React.FC = () => {
                   </Link>
                 ))}
                 
-                {currentUser ? (
+                {isLoggedIn ? (
                   <div className="space-y-2 pt-4 border-t">
                     <Link
                       to={getDashboardLink()}
                       onClick={() => setIsMenuOpen(false)}
                       className="flex items-center space-x-2 px-3 py-2 bg-green-light text-green-deep rounded-md font-semibold"
                     >
-                      {userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
+                      {supabaseUser ? <User size={16} /> : userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
                       <span>Dashboard</span>
                     </Link>
                     <button
@@ -206,6 +237,13 @@ const Header: React.FC = () => {
                     >
                       Entrar
                     </button>
+                    <Link
+                      to="/auth/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block px-3 py-2 bg-blue-600 text-white rounded-md font-roboto font-semibold w-full text-left"
+                    >
+                      Login Teste
+                    </Link>
                     <button
                       onClick={() => {
                         setIsCadastroEmpresaOpen(true);
