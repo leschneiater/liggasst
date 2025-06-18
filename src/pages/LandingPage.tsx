@@ -115,7 +115,7 @@ const LandingPage: React.FC = () => {
                       className="bg-white text-green-deep hover:bg-green-deep hover:text-white border-white font-semibold w-full sm:w-auto transition-all duration-300"
                     >
                       <Search size={18} className="mr-2 flex-shrink-0" style={{ color: '#1B4332' }} />
-                      <span className="text-green-deep">Buscar Profissional</span>
+                      <span style={{ color: '#1B4332' }}>Buscar Profissional</span>
                     </Button>
                   </Link>
                   <Button 
