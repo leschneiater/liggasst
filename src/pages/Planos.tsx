@@ -306,7 +306,7 @@ const Planos: React.FC = () => {
               size="lg"
               className="bg-white text-green-deep hover:bg-green-light"
             >
-              Falar com Especialista
+              <span style={{ color: '#1B4332' }}>Falar com Especialista</span>
             </Button>
           </div>
         </section>
