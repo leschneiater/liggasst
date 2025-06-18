@@ -224,7 +224,7 @@ const LandingPage: React.FC = () => {
                     iconPosition="right" 
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white font-semibold transition-all duration-300"
                   >
-                    Cadastrar Empresa
+                    <span style={{ color: '#1B4332' }}>Cadastrar Empresa</span>
                     <ArrowRight size={18} className="ml-2 flex-shrink-0" style={{ color: '#1B4332' }} />
                   </Button>
                 </button>
@@ -254,7 +254,7 @@ const LandingPage: React.FC = () => {
                     iconPosition="right" 
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white font-semibold transition-all duration-300"
                   >
-                    Cadastrar Profissional
+                    <span style={{ color: '#1B4332' }}>Cadastrar Profissional</span>
                     <ArrowRight size={18} className="ml-2 flex-shrink-0" style={{ color: '#1B4332' }} />
                   </Button>
                 </button>
