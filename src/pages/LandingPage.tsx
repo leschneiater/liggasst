@@ -123,8 +123,8 @@ const LandingPage: React.FC = () => {
                     variant="outline"
                     size="lg"
                     className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
-                    icon={Users}
                   >
+                    <Users size={18} className="mr-2 flex-shrink-0" style={{ color: '#1B4332' }} />
                     <span style={{ color: '#1B4332' }}>Sou Profissional</span>
                   </Button>
                 </div>
