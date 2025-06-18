@@ -125,7 +125,7 @@ const LandingPage: React.FC = () => {
                     className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
                     icon={Users}
                   >
-                    Sou Profissional
+                    <span style={{ color: '#1B4332' }}>Sou Profissional</span>
                   </Button>
                 </div>
               </div>
