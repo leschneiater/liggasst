@@ -10,7 +10,12 @@ const SupabaseTest: React.FC = () => {
     const testConnection = async () => {
       try {
         // Testa a conexão com o Supabase usando uma query simples
-        const { error } = await supabase.from('_test').select('*').limit(1);
+        // Usa throwOnError(false) para evitar logs desnecessários no console
+        const { error } = await supabase
+          .from('_test')
+          .select('*')
+          .limit(1)
+          .throwOnError(false);
         
         // Se o erro for "table not found" (PostgreSQL error code), significa que a conexão está OK
         if (error && error.code === '42P01') {
