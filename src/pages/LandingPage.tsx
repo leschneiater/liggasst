@@ -221,11 +221,11 @@ const LandingPage: React.FC = () => {
                   className="inline-block mt-6"
                 >
                   <Button 
-                    icon={ArrowRight} 
                     iconPosition="right" 
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white font-semibold transition-all duration-300"
                   >
                     Cadastrar Empresa
+                    <ArrowRight size={18} className="ml-2 flex-shrink-0" style={{ color: '#1B4332' }} />
                   </Button>
                 </button>
               </div>
@@ -251,11 +251,11 @@ const LandingPage: React.FC = () => {
                   className="inline-block mt-6"
                 >
                   <Button 
-                    icon={ArrowRight} 
                     iconPosition="right" 
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white font-semibold transition-all duration-300"
                   >
                     Cadastrar Profissional
+                    <ArrowRight size={18} className="ml-2 flex-shrink-0" style={{ color: '#1B4332' }} />
                   </Button>
                 </button>
               </div>
