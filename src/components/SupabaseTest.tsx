@@ -9,34 +9,19 @@ const SupabaseTest: React.FC = () => {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        // Testa a conexão com o Supabase usando uma query simples
-        // Usa throwOnError(false) para evitar logs desnecessários no console
-        const { error } = await supabase
-          .from('_test')
-          .select('*')
-          .limit(1)
-          .throwOnError(false);
+        // Test connection using Supabase auth session check
+        // This is more reliable than querying a specific table
+        const { data, error } = await supabase.auth.getSession();
         
-        // Se o erro for "table not found" (PostgreSQL error code), significa que a conexão está OK
-        if (error && error.code === '42P01') {
-          setConnectionStatus('success');
-          return;
+        if (error) {
+          throw error;
         }
         
-        // Se não há erro, a conexão está OK
-        if (!error) {
-          setConnectionStatus('success');
-          return;
-        }
-        
-        // Outros erros indicam problema de conexão - só loga erros inesperados
-        throw error;
+        // If we get here, the connection is working
+        setConnectionStatus('success');
         
       } catch (error: any) {
-        // Só loga erros que não sejam o esperado "table not found"
-        if (error.code !== '42P01') {
-          console.error('Erro de conexão:', error);
-        }
+        console.error('Erro de conexão:', error);
         setConnectionStatus('error');
         setErrorMessage(error.message || 'Erro desconhecido');
       }
