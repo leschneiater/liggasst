@@ -7,7 +7,6 @@ import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import SupabaseProtectedRoute from './components/SupabaseProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
-import SupabaseTest from './components/SupabaseTest';
 
 // Public Pages
 import LandingPage from './pages/LandingPage';
@@ -192,9 +191,6 @@ function App() {
               {/* 404 Route */}
               <Route path="*" element={<Layout><Error404 /></Layout>} />
             </Routes>
-
-            {/* Supabase Connection Test */}
-            <SupabaseTest />
           </div>
         </SupabaseAuthProvider>
       </AuthProvider>
