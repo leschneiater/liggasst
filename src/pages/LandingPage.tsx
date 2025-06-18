@@ -115,7 +115,7 @@ const LandingPage: React.FC = () => {
                       className="bg-white text-green-deep hover:bg-green-deep hover:text-white border-white font-semibold w-full sm:w-auto transition-all duration-300"
                       icon={Search}
                     >
-                      Buscar Profissional
+                      <span className="text-green-deep">Buscar Profissional</span>
                     </Button>
                   </Link>
                   <Button 
