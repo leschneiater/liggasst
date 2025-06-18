@@ -24,11 +24,14 @@ const SupabaseTest: React.FC = () => {
           return;
         }
         
-        // Outros erros indicam problema de conexão
+        // Outros erros indicam problema de conexão - só loga erros inesperados
         throw error;
         
       } catch (error: any) {
-        console.error('Erro de conexão:', error);
+        // Só loga erros que não sejam o esperado "table not found"
+        if (error.code !== '42P01') {
+          console.error('Erro de conexão:', error);
+        }
         setConnectionStatus('error');
         setErrorMessage(error.message || 'Erro desconhecido');
       }
