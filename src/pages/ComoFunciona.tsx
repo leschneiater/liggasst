@@ -14,62 +14,72 @@ import {
 import Button from '../components/ui/Button';
 
 const ComoFunciona: React.FC = () => {
-  const stepsEmpresa = [
+  const steps = [
     {
       icon: Search,
-      title: 'Cadastre sua Empresa',
-      description: 'Crie seu perfil empresarial com dados da empresa e necessidades de SST'
+      title: 'Busque Profissionais',
+      description: 'Encontre especialistas qualificados em Segurança do Trabalho na sua região'
     },
     {
       icon: UserCheck,
-      title: 'Busque Profissionais',
-      description: 'Use filtros por localização, especialidade e disponibilidade'
+      title: 'Analise Perfis',
+      description: 'Visualize certificações, experiências e avaliações de outros clientes'
     },
     {
       icon: CheckCircle,
       title: 'Contrate com Segurança',
-      description: 'Visualize certificações, avaliações e formalize a parceria'
+      description: 'Conecte-se diretamente e formalize parcerias com total transparência'
     }
   ];
 
-  const stepsProfissional = [
+  const benefits = {
+    companies: [
+      'Acesso a profissionais certificados',
+      'Processos de contratação ágeis',
+      'Relatórios detalhados de SST',
+      'Suporte técnico especializado'
+    ],
+    professionals: [
+      'Oportunidades em todo o Brasil',
+      'Gestão simplificada de contratos',
+      'Networking profissional',
+      'Crescimento da reputação'
+    ]
+  };
+
+  const testimonials = [
     {
-      icon: Award,
-      title: 'Crie seu Perfil',
-      description: 'Cadastre seus dados, certificações e área de atuação'
+      name: 'Maria Silva',
+      role: 'Gerente de Segurança - TechCorp',
+      content: 'Encontrei profissionais excelentes através da LiggaSST. A plataforma facilitou muito nosso processo de contratação.',
+      rating: 5,
+      company: 'TechCorp Ltda'
     },
     {
-      icon: Search,
-      title: 'Receba Oportunidades',
-      description: 'Empresas encontram seu perfil e entram em contato'
+      name: 'João Santos',
+      role: 'Técnico em Segurança do Trabalho',
+      content: 'Consegui expandir minha carteira de clientes e organizar melhor meu trabalho. Recomendo para todos os colegas.',
+      rating: 5,
+      company: 'Profissional Autônomo'
     },
     {
-      icon: Shield,
-      title: 'Feche Contratos',
-      description: 'Negocie diretamente e formalize parcerias seguras'
+      name: 'Ana Costa',
+      role: 'Diretora - Indústria Moderna',
+      content: 'A qualidade dos profissionais é excepcional. Nossa empresa se sente muito mais segura com os serviços contratados.',
+      rating: 5,
+      company: 'Indústria Moderna'
     }
   ];
 
-  const beneficios = [
-    {
-      icon: Clock,
-      title: 'Rapidez',
-      description: 'Encontre profissionais qualificados em minutos, não em semanas'
-    },
-    {
-      icon: Shield,
-      title: 'Segurança',
-      description: 'Todos os profissionais são verificados e certificados'
-    },
-    {
-      icon: Star,
-      title: 'Qualidade',
-      description: 'Sistema de avaliações garante a excelência dos serviços'
-    }
+  const stats = [
+    { number: '5.000+', label: 'Profissionais Cadastrados', icon: Users },
+    { number: '2.500+', label: 'Empresas Ativas', icon: Building2 },
+    { number: '15.000+', label: 'Contratos Realizados', icon: CheckCircle },
+    { number: '98%', label: 'Satisfação dos Clientes', icon: Star }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-green-deep to-green-medium text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -99,7 +109,7 @@ const ComoFunciona: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            {stepsEmpresa.map((step, index) => (
+            {steps.map((step, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mb-6">
                   <div className="w-20 h-20 bg-green-light rounded-full flex items-center justify-center mx-auto group-hover:bg-green-medium transition-colors duration-300">
@@ -143,7 +153,7 @@ const ComoFunciona: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            {stepsProfissional.map((step, index) => (
+            {steps.map((step, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mb-6">
                   <div className="w-20 h-20 bg-green-light rounded-full flex items-center justify-center mx-auto group-hover:bg-green-medium transition-colors duration-300">
@@ -184,7 +194,11 @@ const ComoFunciona: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {beneficios.map((beneficio, index) => (
+            {[
+              { icon: Clock, title: 'Rapidez', description: 'Encontre profissionais qualificados em minutos, não em semanas' },
+              { icon: Shield, title: 'Segurança', description: 'Todos os profissionais são verificados e certificados' },
+              { icon: Star, title: 'Qualidade', description: 'Sistema de avaliações garante a excelência dos serviços' }
+            ].map((beneficio, index) => (
               <div key={index} className="bg-neutral-gray p-8 rounded-2xl text-center hover:shadow-lg transition-shadow duration-300">
                 <div className="w-16 h-16 bg-green-deep rounded-full flex items-center justify-center mx-auto mb-4">
                   <beneficio.icon size={24} className="text-white" />
@@ -217,7 +231,7 @@ const ComoFunciona: React.FC = () => {
               size="lg"
               className="bg-white text-green-deep hover:bg-green-light"
             >
-              Cadastrar Empresa
+              <span style={{ color: '#1B4332' }}>Cadastrar Empresa</span>
             </Button>
             <Button 
               as={Link} 
@@ -226,7 +240,7 @@ const ComoFunciona: React.FC = () => {
               size="lg"
               className="border-white text-white hover:bg-white hover:text-green-deep"
             >
-              Cadastrar Profissional
+              <span style={{ color: '#1B4332' }}>Cadastrar Profissional</span>
             </Button>
           </div>
         </div>
