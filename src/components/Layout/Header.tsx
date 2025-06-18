@@ -139,16 +139,6 @@ const Header: React.FC = () => {
                     Entrar
                   </Button>
                   
-                  {/* Botão para teste Supabase */}
-                  <Button
-                    as={Link}
-                    to="/auth/login"
-                    size="sm"
-                    className="bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    Login Teste
-                  </Button>
-                  
                   <div className="relative group">
                     <Button
                       size="sm"
@@ -237,13 +227,6 @@ const Header: React.FC = () => {
                     >
                       Entrar
                     </button>
-                    <Link
-                      to="/auth/login"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block px-3 py-2 bg-blue-600 text-white rounded-md font-roboto font-semibold w-full text-left"
-                    >
-                      Login Teste
-                    </Link>
                     <button
                       onClick={() => {
                         setIsCadastroEmpresaOpen(true);
