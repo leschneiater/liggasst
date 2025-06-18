@@ -379,7 +379,7 @@ const LandingPage: React.FC = () => {
                   size="lg"
                   className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
                 >
-                  Cadastrar Profissional
+                  <span style={{ color: '#1B4332' }}>Cadastrar Profissional</span>
                 </Button>
               </button>
             </div>
