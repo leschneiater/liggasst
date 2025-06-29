@@ -5,11 +5,14 @@ import { Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import toast from 'react-hot-toast';
 
 interface RegisterFormData {
   email: string;
   password: string;
   confirmPassword: string;
+  userType: 'professional' | 'company';
+  name: string;
 }
 
 const Register: React.FC = () => {
@@ -17,16 +20,27 @@ const Register: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { signUp, loading } = useSupabaseAuth();
   
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>({
+    defaultValues: {
+      userType: 'professional'
+    }
+  });
   const watchPassword = watch('password');
+  const watchUserType = watch('userType');
 
   const onSubmit = async (data: RegisterFormData) => {
     if (data.password !== data.confirmPassword) {
+      toast.error('As senhas não coincidem');
       return;
     }
 
     try {
-      await signUp(data.email, data.password);
+      const userData = {
+        name: data.name,
+        type: data.userType
+      };
+      
+      await signUp(data.email, data.password, userData);
     } catch (error) {
       // Erro já tratado no contexto
     }
@@ -56,6 +70,37 @@ const Register: React.FC = () => {
 
           {/* Register Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="bg-neutral-gray p-4 rounded-lg mb-4">
+              <p className="font-roboto text-sm text-gray-700 mb-3">Eu sou:</p>
+              <div className="flex space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="professional"
+                    {...register('userType')}
+                    className="text-green-deep focus:ring-green-deep mr-2"
+                  />
+                  <span className="font-roboto text-sm">Profissional</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="company"
+                    {...register('userType')}
+                    className="text-green-deep focus:ring-green-deep mr-2"
+                  />
+                  <span className="font-roboto text-sm">Empresa</span>
+                </label>
+              </div>
+            </div>
+
+            <Input
+              label={watchUserType === 'professional' ? "Nome Completo" : "Nome da Empresa"}
+              placeholder={watchUserType === 'professional' ? "Seu nome completo" : "Razão social da empresa"}
+              error={errors.name?.message}
+              {...register('name', { required: 'Nome é obrigatório' })}
+            />
+
             <Input
               label="E-mail"
               type="email"
@@ -90,6 +135,7 @@ const Register: React.FC = () => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -111,6 +157,7 @@ const Register: React.FC = () => {
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                aria-label={showConfirmPassword ? "Esconder senha" : "Mostrar senha"}
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -121,6 +168,7 @@ const Register: React.FC = () => {
                 type="checkbox"
                 required
                 className="rounded border-gray-300 text-green-deep focus:ring-green-deep"
+                aria-label="Aceitar termos de uso e política de privacidade"
               />
               <span className="ml-2 font-roboto text-sm text-gray-600">
                 Aceito os{' '}

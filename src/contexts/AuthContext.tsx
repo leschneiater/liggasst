@@ -97,6 +97,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         case 'auth/too-many-requests':
           errorMessage = 'Muitas tentativas. Tente novamente mais tarde';
           break;
+        case 'auth/invalid-credential':
+          errorMessage = 'Credenciais inválidas';
+          break;
         default:
           errorMessage = error.message || 'Erro ao fazer login';
       }
