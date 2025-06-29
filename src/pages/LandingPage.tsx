@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, 
@@ -22,7 +22,6 @@ import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
-import LoginModal from '../components/LoginModal';
 import toast from 'react-hot-toast';
 
 const LandingPage: React.FC = () => {
@@ -145,8 +144,8 @@ const LandingPage: React.FC = () => {
                     size="lg"
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white border-white font-semibold w-full sm:w-auto transition-all duration-300"
                   >
-                    <Search size={18} className="mr-2 flex-shrink-0" />
-                    <span className="text-green-deep">Buscar Profissional</span>
+                    <Search size={18} className="mr-2 flex-shrink-0" style={{ color: '#1B4332' }} />
+                    <span style={{ color: '#1B4332' }}>Buscar Profissional</span>
                   </Button>
                   <Button 
                     onClick={() => setIsCadastroProfissionalOpen(true)}
@@ -254,8 +253,8 @@ const LandingPage: React.FC = () => {
                     iconPosition="right" 
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white font-semibold transition-all duration-300"
                   >
-                    <span className="text-green-deep">Cadastrar Empresa</span>
-                    <ArrowRight size={18} className="ml-2 flex-shrink-0" />
+                    <span style={{ color: '#1B4332' }}>Cadastrar Empresa</span>
+                    <ArrowRight size={18} className="ml-2 flex-shrink-0" style={{ color: '#1B4332' }} />
                   </Button>
                 </button>
               </div>
@@ -284,8 +283,8 @@ const LandingPage: React.FC = () => {
                     iconPosition="right" 
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white font-semibold transition-all duration-300"
                   >
-                    <span className="text-green-deep">Cadastrar Profissional</span>
-                    <ArrowRight size={18} className="ml-2 flex-shrink-0" />
+                    <span style={{ color: '#1B4332' }}>Cadastrar Profissional</span>
+                    <ArrowRight size={18} className="ml-2 flex-shrink-0" style={{ color: '#1B4332' }} />
                   </Button>
                 </button>
               </div>
@@ -420,7 +419,7 @@ const LandingPage: React.FC = () => {
                   size="lg"
                   className="bg-white text-green-deep hover:bg-green-deep hover:text-white border-white font-semibold w-full sm:w-auto transition-all duration-300"
                 >
-                  <span className="text-green-deep">Cadastrar Empresa</span>
+                  <span style={{ color: '#1B4332' }}>Cadastrar Empresa</span>
                 </Button>
               </button>
               <button onClick={() => setIsCadastroProfissionalOpen(true)}>
@@ -429,7 +428,7 @@ const LandingPage: React.FC = () => {
                   size="lg"
                   className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
                 >
-                  <span>Cadastrar Profissional</span>
+                  <span style={{ color: '#1B4332' }}>Cadastrar Profissional</span>
                 </Button>
               </button>
             </div>
@@ -460,18 +459,6 @@ const LandingPage: React.FC = () => {
       <CadastroProfissionalModal 
         isOpen={isCadastroProfissionalOpen} 
         onClose={() => setIsCadastroProfissionalOpen(false)} 
-      />
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)}
-        onOpenCadastroEmpresa={() => {
-          setIsLoginModalOpen(false);
-          setIsCadastroEmpresaOpen(true);
-        }}
-        onOpenCadastroProfissional={() => {
-          setIsLoginModalOpen(false);
-          setIsCadastroProfissionalOpen(true);
-        }}
       />
     </>
   );
