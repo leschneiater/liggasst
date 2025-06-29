@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { LucideIcon } from 'lucide-react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -8,14 +8,17 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
 }
 
-const Input: React.FC<InputProps> = ({
+const Input = forwardRef<HTMLInputElement, InputProps>(({
   label,
   error,
   icon: Icon,
   helperText,
   className = '',
+  id,
   ...props
-}) => {
+}, ref) => {
+  const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  
   const inputClasses = `
     w-full px-4 py-2 border rounded-lg font-roboto
     ${Icon ? 'pl-10' : ''}
@@ -31,7 +34,7 @@ const Input: React.FC<InputProps> = ({
   return (
     <div className="space-y-1">
       {label && (
-        <label className="block font-roboto font-medium text-soft-black text-sm">
+        <label htmlFor={inputId} className="block font-roboto font-medium text-soft-black text-sm">
           {label}
         </label>
       )}
@@ -40,21 +43,32 @@ const Input: React.FC<InputProps> = ({
           <Icon 
             size={18} 
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+            aria-hidden="true"
           />
         )}
         <input
+          id={inputId}
+          ref={ref}
           className={inputClasses}
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
           {...props}
         />
       </div>
       {error && (
-        <p className="text-red-500 text-sm font-roboto">{error}</p>
+        <p id={`${inputId}-error`} className="text-red-500 text-sm font-roboto" role="alert">
+          {error}
+        </p>
       )}
       {helperText && !error && (
-        <p className="text-gray-500 text-sm font-roboto">{helperText}</p>
+        <p id={`${inputId}-helper`} className="text-gray-500 text-sm font-roboto">
+          {helperText}
+        </p>
       )}
     </div>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input;

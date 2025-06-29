@@ -6,15 +6,43 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   body {
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
+    color: #1A1A1A;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Poppins', sans-serif;
+    line-height: 1.2;
+  }
+
+  /* Melhorias de acessibilidade para foco */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid #1B4332;
+    outline-offset: 2px;
+  }
+
+  /* Melhorias para leitores de tela */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
 }
 
@@ -32,6 +60,15 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Utilitários para animações otimizadas */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
 }
 
 /* Melhorias de performance e animações */
@@ -42,15 +79,21 @@
 img {
   max-width: 100%;
   height: auto;
+  display: block;
 }
 
-/* Focus states melhorados */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #1B4332;
-  outline-offset: 2px;
+/* Otimização para imagens */
+@media (prefers-reduced-motion: no-preference) {
+  .lazy-load {
+    transition: opacity 0.3s ease-in-out;
+  }
+}
+
+/* Melhorias para dispositivos de toque */
+@media (hover: hover) {
+  .hover-effect:hover {
+    transform: translateY(-2px);
+  }
 }
 
 /* Scrollbar customizada */
@@ -69,4 +112,21 @@ textarea:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #2D6A4F;
+}
+
+/* Melhorias para impressão */
+@media print {
+  body {
+    color: #000;
+    background: #fff;
+  }
+  
+  a {
+    text-decoration: underline;
+    color: #1B4332;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
 }

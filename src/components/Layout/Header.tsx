@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, Building2, LogOut, Bell } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -14,6 +14,7 @@ const Header: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   
   // Firebase Auth (sistema original)
   const { currentUser, userType, logout } = useAuth();
@@ -23,6 +24,16 @@ const Header: React.FC = () => {
   
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Detectar scroll para efeito visual no header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -85,11 +96,11 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-white shadow-lg sticky top-0 z-40 border-b border-gray-100">
+      <header className={`bg-white sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'shadow-lg border-b border-gray-100' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 group">
+            <Link to="/" className="flex items-center space-x-2 group" aria-label="LiggaSST - Página Inicial">
               <div className="w-10 h-10 bg-green-deep rounded-lg flex items-center justify-center group-hover:bg-green-medium transition-colors duration-300">
                 <span className="text-white font-bold text-lg">L</span>
               </div>
@@ -99,7 +110,7 @@ const Header: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-6 lg:space-x-8">
+            <nav className="hidden md:flex space-x-6 lg:space-x-8" aria-label="Navegação principal">
               {publicNavItems.map((item) => (
                 item.protected ? (
                   <button
@@ -110,6 +121,7 @@ const Header: React.FC = () => {
                         ? 'text-green-deep font-semibold'
                         : 'text-gray-700 hover:text-green-deep'
                     }`}
+                    aria-current={isActive(item.path) ? 'page' : undefined}
                   >
                     {item.label}
                     {isActive(item.path) && (
@@ -125,6 +137,7 @@ const Header: React.FC = () => {
                         ? 'text-green-deep font-semibold'
                         : 'text-gray-700 hover:text-green-deep'
                     }`}
+                    aria-current={isActive(item.path) ? 'page' : undefined}
                   >
                     {item.label}
                     {isActive(item.path) && (
@@ -140,14 +153,15 @@ const Header: React.FC = () => {
               {isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   {/* Notifications */}
-                  <button className="p-2 text-gray-600 hover:text-green-deep transition-colors duration-300 relative">
+                  <button className="p-2 text-gray-600 hover:text-green-deep transition-colors duration-300 relative" aria-label="Notificações">
                     <Bell size={20} />
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-medium rounded-full"></span>
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-medium rounded-full" aria-hidden="true"></span>
                   </button>
                   
                   <Link
                     to={getDashboardLink()}
                     className="flex items-center space-x-2 px-4 py-2 bg-green-light text-green-deep rounded-lg hover:bg-green-deep hover:text-white transition-all duration-300 font-semibold border border-green-light shadow-sm hover:shadow-md"
+                    aria-label="Acessar Dashboard"
                   >
                     {supabaseUser ? <User size={16} /> : userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
                     <span>Dashboard</span>
@@ -155,6 +169,7 @@ const Header: React.FC = () => {
                   <button
                     onClick={handleLogout}
                     className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-red-600 transition-colors duration-300 font-semibold"
+                    aria-label="Sair da conta"
                   >
                     <LogOut size={16} />
                     <span>Sair</span>
@@ -203,6 +218,8 @@ const Header: React.FC = () => {
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-deep focus:outline-none transition-colors duration-300"
+              aria-expanded={isMenuOpen}
+              aria-label="Menu principal"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -225,6 +242,7 @@ const Header: React.FC = () => {
                           ? 'text-green-deep bg-green-light font-semibold'
                           : 'text-gray-700 hover:text-green-deep hover:bg-neutral-gray'
                       }`}
+                      aria-current={isActive(item.path) ? 'page' : undefined}
                     >
                       {item.label}
                     </button>
@@ -238,6 +256,7 @@ const Header: React.FC = () => {
                           ? 'text-green-deep bg-green-light font-semibold'
                           : 'text-gray-700 hover:text-green-deep hover:bg-neutral-gray'
                       }`}
+                      aria-current={isActive(item.path) ? 'page' : undefined}
                     >
                       {item.label}
                     </Link>

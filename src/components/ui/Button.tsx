@@ -49,14 +49,15 @@ const Button: React.FC<ButtonProps> = ({
       className={combinedClasses}
       disabled={disabled || loading}
       {...props}
+      aria-busy={loading}
     >
       {loading ? (
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
+        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current" aria-hidden="true"></div>
       ) : (
         <>
-          {Icon && iconPosition === 'left' && <Icon size={18} className="mr-2 flex-shrink-0" />}
+          {Icon && iconPosition === 'left' && <Icon size={18} className="mr-2 flex-shrink-0" aria-hidden="true" />}
           <span className="truncate">{children}</span>
-          {Icon && iconPosition === 'right' && <Icon size={18} className="ml-2 flex-shrink-0" />}
+          {Icon && iconPosition === 'right' && <Icon size={18} className="ml-2 flex-shrink-0" aria-hidden="true" />}
         </>
       )}
     </Component>

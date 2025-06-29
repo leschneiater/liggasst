@@ -24,10 +24,12 @@ import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
 import LoginModal from '../components/LoginModal';
 import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet';
 
 const LandingPage: React.FC = () => {
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const navigate = useNavigate();
   
   const { currentUser } = useAuth();
@@ -43,8 +45,6 @@ const LandingPage: React.FC = () => {
       setIsLoginModalOpen(true);
     }
   };
-
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const handleProtectedAction = (action: () => void, actionName: string) => {
     if (!isLoggedIn) {
@@ -121,6 +121,13 @@ const LandingPage: React.FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>LiggaSST - Conectando Profissionais de SST com Empresas</title>
+        <meta name="description" content="Encontre e contrate especialistas de Segurança do Trabalho qualificados em qualquer lugar do Brasil. Conecte-se com confiança e segurança." />
+        <meta name="keywords" content="segurança do trabalho, SST, profissionais SST, técnico segurança, engenheiro segurança, PCMSO, PPRA, NR, consultoria SST" />
+        <link rel="canonical" href="https://liggasst.com.br/" />
+      </Helmet>
+      
       <div className="min-h-screen">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-green-deep via-green-medium to-green-light text-white py-12 md:py-20 relative overflow-hidden">
@@ -154,8 +161,8 @@ const LandingPage: React.FC = () => {
                     size="lg"
                     className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
                   >
-                    <Users size={18} className="mr-2 flex-shrink-0" style={{ color: '#1B4332' }} />
-                    <span style={{ color: '#1B4332' }}>Sou Profissional</span>
+                    <Users size={18} className="mr-2 flex-shrink-0" />
+                    <span>Sou Profissional</span>
                   </Button>
                 </div>
               </div>
@@ -166,6 +173,9 @@ const LandingPage: React.FC = () => {
                     src="https://images.pexels.com/photos/5256816/pexels-photo-5256816.jpeg" 
                     alt="Profissionais de Segurança do Trabalho"
                     className="rounded-2xl shadow-2xl w-full h-auto"
+                    loading="lazy"
+                    width="600"
+                    height="400"
                   />
                 </div>
               </div>
@@ -293,6 +303,26 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Publique Demanda CTA */}
+        <section className="py-16 bg-neutral-gray">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="font-poppins font-bold text-2xl md:text-3xl text-soft-black mb-6">
+              Não encontrou o profissional ideal?
+            </h2>
+            <p className="font-roboto text-lg text-gray-600 mb-8">
+              Publique sua demanda e receba propostas de profissionais qualificados
+            </p>
+            <Button 
+              onClick={() => handleProtectedAction(() => navigate('/publique-demanda'), 'publicar demanda')}
+              size="lg"
+              icon={Plus}
+              className="bg-green-deep text-white hover:bg-green-medium font-semibold"
+            >
+              Publicar Demanda
+            </Button>
+          </div>
+        </section>
+
         {/* Testimonials */}
         <section className="py-12 md:py-20 bg-neutral-gray">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -382,26 +412,6 @@ const LandingPage: React.FC = () => {
                 </p>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Publique Demanda CTA */}
-        <section className="py-16 bg-neutral-gray">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-poppins font-bold text-2xl md:text-3xl text-soft-black mb-6">
-              Não encontrou o profissional ideal?
-            </h2>
-            <p className="font-roboto text-lg text-gray-600 mb-8">
-              Publique sua demanda e receba propostas de profissionais qualificados
-            </p>
-            <Button 
-              onClick={() => handleProtectedAction(() => navigate('/publique-demanda'), 'publicar demanda')}
-              size="lg"
-              icon={Plus}
-              className="bg-green-deep text-white hover:bg-green-medium font-semibold"
-            >
-              Publicar Demanda
-            </Button>
           </div>
         </section>
 
