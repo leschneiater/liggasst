@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, 
   Users, 
@@ -27,13 +27,28 @@ import toast from 'react-hot-toast';
 const LandingPage: React.FC = () => {
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
+  const navigate = useNavigate();
   
   const { currentUser } = useAuth();
   const { user: supabaseUser } = useSupabaseAuth();
 
+  const isLoggedIn = currentUser || supabaseUser;
+
+  const handleBuscarProfissional = () => {
+    if (isLoggedIn) {
+      navigate('/busca-profissionais');
+    } else {
+      toast.error('Você precisa estar logado para buscar profissionais');
+      setIsLoginModalOpen(true);
+    }
+  };
+
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
   const handleProtectedAction = (action: () => void, actionName: string) => {
-    if (!currentUser && !supabaseUser) {
+    if (!isLoggedIn) {
       toast.error(`Você precisa estar logado para ${actionName}`);
+      setIsLoginModalOpen(true);
       return;
     }
     action();
@@ -125,7 +140,7 @@ const LandingPage: React.FC = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                   <Button 
-                    onClick={() => handleProtectedAction(() => window.location.href = '/busca-profissionais', 'buscar profissionais')}
+                    onClick={handleBuscarProfissional}
                     size="lg"
                     className="bg-white text-green-deep hover:bg-green-deep hover:text-white border-white font-semibold w-full sm:w-auto transition-all duration-300"
                   >
@@ -138,8 +153,8 @@ const LandingPage: React.FC = () => {
                     size="lg"
                     className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
                   >
-                    <Users size={18} className="mr-2 flex-shrink-0" style={{ color: '#1B4332' }} />
-                    <span style={{ color: '#1B4332' }}>Sou Profissional</span>
+                    <Users size={18} className="mr-2 flex-shrink-0" />
+                    <span>Sou Profissional</span>
                   </Button>
                 </div>
               </div>
@@ -369,6 +384,26 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Publique Demanda CTA */}
+        <section className="py-16 bg-neutral-gray">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="font-poppins font-bold text-2xl md:text-3xl text-soft-black mb-6">
+              Não encontrou o profissional ideal?
+            </h2>
+            <p className="font-roboto text-lg text-gray-600 mb-8">
+              Publique sua demanda e receba propostas de profissionais qualificados
+            </p>
+            <Button 
+              onClick={() => handleProtectedAction(() => navigate('/publique-demanda'), 'publicar demanda')}
+              size="lg"
+              icon={Plus}
+              className="bg-green-deep text-white hover:bg-green-medium font-semibold"
+            >
+              Publicar Demanda
+            </Button>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-12 md:py-20 bg-gradient-to-r from-green-deep to-green-medium text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -412,26 +447,6 @@ const LandingPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Publique Demanda CTA */}
-        <section className="py-16 bg-neutral-gray">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-poppins font-bold text-2xl md:text-3xl text-soft-black mb-6">
-              Não encontrou o profissional ideal?
-            </h2>
-            <p className="font-roboto text-lg text-gray-600 mb-8">
-              Publique sua demanda e receba propostas de profissionais qualificados
-            </p>
-            <Button 
-              onClick={() => handleProtectedAction(() => window.location.href = '/publique-demanda', 'publicar demanda')}
-              size="lg"
-              icon={Plus}
-              className="bg-green-deep text-white hover:bg-green-medium font-semibold"
-            >
-              Publicar Demanda
-            </Button>
           </div>
         </section>
       </div>
