@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, 
@@ -22,6 +22,7 @@ import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
+import LoginModal from '../components/LoginModal';
 import toast from 'react-hot-toast';
 
 const LandingPage: React.FC = () => {
@@ -154,7 +155,7 @@ const LandingPage: React.FC = () => {
                     className="border-white text-white hover:bg-white hover:text-green-deep font-semibold w-full sm:w-auto transition-all duration-300"
                   >
                     <Users size={18} className="mr-2 flex-shrink-0" />
-                    <span>Sou Profissional</span>
+                    <span style={{ color: '#1B4332' }}>Sou Profissional</span>
                   </Button>
                 </div>
               </div>
@@ -459,6 +460,18 @@ const LandingPage: React.FC = () => {
       <CadastroProfissionalModal 
         isOpen={isCadastroProfissionalOpen} 
         onClose={() => setIsCadastroProfissionalOpen(false)} 
+      />
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)}
+        onOpenCadastroEmpresa={() => {
+          setIsLoginModalOpen(false);
+          setIsCadastroEmpresaOpen(true);
+        }}
+        onOpenCadastroProfissional={() => {
+          setIsLoginModalOpen(false);
+          setIsCadastroProfissionalOpen(true);
+        }}
       />
     </>
   );
