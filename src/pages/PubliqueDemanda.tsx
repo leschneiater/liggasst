@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 
   Building2, 
@@ -10,8 +11,11 @@ import {
   Users,
   Clock,
   Send,
-  CheckCircle
+  CheckCircle,
+  Shield
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -37,8 +41,20 @@ const PubliqueDemanda: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [demandPublished, setDemandPublished] = useState(false);
+  const navigate = useNavigate();
+  
+  const { currentUser } = useAuth();
+  const { user: supabaseUser } = useSupabaseAuth();
   
   const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<DemandFormData>();
+
+  // Verificar se o usuário está logado
+  useEffect(() => {
+    if (!currentUser && !supabaseUser) {
+      toast.error('Você precisa estar logado para publicar uma demanda');
+      navigate('/');
+    }
+  }, [currentUser, supabaseUser, navigate]);
 
   const tiposServico = [
     'PCMSO - Programa de Controle Médico de Saúde Ocupacional',
@@ -82,6 +98,44 @@ const PubliqueDemanda: React.FC = () => {
   const prevStep = () => {
     setStep(step - 1);
   };
+
+  if (!currentUser && !supabaseUser) {
+    return (
+      <div className="min-h-screen bg-neutral-gray py-8">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Shield size={32} className="text-yellow-600" />
+            </div>
+            
+            <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
+              Acesso Restrito
+            </h2>
+            
+            <p className="font-roboto text-gray-600 mb-6">
+              Você precisa estar logado para publicar uma demanda.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                onClick={() => navigate('/')}
+                variant="outline"
+                className="flex-1"
+              >
+                Voltar ao Início
+              </Button>
+              <Button 
+                onClick={() => navigate('/login')}
+                className="flex-1"
+              >
+                Fazer Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (demandPublished) {
     return (
@@ -390,7 +444,7 @@ const PubliqueDemanda: React.FC = () => {
                 <Input
                   label="Telefone"
                   icon={Clock}
-                  placeholder="(11) 99999-9999"
+                  placeholder="(11) 98886-1490"
                   error={errors.telefone?.message}
                   {...register('telefone', { required: 'Telefone é obrigatório' })}
                 />

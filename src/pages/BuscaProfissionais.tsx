@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, 
   Filter, 
@@ -13,10 +13,14 @@ import {
   DollarSign,
   CheckCircle,
   Plus,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Shield
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
+import toast from 'react-hot-toast';
 
 interface Professional {
   id: string;
@@ -149,6 +153,18 @@ const BuscaProfissionais: React.FC = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
+  
+  const { currentUser } = useAuth();
+  const { user: supabaseUser } = useSupabaseAuth();
+  const navigate = useNavigate();
+  
+  // Verificar se o usuário está logado
+  useEffect(() => {
+    if (!currentUser && !supabaseUser) {
+      toast.error('Você precisa estar logado para buscar profissionais');
+      navigate('/');
+    }
+  }, [currentUser, supabaseUser, navigate]);
 
   const estados = [
     { sigla: 'AC', nome: 'Acre' },
@@ -283,13 +299,51 @@ const BuscaProfissionais: React.FC = () => {
 
   const handleContactProfessional = (professionalId: string) => {
     // Simular contato com profissional
-    alert(`Entrando em contato com o profissional ${professionalId}`);
+    toast.success(`Entrando em contato com o profissional ${professionalId}`);
   };
 
   const handleViewProfile = (professionalId: string) => {
     // Redirecionar para perfil do profissional
     window.location.href = `/perfil-profissional-publico/${professionalId}`;
   };
+
+  if (!currentUser && !supabaseUser) {
+    return (
+      <div className="min-h-screen bg-neutral-gray py-8">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Shield size={32} className="text-yellow-600" />
+            </div>
+            
+            <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
+              Acesso Restrito
+            </h2>
+            
+            <p className="font-roboto text-gray-600 mb-6">
+              Você precisa estar logado para buscar profissionais.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                onClick={() => navigate('/')}
+                variant="outline"
+                className="flex-1"
+              >
+                Voltar ao Início
+              </Button>
+              <Button 
+                onClick={() => navigate('/login')}
+                className="flex-1"
+              >
+                Fazer Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -631,8 +685,7 @@ const BuscaProfissionais: React.FC = () => {
               Publique sua demanda e receba propostas de profissionais qualificados
             </p>
             <Button 
-              as={Link}
-              to="/publique-demanda"
+              onClick={() => navigate('/publique-demanda')}
               size="lg"
               className="bg-green-light text-green-deep hover:bg-white font-semibold"
               icon={Plus}

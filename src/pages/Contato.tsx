@@ -29,12 +29,28 @@ const Contato: React.FC = () => {
   const onSubmit = async (data: ContactFormData) => {
     setLoading(true);
     try {
-      // Simular envio do formulário
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Mensagem enviada com sucesso! Retornaremos em breve.');
+      // Criar o corpo do email
+      const emailBody = `
+Nome: ${data.nome}
+Email: ${data.email}
+Telefone: ${data.telefone || 'Não informado'}
+Empresa: ${data.empresa || 'Não informado'}
+Assunto: ${data.assunto}
+
+Mensagem:
+${data.mensagem}
+      `.trim();
+
+      // Criar o link mailto
+      const mailtoLink = `mailto:contato@liggasst.com.br?subject=${encodeURIComponent(data.assunto)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Abrir o cliente de email
+      window.location.href = mailtoLink;
+      
+      toast.success('Cliente de email aberto! Complete o envio da mensagem.');
       reset();
     } catch (error) {
-      toast.error('Erro ao enviar mensagem. Tente novamente.');
+      toast.error('Erro ao processar formulário. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -50,8 +66,8 @@ const Contato: React.FC = () => {
     {
       icon: Phone,
       title: 'Telefone',
-      content: '(11) 99999-9999',
-      link: 'tel:+5511999999999'
+      content: '(11) 98886-1490',
+      link: 'tel:+5511988861490'
     },
     {
       icon: MapPin,
@@ -112,7 +128,7 @@ const Contato: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Telefone"
-                    placeholder="(11) 99999-9999"
+                    placeholder="(11) 98886-1490"
                     error={errors.telefone?.message}
                     {...register('telefone')}
                   />

@@ -30,13 +30,12 @@ const Error404: React.FC = () => {
           
           <Button
             as={Link}
-            to="/busca-profissionais"
+            to="/planos"
             variant="outline"
             size="lg"
-            icon={Search}
             className="border-white text-white hover:bg-white hover:text-green-deep w-full"
           >
-            Buscar Profissionais
+            Ver Planos
           </Button>
           
           <button
@@ -55,11 +54,11 @@ const Error404: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center justify-center space-x-2">
               <Mail size={16} />
-              <span className="font-roboto text-sm">suporte@liggasst.com.br</span>
+              <span className="font-roboto text-sm">contato@liggasst.com.br</span>
             </div>
             <div className="flex items-center justify-center space-x-2">
               <Phone size={16} />
-              <span className="font-roboto text-sm">(11) 99999-9999</span>
+              <span className="font-roboto text-sm">(11) 98886-1490</span>
             </div>
           </div>
         </div>

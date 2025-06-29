@@ -222,13 +222,13 @@ const FAQ: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:suporte@liggasst.com.br"
+              href="mailto:contato@liggasst.com.br"
               className="px-8 py-3 bg-white text-green-deep rounded-lg hover:bg-green-light transition-colors duration-200 font-roboto font-medium"
             >
               Enviar E-mail
             </a>
             <a
-              href="https://wa.me/5511999999999"
+              href="https://wa.me/5511988861490"
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-green-deep transition-colors duration-200 font-roboto font-medium"

@@ -14,15 +14,30 @@ import {
   TrendingUp,
   MapPin,
   Phone,
-  Mail
+  Mail,
+  Plus
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
+import toast from 'react-hot-toast';
 
 const LandingPage: React.FC = () => {
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
+  
+  const { currentUser } = useAuth();
+  const { user: supabaseUser } = useSupabaseAuth();
+
+  const handleProtectedAction = (action: () => void, actionName: string) => {
+    if (!currentUser && !supabaseUser) {
+      toast.error(`Você precisa estar logado para ${actionName}`);
+      return;
+    }
+    action();
+  };
 
   const steps = [
     {
@@ -109,15 +124,14 @@ const LandingPage: React.FC = () => {
                   Conecte-se com confiança e segurança.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  <Link to="/busca-profissionais">
-                    <Button 
-                      size="lg"
-                      className="bg-white text-green-deep hover:bg-green-deep hover:text-white border-white font-semibold w-full sm:w-auto transition-all duration-300"
-                    >
-                      <Search size={18} className="mr-2 flex-shrink-0" style={{ color: '#1B4332' }} />
-                      <span style={{ color: '#1B4332' }}>Buscar Profissional</span>
-                    </Button>
-                  </Link>
+                  <Button 
+                    onClick={() => handleProtectedAction(() => window.location.href = '/busca-profissionais', 'buscar profissionais')}
+                    size="lg"
+                    className="bg-white text-green-deep hover:bg-green-deep hover:text-white border-white font-semibold w-full sm:w-auto transition-all duration-300"
+                  >
+                    <Search size={18} className="mr-2 flex-shrink-0" style={{ color: '#1B4332' }} />
+                    <span style={{ color: '#1B4332' }}>Buscar Profissional</span>
+                  </Button>
                   <Button 
                     onClick={() => setIsCadastroProfissionalOpen(true)}
                     variant="outline"
@@ -394,10 +408,30 @@ const LandingPage: React.FC = () => {
                 </div>
                 <div className="flex items-center">
                   <Phone size={16} className="mr-2" />
-                  <span>(11) 99999-9999</span>
+                  <span>(11) 98886-1490</span>
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Publique Demanda CTA */}
+        <section className="py-16 bg-neutral-gray">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="font-poppins font-bold text-2xl md:text-3xl text-soft-black mb-6">
+              Não encontrou o profissional ideal?
+            </h2>
+            <p className="font-roboto text-lg text-gray-600 mb-8">
+              Publique sua demanda e receba propostas de profissionais qualificados
+            </p>
+            <Button 
+              onClick={() => handleProtectedAction(() => window.location.href = '/publique-demanda', 'publicar demanda')}
+              size="lg"
+              icon={Plus}
+              className="bg-green-deep text-white hover:bg-green-medium font-semibold"
+            >
+              Publicar Demanda
+            </Button>
           </div>
         </section>
       </div>

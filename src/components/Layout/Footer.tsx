@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
               </a>
               
               <a 
-                href="https://wa.me/5511999999999" 
+                href="https://wa.me/5511988861490" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-green-medium bg-opacity-30 rounded-lg flex items-center justify-center text-green-light hover:bg-green-light hover:text-green-deep transition-all duration-300 group"
@@ -148,24 +148,6 @@ const Footer: React.FC = () => {
                   Contato
                 </Link>
               </li>
-              <li>
-                <Link to="/dashboard-profissional" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
-                  <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
-                  Dashboard Profissional
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard-empresa" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
-                  <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
-                  Dashboard Empresa
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
-                  <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
-                  Dashboard Admin
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -186,8 +168,8 @@ const Footer: React.FC = () => {
                 <Phone size={16} className="text-green-light mt-1 flex-shrink-0" />
                 <div>
                   <p className="text-green-light text-sm">Telefone</p>
-                  <a href="tel:+5511999999999" className="text-white hover:text-green-light transition-colors duration-200">
-                    (11) 99999-9999
+                  <a href="tel:+5511988861490" className="text-white hover:text-green-light transition-colors duration-200">
+                    (11) 98886-1490
                   </a>
                 </div>
               </div>
