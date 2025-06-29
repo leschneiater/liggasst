@@ -1,12 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import * as db from '../lib/database';
+
+interface User {
+  id: string;
+  email: string;
+  type: string;
+  [key: string]: any;
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
+  session: any | null;
   loading: boolean;
   signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -26,76 +32,52 @@ export const useSupabaseAuth = () => {
 
 export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Obter sessão inicial
-    const getInitialSession = async () => {
+    // Verificar se há sessão salva
+    const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
+        const sessionData = localStorage.getItem('db_session');
+        
+        if (sessionData) {
+          const parsedSession = JSON.parse(sessionData);
+          
+          // Verificar se a sessão ainda é válida
+          if (new Date(parsedSession.expires_at) > new Date()) {
+            setSession(parsedSession);
+            setUser(parsedSession.user);
+          } else {
+            // Sessão expirada
+            localStorage.removeItem('db_session');
+          }
+        }
       } catch (error) {
-        console.error('Erro ao obter sessão:', error);
+        console.error('Erro ao verificar sessão:', error);
+        localStorage.removeItem('db_session');
       } finally {
         setLoading(false);
       }
     };
 
-    getInitialSession();
-
-    // Escutar mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-
-        if (event === 'SIGNED_IN') {
-          toast.success('Login realizado com sucesso!');
-          navigate('/dashboard');
-        } else if (event === 'SIGNED_OUT') {
-          toast.success('Logout realizado com sucesso!');
-          navigate('/');
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    checkSession();
+  }, []);
 
   const signUp = async (email: string, password: string, userData?: any) => {
     setLoading(true);
     try {
-      const { error, data } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData || {},
-        }
-      });
-
-      if (error) throw error;
-
-      // Se o usuário foi criado com sucesso, salvar dados adicionais
-      if (data.user) {
-        // Aqui você pode salvar dados adicionais no perfil do usuário
-        // Por exemplo, usando a tabela 'profiles'
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            ...userData,
-            updated_at: new Date().toISOString(),
-          });
-
-        if (profileError) {
-          console.error('Erro ao salvar perfil:', profileError);
-        }
+      // Determinar tipo de usuário
+      const userType = userData?.type || 'professional';
+      
+      // Registrar usuário
+      const result = await db.registerUser(email, password, userData, userType);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao criar conta');
       }
-
+      
       toast.success('Conta criada com sucesso! Verifique seu email para confirmar.');
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
@@ -109,12 +91,34 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      // Autenticar usuário
+      const result = await db.authenticateUser(email, password);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao fazer login');
+      }
+      
+      // Verificar se o email foi confirmado
+      if (!result.user.verified) {
+        toast.error('Por favor, confirme seu e-mail antes de fazer login.');
+        throw new Error('Email não verificado');
+      }
+      
+      // Criar objeto de sessão
+      const sessionData = {
+        user: result.user,
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
+      };
+      
+      // Salvar sessão
+      localStorage.setItem('db_session', JSON.stringify(sessionData));
+      
+      // Atualizar estado
+      setUser(result.user);
+      setSession(sessionData);
+      
+      toast.success('Login realizado com sucesso!');
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Erro no login:', error);
       toast.error(error.message || 'Erro ao fazer login');
@@ -127,8 +131,15 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const signOut = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Limpar sessão
+      localStorage.removeItem('db_session');
+      
+      // Atualizar estado
+      setUser(null);
+      setSession(null);
+      
+      toast.success('Logout realizado com sucesso!');
+      navigate('/');
     } catch (error: any) {
       console.error('Erro no logout:', error);
       toast.error(error.message || 'Erro ao fazer logout');
@@ -140,11 +151,11 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const resetPassword = async (email: string) => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
+      const result = await db.resetPassword(email);
       
-      if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao enviar e-mail de recuperação');
+      }
       
       toast.success('E-mail de recuperação enviado!');
     } catch (error: any) {

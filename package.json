@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup-db": "node src/scripts/setup-database.js",
+    "migrate": "vite --port 3000 --open /migracao"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
     "firebase": "^10.13.0",
     "framer-motion": "^11.3.0",
     "lucide-react": "^0.344.0",
+    "mysql2": "^3.9.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",

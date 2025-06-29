@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { supabase, testConnection } from '../lib/supabase';
 import { CheckCircle, AlertCircle, Database } from 'lucide-react';
+import * as db from '../lib/database';
 
 const SupabaseTest: React.FC = () => {
   const [connectionStatus, setConnectionStatus] = useState<'testing' | 'success' | 'error'>('testing');
@@ -9,16 +9,11 @@ const SupabaseTest: React.FC = () => {
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        // Primeiro, tente testar a conexão com a tabela _test
-        const result = await testConnection();
+        // Testar conexão com o banco de dados
+        const result = await db.testConnection();
         
         if (!result.success) {
-          // Se falhar, tente o método de sessão como fallback
-          const { data, error } = await supabase.auth.getSession();
-          
-          if (error) {
-            throw error;
-          }
+          throw new Error(result.error || 'Erro desconhecido na conexão');
         }
         
         // Se chegamos aqui, a conexão está funcionando

@@ -33,6 +33,7 @@ const PubliqueDemanda = lazy(() => import('./pages/PubliqueDemanda'));
 const PerfilProfissionalPublico = lazy(() => import('./pages/PerfilProfissionalPublico'));
 const RecuperarSenha = lazy(() => import('./pages/RecuperarSenha'));
 const Error404 = lazy(() => import('./pages/Error404'));
+const MigrationPage = lazy(() => import('./pages/MigrationPage'));
 
 // Auth Pages (Supabase)
 const Login = lazy(() => import('./pages/auth/Login'));
@@ -107,6 +108,7 @@ function App() {
                 <Route path="/publique-demanda" element={<Layout><PubliqueDemanda /></Layout>} />
                 <Route path="/perfil-profissional-publico/:id" element={<Layout><PerfilProfissionalPublico /></Layout>} />
                 <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+                <Route path="/migracao" element={<MigrationPage />} />
 
                 {/* Supabase Auth Routes */}
                 <Route path="/auth/login" element={<Login />} />
