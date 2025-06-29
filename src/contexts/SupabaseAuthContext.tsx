@@ -8,9 +8,10 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,10 +33,15 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     // Obter sessão inicial
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Erro ao obter sessão:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getInitialSession();
@@ -60,15 +66,35 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, userData?: any) => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: userData || {},
+        }
       });
 
       if (error) throw error;
+
+      // Se o usuário foi criado com sucesso, salvar dados adicionais
+      if (data.user) {
+        // Aqui você pode salvar dados adicionais no perfil do usuário
+        // Por exemplo, usando a tabela 'profiles'
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            ...userData,
+            updated_at: new Date().toISOString(),
+          });
+
+        if (profileError) {
+          console.error('Erro ao salvar perfil:', profileError);
+        }
+      }
 
       toast.success('Conta criada com sucesso! Verifique seu email para confirmar.');
     } catch (error: any) {
@@ -111,6 +137,25 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  const resetPassword = async (email: string) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      toast.success('E-mail de recuperação enviado!');
+    } catch (error: any) {
+      console.error('Erro na recuperação de senha:', error);
+      toast.error(error.message || 'Erro ao enviar e-mail de recuperação');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     session,
@@ -118,6 +163,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     signUp,
     signIn,
     signOut,
+    resetPassword
   };
 
   return (

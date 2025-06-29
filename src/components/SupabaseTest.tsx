@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, testConnection } from '../lib/supabase';
 import { CheckCircle, AlertCircle, Database } from 'lucide-react';
 
 const SupabaseTest: React.FC = () => {
@@ -7,17 +7,21 @@ const SupabaseTest: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
-    const testConnection = async () => {
+    const checkConnection = async () => {
       try {
-        // Test connection using Supabase auth session check
-        // This is more reliable than querying a specific table
-        const { data, error } = await supabase.auth.getSession();
+        // Primeiro, tente testar a conexão com a tabela _test
+        const result = await testConnection();
         
-        if (error) {
-          throw error;
+        if (!result.success) {
+          // Se falhar, tente o método de sessão como fallback
+          const { data, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            throw error;
+          }
         }
         
-        // If we get here, the connection is working
+        // Se chegamos aqui, a conexão está funcionando
         setConnectionStatus('success');
         
       } catch (error: any) {
@@ -27,7 +31,12 @@ const SupabaseTest: React.FC = () => {
       }
     };
 
-    testConnection();
+    checkConnection();
+
+    // Configurar um intervalo para verificar a conexão periodicamente
+    const interval = setInterval(checkConnection, 60000); // Verifica a cada minuto
+    
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -36,7 +45,7 @@ const SupabaseTest: React.FC = () => {
         <Database size={20} className="text-green-deep" />
         <div>
           <h3 className="font-poppins font-semibold text-sm text-soft-black">
-            Status Supabase
+            Status Banco de Dados
           </h3>
           <div className="flex items-center space-x-2 mt-1">
             {connectionStatus === 'testing' && (
