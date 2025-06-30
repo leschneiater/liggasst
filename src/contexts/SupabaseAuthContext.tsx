@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import * as db from '../lib/database';
+import { supabase } from '../lib/supabase';
+import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -12,7 +13,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  session: any | null;
+  session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -32,56 +33,109 @@ export const useSupabaseAuth = () => {
 
 export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<any | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Verificar se há sessão salva
-    const checkSession = async () => {
-      try {
-        const sessionData = localStorage.getItem('db_session');
-        
-        if (sessionData) {
-          const parsedSession = JSON.parse(sessionData);
-          
-          // Verificar se a sessão ainda é válida
-          if (new Date(parsedSession.expires_at) > new Date()) {
-            setSession(parsedSession);
-            setUser(parsedSession.user);
-          } else {
-            // Sessão expirada
-            localStorage.removeItem('db_session');
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
-        localStorage.removeItem('db_session');
-      } finally {
-        setLoading(false);
+    // Verificar sessão atual
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        loadUserProfile(session.user);
       }
-    };
+      setLoading(false);
+    });
 
-    checkSession();
+    // Escutar mudanças de autenticação
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
+      
+      if (session?.user) {
+        await loadUserProfile(session.user);
+      } else {
+        setUser(null);
+      }
+      
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', supabaseUser.id)
+        .single();
+
+      if (error) {
+        console.error('Erro ao carregar perfil:', error);
+        return;
+      }
+
+      const userData: User = {
+        id: supabaseUser.id,
+        email: supabaseUser.email!,
+        type: data?.type || 'professional',
+        ...data
+      };
+
+      setUser(userData);
+    } catch (error) {
+      console.error('Erro ao carregar dados do usuário:', error);
+    }
+  };
 
   const signUp = async (email: string, password: string, userData?: any) => {
     setLoading(true);
     try {
-      // Determinar tipo de usuário
-      const userType = userData?.type || 'professional';
-      
-      // Registrar usuário
-      const result = await db.registerUser(email, password, userData, userType);
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao criar conta');
+      // Registrar usuário no Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        // Salvar dados adicionais na tabela users
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email,
+            type: userData?.type || 'professional',
+            ...userData,
+            created_at: new Date().toISOString()
+          });
+
+        if (profileError) {
+          console.error('Erro ao salvar perfil:', profileError);
+        }
       }
       
       toast.success('Conta criada com sucesso! Verifique seu email para confirmar.');
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
-      toast.error(error.message || 'Erro ao criar conta');
+      
+      let errorMessage = 'Erro ao criar conta';
+      
+      if (error.message?.includes('already registered')) {
+        errorMessage = 'Este e-mail já está em uso';
+      } else if (error.message?.includes('Password should be')) {
+        errorMessage = 'Senha muito fraca. Use pelo menos 6 caracteres';
+      } else if (error.message?.includes('Invalid email')) {
+        errorMessage = 'E-mail inválido';
+      }
+      
+      toast.error(errorMessage);
       throw error;
     } finally {
       setLoading(false);
@@ -92,36 +146,37 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setLoading(true);
     try {
       // Autenticar usuário
-      const result = await db.authenticateUser(email, password);
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao fazer login');
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
       }
-      
+
       // Verificar se o email foi confirmado
-      if (!result.user.verified) {
+      if (data.user && !data.user.email_confirmed_at) {
         toast.error('Por favor, confirme seu e-mail antes de fazer login.');
         throw new Error('Email não verificado');
       }
-      
-      // Criar objeto de sessão
-      const sessionData = {
-        user: result.user,
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
-      };
-      
-      // Salvar sessão
-      localStorage.setItem('db_session', JSON.stringify(sessionData));
-      
-      // Atualizar estado
-      setUser(result.user);
-      setSession(sessionData);
       
       toast.success('Login realizado com sucesso!');
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Erro no login:', error);
-      toast.error(error.message || 'Erro ao fazer login');
+      
+      let errorMessage = 'Erro ao fazer login';
+      
+      if (error.message === 'Email não verificado') {
+        throw error;
+      } else if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Credenciais inválidas';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Por favor, confirme seu e-mail antes de fazer login';
+      }
+      
+      toast.error(errorMessage);
       throw error;
     } finally {
       setLoading(false);
@@ -131,8 +186,11 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const signOut = async () => {
     setLoading(true);
     try {
-      // Limpar sessão
-      localStorage.removeItem('db_session');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
       
       // Atualizar estado
       setUser(null);
@@ -151,16 +209,25 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const resetPassword = async (email: string) => {
     setLoading(true);
     try {
-      const result = await db.resetPassword(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
       
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao enviar e-mail de recuperação');
+      if (error) {
+        throw error;
       }
       
       toast.success('E-mail de recuperação enviado!');
     } catch (error: any) {
       console.error('Erro na recuperação de senha:', error);
-      toast.error(error.message || 'Erro ao enviar e-mail de recuperação');
+      
+      let errorMessage = 'Erro ao enviar e-mail de recuperação';
+      
+      if (error.message?.includes('User not found')) {
+        errorMessage = 'Usuário não encontrado';
+      } else if (error.message?.includes('Invalid email')) {
+        errorMessage = 'E-mail inválido';
+      }
+      
+      toast.error(errorMessage);
       throw error;
     } finally {
       setLoading(false);

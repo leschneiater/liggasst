@@ -1,7 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import * as db from '../lib/database';
+import { auth, db } from '../config/firebase';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  sendPasswordResetEmail,
+  User as FirebaseUser
+} from 'firebase/auth';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
 interface User {
   id: string;
@@ -45,23 +53,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       
-      // Autenticar usuário
-      const result = await db.authenticateUser(email, password);
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao fazer login');
-      }
+      // Autenticar usuário com Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
       
       // Verificar se o email foi confirmado
-      if (!result.user.verified) {
+      if (!firebaseUser.emailVerified) {
         toast.error('Por favor, confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.');
         throw new Error('Email não verificado');
       }
       
+      // Buscar dados do usuário no Firestore
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+      
+      if (!userDoc.exists()) {
+        throw new Error('Dados do usuário não encontrados');
+      }
+      
+      const userData = userDoc.data();
+      const user: User = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email!,
+        type: userData.type,
+        verified: firebaseUser.emailVerified,
+        ...userData
+      };
+      
       // Definir usuário atual
-      setCurrentUser(result.user);
-      setUserType(result.user.type);
-      setUserData(result.user);
+      setCurrentUser(user);
+      setUserType(user.type);
+      setUserData(userData);
       
       toast.success('Login realizado com sucesso!');
       
@@ -78,13 +99,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error.message === 'Email não verificado') {
         throw error;
-      } else if (error.message === 'Usuário não encontrado') {
+      } else if (error.code === 'auth/user-not-found') {
         errorMessage = 'Usuário não encontrado';
-      } else if (error.message === 'Senha incorreta') {
+      } else if (error.code === 'auth/wrong-password') {
         errorMessage = 'Senha incorreta';
-      } else if (error.message.includes('invalid-credential')) {
+      } else if (error.code === 'auth/invalid-credential') {
         errorMessage = 'Credenciais inválidas';
-      } else if (error.message.includes('too-many-requests')) {
+      } else if (error.code === 'auth/too-many-requests') {
         errorMessage = 'Muitas tentativas. Tente novamente mais tarde';
       }
       
@@ -99,20 +120,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       
-      // Registrar usuário
-      const result = await db.registerUser(email, password, userData, type);
+      // Registrar usuário com Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
       
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao criar conta');
-      }
-      
-      // Enviar email de verificação
-      const verificationToken = generateVerificationToken();
-      
-      // Salvar token no banco (implementação simplificada)
-      // Em produção, salve em uma tabela de tokens de verificação
-      
-      await db.sendVerificationEmail(email, verificationToken);
+      // Salvar dados adicionais no Firestore
+      await setDoc(doc(db, 'users', firebaseUser.uid), {
+        ...userData,
+        type,
+        email,
+        createdAt: new Date().toISOString(),
+        verified: false
+      });
       
       toast.success('Cadastro realizado! Verifique seu e-mail para ativar a conta.');
       
@@ -121,11 +140,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       let errorMessage = 'Erro ao criar conta';
       
-      if (error.message.includes('já está em uso')) {
+      if (error.code === 'auth/email-already-in-use') {
         errorMessage = 'Este e-mail já está em uso';
-      } else if (error.message.includes('weak-password')) {
+      } else if (error.code === 'auth/weak-password') {
         errorMessage = 'Senha muito fraca. Use pelo menos 6 caracteres';
-      } else if (error.message.includes('invalid-email')) {
+      } else if (error.code === 'auth/invalid-email') {
         errorMessage = 'E-mail inválido';
       }
       
@@ -138,14 +157,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
+      await signOut(auth);
+      
       // Limpar dados de sessão
       setCurrentUser(null);
       setUserType(null);
       setUserData(null);
-      
-      // Limpar localStorage/sessionStorage se necessário
-      localStorage.removeItem('auth_token');
-      sessionStorage.removeItem('auth_session');
       
       navigate('/');
       toast.success('Logout realizado com sucesso!');
@@ -158,21 +175,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     try {
-      const result = await db.resetPassword(email);
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao enviar e-mail de recuperação');
-      }
-      
+      await sendPasswordResetEmail(auth, email);
       toast.success('E-mail de recuperação enviado!');
     } catch (error: any) {
       console.error('Password reset error:', error);
       
       let errorMessage = 'Erro ao enviar e-mail de recuperação';
       
-      if (error.message.includes('user-not-found')) {
+      if (error.code === 'auth/user-not-found') {
         errorMessage = 'Usuário não encontrado';
-      } else if (error.message.includes('invalid-email')) {
+      } else if (error.code === 'auth/invalid-email') {
         errorMessage = 'E-mail inválido';
       }
       
@@ -185,21 +197,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) throw new Error('Usuário não autenticado');
     
     try {
-      // Upload do arquivo
-      const path = `profile-photos/${currentUser.id}`;
-      const uploadResult = await db.uploadFile(file, path);
+      // Implementação simplificada para upload
+      // Em produção, use Firebase Storage
+      const photoURL = `https://example.com/photos/${currentUser.id}`;
       
-      if (!uploadResult.success) {
-        throw new Error(uploadResult.error || 'Erro ao fazer upload da foto');
-      }
-      
-      const photoURL = uploadResult.url;
-      
-      // Atualizar URL da foto no perfil do usuário
-      await db.query(
-        'UPDATE users SET photo_url = ? WHERE id = ?',
-        [photoURL, currentUser.id]
-      );
+      // Atualizar URL da foto no Firestore
+      await updateDoc(doc(db, 'users', currentUser.id), {
+        photoURL
+      });
       
       // Atualizar estado local
       setUserData((prev: any) => ({ ...prev, photoURL }));
@@ -216,11 +221,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) throw new Error('Usuário não autenticado');
     
     try {
-      const result = await db.saveUserProfile(currentUser.id, data, userType || 'professional');
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao atualizar perfil');
-      }
+      // Atualizar dados no Firestore
+      await updateDoc(doc(db, 'users', currentUser.id), data);
       
       // Atualizar estado local
       setUserData((prev: any) => ({ ...prev, ...data }));
@@ -233,25 +235,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loadUserData = async (userId: string) => {
+  const loadUserData = async (firebaseUser: FirebaseUser) => {
     try {
-      // Buscar dados do usuário
-      const result = await db.fetchUserProfile(userId);
+      // Buscar dados do usuário no Firestore
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
       
-      if (!result.success) {
-        throw new Error(result.error || 'Erro ao carregar dados do usuário');
-      }
-      
-      const userData = result.data[0];
-      
-      if (!userData) {
+      if (!userDoc.exists()) {
         throw new Error('Usuário não encontrado');
       }
       
+      const userData = userDoc.data();
+      const user: User = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email!,
+        type: userData.type,
+        verified: firebaseUser.emailVerified,
+        ...userData
+      };
+      
+      setCurrentUser(user);
       setUserType(userData.type);
       setUserData(userData);
     } catch (error) {
       console.error('Error loading user data:', error);
+      setCurrentUser(null);
       setUserType(null);
       setUserData(null);
     }
@@ -275,44 +282,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Gerar token de verificação
-  const generateVerificationToken = () => {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  };
-
   // Verificar sessão ao carregar
   useEffect(() => {
-    const checkSession = async () => {
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       setLoading(true);
       
-      try {
-        // Verificar se há token salvo
-        const token = localStorage.getItem('auth_token');
-        
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-        
-        // Verificar token com o servidor
-        // Implementação simplificada para exemplo
-        const userId = token; // Em produção, decodifique o token
-        
-        // Carregar dados do usuário
-        await loadUserData(userId);
-      } catch (error) {
-        console.error('Session check error:', error);
-        // Limpar dados em caso de erro
+      if (firebaseUser) {
+        await loadUserData(firebaseUser);
+      } else {
         setCurrentUser(null);
         setUserType(null);
         setUserData(null);
-        localStorage.removeItem('auth_token');
-      } finally {
-        setLoading(false);
       }
-    };
-    
-    checkSession();
+      
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const value: AuthContextType = {
@@ -333,21 +319,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AuthContext.Provider>
   );
-};
-
-// Função auxiliar para upload de arquivo
-const uploadFile = async (file: File, path: string) => {
-  try {
-    // Implementação simplificada para exemplo
-    // Em produção, use um serviço de armazenamento
-    
-    // Simular URL de arquivo
-    const fileName = `${Date.now()}_${file.name}`;
-    const url = `https://liggasst.com.br/uploads/${path}/${fileName}`;
-    
-    return { success: true, url };
-  } catch (error) {
-    console.error('File upload error:', error);
-    return { success: false, error };
-  }
 };
