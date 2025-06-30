@@ -17,7 +17,7 @@ const Login: React.FC = () => {
   const { signIn, loading } = useSupabaseAuth();
   const navigate = useNavigate();
   
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -26,6 +26,12 @@ const Login: React.FC = () => {
     } catch (error) {
       // Erro já tratado no contexto
     }
+  };
+
+  const fillTestCredentials = () => {
+    setValue('email', 'teste@liggasst.com.br');
+    setValue('password', 'teste123');
+    toast.success('Credenciais de teste preenchidas!');
   };
 
   return (
@@ -116,6 +122,17 @@ const Login: React.FC = () => {
               Entrar
             </Button>
           </form>
+
+          {/* Test User Button */}
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={fillTestCredentials}
+              className="w-full text-center text-sm text-green-deep hover:text-green-medium font-roboto"
+            >
+              Usar credenciais de teste
+            </button>
+          </div>
 
           {/* Footer */}
           <div className="mt-8 text-center">

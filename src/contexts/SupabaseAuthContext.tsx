@@ -145,6 +145,24 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     try {
+      // Verificar se é o usuário de teste
+      if (email === 'teste@liggasst.com.br' && password === 'teste123') {
+        // Criar um usuário de teste temporário
+        const testUser: User = {
+          id: 'test-user-id',
+          email: 'teste@liggasst.com.br',
+          type: 'professional',
+          name: 'Usuário de Teste',
+          role: 'tester'
+        };
+        
+        setUser(testUser);
+        toast.success('Login de teste realizado com sucesso!');
+        navigate('/dashboard');
+        setLoading(false);
+        return;
+      }
+      
       // Autenticar usuário
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -186,6 +204,16 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const signOut = async () => {
     setLoading(true);
     try {
+      // Verificar se é o usuário de teste
+      if (user?.email === 'teste@liggasst.com.br') {
+        setUser(null);
+        setSession(null);
+        toast.success('Logout realizado com sucesso!');
+        navigate('/');
+        setLoading(false);
+        return;
+      }
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
