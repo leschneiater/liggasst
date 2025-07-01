@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096 --stack-size=8192' tsc && NODE_OPTIONS='--max-old-space-size=4096 --stack-size=8192' vite build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192 --stack-size=16384' tsc && NODE_OPTIONS='--max-old-space-size=8192 --stack-size=16384' vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "setup-db": "node src/scripts/setup-database.js",
