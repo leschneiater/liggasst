@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
-import SupabaseTest from '../SupabaseTest';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,7 +19,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
       <Footer />
-      <SupabaseTest />
     </div>
   );
 };

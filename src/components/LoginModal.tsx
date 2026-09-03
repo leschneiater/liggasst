@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, X, Building2, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from './ui/Button';
 import Input from './ui/Input';
+import toast from 'react-hot-toast';
 
 interface LoginFormData {
   email: string;
@@ -35,8 +37,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
       await login(data.email, data.password);
       onClose();
       reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      // Erro já tratado no contexto de autenticação
     } finally {
       setLoading(false);
     }
@@ -51,7 +54,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" aria-modal="true" role="dialog">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-8">
           {/* Header */}
@@ -67,6 +70,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
             <button
               onClick={handleClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Fechar"
             >
               <X size={20} className="text-gray-500" />
             </button>
@@ -117,6 +121,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -124,7 +129,11 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
             <div className="flex items-center justify-between">
               <label className="flex items-center">
-                <input type="checkbox" className="rounded border-gray-300 text-green-deep focus:ring-green-deep" />
+                <input 
+                  type="checkbox" 
+                  className="rounded border-gray-300 text-green-deep focus:ring-green-deep" 
+                  aria-label="Lembrar-me"
+                />
                 <span className="ml-2 font-roboto text-sm text-gray-600">Lembrar-me</span>
               </label>
               <a

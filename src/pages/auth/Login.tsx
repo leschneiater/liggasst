@@ -14,12 +14,12 @@ interface LoginFormData {
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { signIn, loading } = useSupabaseAuth();
-  
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       await signIn(data.email, data.password);
+      // Redirecionamento é feito no contexto de autenticação
     } catch (error) {
       // Erro já tratado no contexto
     }
@@ -83,6 +83,7 @@ const Login: React.FC = () => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
