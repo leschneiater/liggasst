@@ -26,7 +26,7 @@ const DashboardEmpresa: React.FC = () => {
     avaliacaoMedia: 0
   });
 
-  // Mock data - Em produção, buscar do Firebase
+  // Mock data - Em produção, buscar do Supabase
   const recentProfessionals = [
     {
       id: 1,
@@ -83,7 +83,7 @@ const DashboardEmpresa: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Carregar estatísticas do Firebase
+    // Carregar estatísticas do Supabase
     setStats({
       profissionaisContratados: 8,
       projetosAtivos: 3,

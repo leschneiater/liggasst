@@ -17,7 +17,6 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import toast from 'react-hot-toast';
@@ -155,16 +154,15 @@ const BuscaProfissionais: React.FC = () => {
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   
   const { currentUser } = useAuth();
-  const { user: supabaseUser } = useSupabaseAuth();
   const navigate = useNavigate();
   
   // Verificar se o usuário está logado
   useEffect(() => {
-    if (!currentUser && !supabaseUser) {
+    if (!currentUser) {
       toast.error('Você precisa estar logado para buscar profissionais');
       navigate('/');
     }
-  }, [currentUser, supabaseUser, navigate]);
+  }, [currentUser, navigate]);
 
   const estados = [
     { sigla: 'AC', nome: 'Acre' },
@@ -307,7 +305,7 @@ const BuscaProfissionais: React.FC = () => {
     window.location.href = `/perfil-profissional-publico/${professionalId}`;
   };
 
-  if (!currentUser && !supabaseUser) {
+  if (!currentUser) {
     return (
       <div className="min-h-screen bg-neutral-gray py-8">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -333,7 +331,7 @@ const BuscaProfissionais: React.FC = () => {
                 Voltar ao Início
               </Button>
               <Button 
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/auth/login')}
                 className="flex-1"
               >
                 Fazer Login

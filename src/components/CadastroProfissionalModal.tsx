@@ -309,8 +309,8 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
                     {...register('password', {
                       required: 'Senha é obrigatória',
                       minLength: {
-                        value: 6,
-                        message: 'Senha deve ter pelo menos 6 caracteres'
+                        value: 10,
+                        message: 'Senha deve ter pelo menos 10 caracteres'
                       }
                     })}
                   />

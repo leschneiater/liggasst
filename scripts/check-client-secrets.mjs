@@ -3,7 +3,7 @@ import { extname, join, relative } from 'node:path';
 
 const root = process.cwd();
 const ignoredDirectories = new Set(['.git', 'dist', 'node_modules']);
-const checkedExtensions = new Set(['.js', '.jsx', '.ts', '.tsx', '.env']);
+const checkedExtensions = new Set(['.js', '.jsx', '.ts', '.tsx', '.env', '.json', '.md', '.sql', '.yml', '.yaml']);
 const checkedFiles = new Set(['.env.example', 'package.json']);
 
 const forbiddenPatterns = [
@@ -36,6 +36,10 @@ for (const file of await collectFiles(root)) {
   const content = await readFile(file, 'utf8');
   for (const { label, pattern } of forbiddenPatterns) {
     if (pattern.test(content)) findings.push(`${relative(root, file)}: ${label}`);
+  }
+  if (['.md', '.env'].includes(extname(file))
+      && /(?:^|\n)\s*(?:senha|password)\s*:\s*(?!placeholder|example|exemplo|your_)[^\s`]+/i.test(content)) {
+    findings.push(`${relative(root, file)}: plaintext password field`);
   }
 }
 

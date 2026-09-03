@@ -42,7 +42,7 @@ const DashboardProfissional: React.FC = () => {
 
   const [currentPlan, setCurrentPlan] = useState('gratuito');
 
-  // Mock data - Em produção, buscar do Firebase/Supabase
+  // Mock data - Em produção, buscar do Supabase
   const recentMessages = [
     {
       id: 1,
@@ -108,7 +108,7 @@ const DashboardProfissional: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Carregar estatísticas do Firebase/Supabase
+    // Carregar estatísticas do Supabase
     setStats({
       totalContratos: 12,
       avaliacaoMedia: 4.8,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
@@ -13,12 +13,12 @@ interface LoginFormData {
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { signIn, loading } = useSupabaseAuth();
+  const { login, loading } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await signIn(data.email, data.password);
+      await login(data.email, data.password);
       // Redirecionamento é feito no contexto de autenticação
     } catch (error) {
       // Erro já tratado no contexto

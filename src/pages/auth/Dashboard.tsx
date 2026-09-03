@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import { 
   User, 
@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
-  const { user, signOut, loading } = useSupabaseAuth();
+  const { currentUser: user, logout: signOut, loading } = useAuth();
 
   const handleLogout = async () => {
     try {

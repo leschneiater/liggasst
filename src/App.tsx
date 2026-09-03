@@ -2,10 +2,8 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
-import { SupabaseAuthProvider } from './contexts/SupabaseAuthContext';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import SupabaseProtectedRoute from './components/SupabaseProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 
 // Loading component
@@ -31,14 +29,15 @@ const PoliticaPrivacidade = lazy(() => import('./pages/PoliticaPrivacidade'));
 const BuscaProfissionais = lazy(() => import('./pages/BuscaProfissionais'));
 const PubliqueDemanda = lazy(() => import('./pages/PubliqueDemanda'));
 const PerfilProfissionalPublico = lazy(() => import('./pages/PerfilProfissionalPublico'));
-const RecuperarSenha = lazy(() => import('./pages/RecuperarSenha'));
 const Error404 = lazy(() => import('./pages/Error404'));
 
-// Auth Pages (Supabase)
+// Auth Pages
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
 const Dashboard = lazy(() => import('./pages/auth/Dashboard'));
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const AuthCallback = lazy(() => import('./pages/auth/AuthCallback'));
 
 // Professional Pages
 const DashboardProfissional = lazy(() => import('./pages/professional/DashboardProfissional'));
@@ -65,7 +64,6 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <SupabaseAuthProvider>
           <ScrollToTop />
           <div className="min-h-screen bg-gray-50">
             <Toaster 
@@ -106,16 +104,18 @@ function App() {
                 <Route path="/busca-profissionais" element={<Layout><BuscaProfissionais /></Layout>} />
                 <Route path="/publique-demanda" element={<Layout><PubliqueDemanda /></Layout>} />
                 <Route path="/perfil-profissional-publico/:id" element={<Layout><PerfilProfissionalPublico /></Layout>} />
-                <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+                <Route path="/recuperar-senha" element={<ForgotPassword />} />
 
                 {/* Supabase Auth Routes */}
                 <Route path="/auth/login" element={<Login />} />
                 <Route path="/auth/register" element={<Register />} />
                 <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/dashboard" element={
-                  <SupabaseProtectedRoute>
+                  <ProtectedRoute>
                     <Layout><Dashboard /></Layout>
-                  </SupabaseProtectedRoute>
+                  </ProtectedRoute>
                 } />
 
                 {/* Professional Protected Routes */}
@@ -204,7 +204,6 @@ function App() {
               </Routes>
             </Suspense>
           </div>
-        </SupabaseAuthProvider>
       </AuthProvider>
     </Router>
   );

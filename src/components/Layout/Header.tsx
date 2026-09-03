@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, Building2, LogOut, Bell } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
 import LoginModal from '../LoginModal';
 import CadastroEmpresaModal from '../CadastroEmpresaModal';
 import CadastroProfissionalModal from '../CadastroProfissionalModal';
@@ -16,11 +15,7 @@ const Header: React.FC = () => {
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
-  // Firebase Auth (sistema original)
   const { currentUser, userType, logout } = useAuth();
-  
-  // Supabase Auth (sistema de teste)
-  const { user: supabaseUser, signOut } = useSupabaseAuth();
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,12 +32,7 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      if (currentUser) {
-        await logout();
-      }
-      if (supabaseUser) {
-        await signOut();
-      }
+      await logout();
       navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
@@ -50,7 +40,7 @@ const Header: React.FC = () => {
   };
 
   const handleProtectedNavigation = (path: string, actionName: string) => {
-    if (!currentUser && !supabaseUser) {
+    if (!currentUser) {
       toast.error(`Você precisa estar logado para ${actionName}`);
       setIsLoginModalOpen(true);
       return;
@@ -74,12 +64,6 @@ const Header: React.FC = () => {
   ];
 
   const getDashboardLink = () => {
-    // Se tem usuário Supabase, vai para dashboard Supabase
-    if (supabaseUser) {
-      return '/dashboard';
-    }
-    
-    // Se tem usuário Firebase, vai para dashboard específico
     switch (userType) {
       case 'professional':
         return '/dashboard-profissional';
@@ -92,7 +76,7 @@ const Header: React.FC = () => {
     }
   };
 
-  const isLoggedIn = currentUser || supabaseUser;
+  const isLoggedIn = Boolean(currentUser);
 
   return (
     <>
@@ -163,7 +147,7 @@ const Header: React.FC = () => {
                     className="flex items-center space-x-2 px-4 py-2 bg-green-light text-green-deep rounded-lg hover:bg-green-deep hover:text-white transition-all duration-300 font-semibold border border-green-light shadow-sm hover:shadow-md"
                     aria-label="Acessar Dashboard"
                   >
-                    {supabaseUser ? <User size={16} /> : userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
+                    {userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
                     <span>Dashboard</span>
                   </Link>
                   <button
@@ -270,7 +254,7 @@ const Header: React.FC = () => {
                       onClick={() => setIsMenuOpen(false)}
                       className="flex items-center space-x-2 px-3 py-2 bg-green-light text-green-deep rounded-md font-semibold"
                     >
-                      {supabaseUser ? <User size={16} /> : userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
+                      {userType === 'professional' ? <User size={16} /> : <Building2 size={16} />}
                       <span>Dashboard</span>
                     </Link>
                     <button

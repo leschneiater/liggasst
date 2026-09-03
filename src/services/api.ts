@@ -1,13 +1,20 @@
 import { supabase } from '../lib/supabase';
 
 // Função para fazer upload de arquivo
-export const uploadFile = async (file: File, bucket: string, path: string) => {
+export const uploadFile = async (
+  file: File,
+  bucket: 'profile-images' | 'documents',
+  path: string
+) => {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-    const filePath = `${path}/${fileName}`;
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) throw authError ?? new Error('Usuário não autenticado.');
 
-    const { data, error } = await supabase.storage
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'bin';
+    const safePath = path.replace(/[^a-zA-Z0-9/_-]/g, '').replace(/^\/+|\/+$/g, '');
+    const filePath = `${authData.user.id}/${safePath ? `${safePath}/` : ''}${crypto.randomUUID()}.${fileExt}`;
+
+    const { error } = await supabase.storage
       .from(bucket)
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -16,12 +23,13 @@ export const uploadFile = async (file: File, bucket: string, path: string) => {
 
     if (error) throw error;
 
-    // Obter URL pública do arquivo
-    const { data: urlData } = supabase.storage
+    const { data: urlData, error: urlError } = await supabase.storage
       .from(bucket)
-      .getPublicUrl(filePath);
+      .createSignedUrl(filePath, 3600);
 
-    return { success: true, filePath, publicUrl: urlData.publicUrl };
+    if (urlError) throw urlError;
+
+    return { success: true, filePath, signedUrl: urlData.signedUrl };
   } catch (error) {
     console.error('Erro ao fazer upload de arquivo:', error);
     return { success: false, error };
@@ -31,12 +39,15 @@ export const uploadFile = async (file: File, bucket: string, path: string) => {
 // Função para enviar email via API
 export const sendEmail = async (to: string, subject: string, body: string) => {
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Usuário não autenticado.');
     // Implementar integração com serviço de email
     // Esta é uma implementação de exemplo
     const response = await fetch('https://liggasst.com.br/api/send-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({
         to,
@@ -60,7 +71,7 @@ export const sendEmail = async (to: string, subject: string, body: string) => {
 // Função para verificar disponibilidade de nome de usuário
 export const checkUsernameAvailability = async (username: string) => {
   try {
-    const { data, error, count } = await supabase
+    const { error, count } = await supabase
       .from('profiles')
       .select('id', { count: 'exact' })
       .eq('username', username);
@@ -107,15 +118,17 @@ export const getGeolocationData = async (cep: string) => {
 };
 
 // Função para gerar relatório
-export const generateReport = async (reportType: string, filters: any) => {
+export const generateReport = async (reportType: string, filters: Record<string, unknown>) => {
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Usuário não autenticado.');
     // Implementar geração de relatório
     // Esta é uma implementação de exemplo
     const response = await fetch('https://liggasst.com.br/api/generate-report', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabase.auth.getSession()}`
+        'Authorization': `Bearer ${session.access_token}`
       },
       body: JSON.stringify({
         reportType,

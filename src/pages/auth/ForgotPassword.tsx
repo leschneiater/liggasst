@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -14,17 +14,14 @@ interface ForgotPasswordFormData {
 const ForgotPassword: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const { resetPassword } = useAuth();
   
   const { register, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormData>();
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
-
-      if (error) throw error;
+      await resetPassword(data.email);
 
       setEmailSent(true);
       toast.success('E-mail de recuperação enviado!');
