@@ -145,7 +145,7 @@ const DashboardAdmin: React.FC = () => {
   ]);
 
   useEffect(() => {
-    // Carregar estatísticas do Firebase
+    // Carregar estatísticas do Supabase
     setStats({
       totalProfissionais: 5247,
       totalEmpresas: 2156,

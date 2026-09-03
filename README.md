@@ -1,170 +1,94 @@
-# LiggaSST Platform
+# LiggaSST
 
-Plataforma que conecta empresas com profissionais qualificados de Segurança do Trabalho em todo o Brasil.
+Plataforma que conecta empresas e profissionais de Segurança e Saúde no Trabalho.
 
-## 🚀 Configuração do Projeto
+## Arquitetura
 
-### 1. Instalação das Dependências
+- React, TypeScript e Vite no frontend.
+- Supabase Auth para cadastro, confirmação de e-mail, sessão e recuperação de senha.
+- Supabase PostgreSQL para todos os dados da aplicação.
+- Supabase Storage em buckets privados para fotos e documentos.
+- Row Level Security (RLS) para isolamento de dados por usuário e papel.
 
-```bash
-npm install
-```
+Firebase e conexões diretas a bancos não fazem parte da arquitetura.
 
-### 2. Configuração do Firebase
+## Configuração local
 
-1. Crie um projeto no [Firebase Console](https://console.firebase.google.com/)
-2. Ative Authentication (Email/Password)
-3. Ative Firestore Database
-4. Ative Storage
-5. Copie as configurações do projeto
+1. Instale as dependências:
 
-### 3. Configuração das Variáveis de Ambiente
+   ```bash
+   npm ci
+   ```
 
-1. Copie o arquivo `.env.example` para `.env`:
-```bash
-cp .env.example .env
-```
+2. Copie `.env.example` para `.env` e informe apenas as configurações públicas:
 
-2. Preencha as variáveis com suas chaves do Firebase:
-```env
-VITE_FIREBASE_API_KEY=sua_api_key_aqui
-VITE_FIREBASE_AUTH_DOMAIN=seu_projeto.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=seu_project_id
-VITE_FIREBASE_STORAGE_BUCKET=seu_projeto.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
-VITE_FIREBASE_APP_ID=seu_app_id
-VITE_FIREBASE_MEASUREMENT_ID=seu_measurement_id
-```
+   ```env
+   VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+   VITE_SUPABASE_ANON_KEY=sua_chave_publica
+   ```
 
-### 4. Configuração do Firestore
+   Nunca coloque `service_role`, senha de banco ou chave privada em uma variável
+   `VITE_*`. Tudo que começa com `VITE_` é incluído no bundle do navegador.
 
-Crie as seguintes coleções no Firestore:
+3. Aplique a migration:
 
-- `users` - Controle de tipos de usuário
-- `profissionais` - Dados dos profissionais
-- `empresas` - Dados das empresas
-- `contratos` - Contratos entre empresas e profissionais
-- `mensagens` - Sistema de mensagens
+   ```bash
+   supabase link --project-ref SEU_PROJECT_REF
+   supabase db push
+   ```
 
-### 5. Regras de Segurança do Firestore
+   Como alternativa, execute
+   `supabase/migrations/20260903190000_unify_supabase.sql` no SQL Editor.
 
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Users collection
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Profissionais collection
-    match /profissionais/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Empresas collection
-    match /empresas/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Contratos collection
-    match /contratos/{contractId} {
-      allow read, write: if request.auth != null && 
-        (request.auth.uid == resource.data.profissionalId || 
-         request.auth.uid == resource.data.empresaId);
-    }
-    
-    // Mensagens collection
-    match /mensagens/{messageId} {
-      allow read, write: if request.auth != null && 
-        (request.auth.uid == resource.data.senderId || 
-         request.auth.uid == resource.data.receiverId);
-    }
-  }
-}
-```
+4. No painel Supabase, em Authentication:
 
-### 6. Executar o Projeto
+   - habilite Email/Password;
+   - mantenha a confirmação de e-mail obrigatória;
+   - configure `https://liggasst.com.br` como Site URL;
+   - adicione `/auth/callback` e `/auth/reset-password` às Redirect URLs;
+   - configure SMTP próprio antes de abrir cadastros em produção;
+   - defina política de senha com no mínimo 10 caracteres.
+
+5. Inicie o projeto:
+
+   ```bash
+   npm run dev
+   ```
+
+## Banco de dados
+
+A migration cria:
+
+- `profiles`: identidade, papel e dados comuns;
+- `professionals`: dados privados do profissional;
+- `companies`: dados privados da empresa;
+- `demands`: demandas publicadas por empresas;
+- `contracts`: contratos entre empresas e profissionais;
+- `messages`: mensagens entre participantes;
+- `certificates`: documentos e certificados profissionais;
+- funções seguras de busca com exclusão de CPF, CNPJ, endereço e contatos privados;
+- buckets privados `profile-images` e `documents`.
+
+O papel inicial só pode ser `professional` ou `company`. O trigger de cadastro
+ignora qualquer tentativa do navegador de criar um administrador. Contas admin
+devem ser promovidas por uma operação administrativa server-side.
+
+## Verificações
+
+Execute antes de enviar mudanças:
 
 ```bash
-npm run dev
+npm run check:secrets
+npm run check:architecture
+npm run typecheck
+npm run build
 ```
 
-## 🔧 Funcionalidades
+O workflow `Security CI` executa as mesmas verificações em pull requests e pushes
+na `main`.
 
-### Autenticação
-- ✅ Login/Logout com Firebase Auth
-- ✅ Cadastro de profissionais e empresas
-- ✅ Verificação de email
-- ✅ Recuperação de senha
-- ✅ Redirecionamento automático para dashboard
+## Segurança
 
-### Profissionais
-- ✅ Dashboard personalizado
-- ✅ Gestão de perfil e certificados
-- ✅ Busca de empresas
-- ✅ Sistema de mensagens
-- ✅ Gestão de contratos
-
-### Empresas
-- ✅ Dashboard empresarial
-- ✅ Busca de profissionais
-- ✅ Publicação de demandas
-- ✅ Sistema de mensagens
-- ✅ Relatórios e análises
-
-### Administração
-- ✅ Dashboard administrativo
-- ✅ Gestão de usuários
-- ✅ Relatórios gerais
-- ✅ Moderação de conteúdo
-
-## 🛡️ Segurança
-
-- Autenticação Firebase
-- Regras de segurança Firestore
-- Validação de dados no frontend
-- Proteção de rotas
-- Verificação de email obrigatória
-
-## 📱 Responsividade
-
-- Design mobile-first
-- Breakpoints otimizados
-- Interface adaptável
-- Performance otimizada
-
-## 🎨 Design System
-
-- Cores da marca LiggaSST
-- Tipografia Poppins + Roboto
-- Componentes reutilizáveis
-- Animações suaves
-- Estados de hover/focus
-
-## 📦 Tecnologias
-
-- React 18 + TypeScript
-- Vite
-- Firebase (Auth, Firestore, Storage)
-- Tailwind CSS
-- React Router DOM
-- React Hook Form
-- Lucide React (ícones)
-- React Hot Toast
-
-## 🚀 Deploy
-
-O projeto está configurado para deploy automático. Certifique-se de:
-
-1. Configurar as variáveis de ambiente no serviço de deploy
-2. Configurar as regras de segurança do Firebase
-3. Testar todas as funcionalidades em produção
-
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-- Email: suporte@liggasst.com.br
-- WhatsApp: (11) 99999-9999
+Consulte [SECURITY.md](SECURITY.md) para reportar vulnerabilidades. As regras RLS
+são a autorização efetiva; os componentes de rota no frontend servem apenas para
+experiência de navegação.

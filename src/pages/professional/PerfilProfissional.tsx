@@ -37,7 +37,7 @@ interface ProfileFormData {
 }
 
 const PerfilProfissional: React.FC = () => {
-  const { userData, currentUser } = useAuth();
+  const { userData, updateUserProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('dados-pessoais');
   
@@ -72,9 +72,7 @@ const PerfilProfissional: React.FC = () => {
   const onSubmit = async (data: ProfileFormData) => {
     setLoading(true);
     try {
-      // Aqui você salvaria os dados no Firebase
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Perfil atualizado com sucesso!');
+      await updateUserProfile(data);
     } catch (error) {
       toast.error('Erro ao atualizar perfil');
     } finally {

@@ -18,7 +18,6 @@ import {
   Plus
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
@@ -33,9 +32,7 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   
   const { currentUser } = useAuth();
-  const { user: supabaseUser } = useSupabaseAuth();
-
-  const isLoggedIn = currentUser || supabaseUser;
+  const isLoggedIn = Boolean(currentUser);
 
   const handleBuscarProfissional = () => {
     if (isLoggedIn) {

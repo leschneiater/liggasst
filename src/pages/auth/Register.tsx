@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
-import { useSupabaseAuth } from '../../contexts/SupabaseAuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -18,7 +18,7 @@ interface RegisterFormData {
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { signUp, loading } = useSupabaseAuth();
+  const { signup, loading } = useAuth();
   
   const { register, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>({
     defaultValues: {
@@ -40,7 +40,7 @@ const Register: React.FC = () => {
         type: data.userType
       };
       
-      await signUp(data.email, data.password, userData);
+      await signup(data.email, data.password, userData, data.userType);
     } catch (error) {
       // Erro já tratado no contexto
     }
@@ -126,8 +126,8 @@ const Register: React.FC = () => {
                 {...register('password', {
                   required: 'Senha é obrigatória',
                   minLength: {
-                    value: 6,
-                    message: 'Senha deve ter pelo menos 6 caracteres'
+                    value: 10,
+                    message: 'Senha deve ter pelo menos 10 caracteres'
                   }
                 })}
               />
