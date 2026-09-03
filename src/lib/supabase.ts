@@ -1,11 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Configuração para o servidor fornecido
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://liggasst.com.br/supabase-api'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpZ2dhc3N0IiwicGFyYW1zIjp7fSwiaWF0IjoxNjg3MzQ1NjIzLCJleHAiOjE3MTg4ODE2MjN9'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase environment variables not found, using default values')
+  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY')
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
