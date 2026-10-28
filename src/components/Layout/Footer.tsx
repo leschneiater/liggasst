@@ -186,7 +186,7 @@ const Footer: React.FC = () => {
               </div>
             </div>
             
-            {/* Stats */}
+            {/* Stats 
             <div className="mt-6 p-4 bg-green-medium bg-opacity-30 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
                 <Users size={16} className="text-green-light" />
@@ -196,7 +196,7 @@ const Footer: React.FC = () => {
               <p className="text-white font-poppins font-semibold">2.500+ Empresas</p>
             </div>
           </div>
-        </div>
+        </div>*/}
 
         {/* Bottom Section */}
         <div className="border-t border-green-medium mt-8 pt-8">
