@@ -4,9 +4,10 @@ import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  userType?: 'professional' | 'company' | 'admin';
 }
 
-const SupabaseProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const SupabaseProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, userType }) => {
   const { user, loading } = useSupabaseAuth();
 
   if (loading) {
@@ -22,6 +23,17 @@ const SupabaseProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => 
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;
+  }
+
+  if (userType && user.type !== userType) {
+    if (user.type === 'professional') {
+      return <Navigate to="/dashboard-profissional" replace />;
+    } else if (user.type === 'company') {
+      return <Navigate to="/dashboard-empresa" replace />;
+    } else if (user.type === 'admin') {
+      return <Navigate to="/admin" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

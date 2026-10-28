@@ -155,22 +155,29 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         throw error;
       }
 
-      // Verificar se o email foi confirmado
-      if (data.user && !data.user.email_confirmed_at) {
-        toast.error('Por favor, confirme seu e-mail antes de fazer login.');
-        throw new Error('Email não verificado');
-      }
-      
       toast.success('Login realizado com sucesso!');
-      navigate('/dashboard');
+
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('type')
+          .eq('id', data.user.id)
+          .maybeSingle();
+
+        const userType = profile?.type || 'professional';
+        if (userType === 'professional') navigate('/dashboard-profissional');
+        else if (userType === 'company') navigate('/dashboard-empresa');
+        else if (userType === 'admin') navigate('/admin');
+        else navigate('/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error: any) {
       console.error('Erro no login:', error);
       
       let errorMessage = 'Erro ao fazer login';
       
-      if (error.message === 'Email não verificado') {
-        throw error;
-      } else if (error.message?.includes('Invalid login credentials')) {
+      if (error.message?.includes('Invalid login credentials')) {
         errorMessage = 'Credenciais inválidas';
       } else if (error.message?.includes('Email not confirmed')) {
         errorMessage = 'Por favor, confirme seu e-mail antes de fazer login';

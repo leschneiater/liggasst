@@ -4,7 +4,6 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { SupabaseAuthProvider } from './contexts/SupabaseAuthContext';
 import Layout from './components/Layout/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
 import SupabaseProtectedRoute from './components/SupabaseProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -120,83 +119,83 @@ function App() {
 
                 {/* Professional Protected Routes */}
                 <Route path="/dashboard-profissional" element={
-                  <ProtectedRoute userType="professional">
+                  <SupabaseProtectedRoute userType="professional">
                     <Layout><DashboardProfissional /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/perfil-profissional" element={
-                  <ProtectedRoute userType="professional">
+                  <SupabaseProtectedRoute userType="professional">
                     <Layout><PerfilProfissional /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/certificados" element={
-                  <ProtectedRoute userType="professional">
+                  <SupabaseProtectedRoute userType="professional">
                     <Layout><CertificadosProfissional /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/contratos-profissional" element={
-                  <ProtectedRoute userType="professional">
+                  <SupabaseProtectedRoute userType="professional">
                     <Layout><ContratosProfissional /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/mensagens-profissional" element={
-                  <ProtectedRoute userType="professional">
+                  <SupabaseProtectedRoute userType="professional">
                     <Layout><MensagensProfissional /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/assinatura-profissional" element={
-                  <ProtectedRoute userType="professional">
+                  <SupabaseProtectedRoute userType="professional">
                     <Layout><AssinaturaProfissional /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/busca-empresas" element={
-                  <ProtectedRoute userType="professional">
+                  <SupabaseProtectedRoute userType="professional">
                     <Layout><BuscaEmpresas /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
 
                 {/* Company Protected Routes */}
                 <Route path="/dashboard-empresa" element={
-                  <ProtectedRoute userType="company">
+                  <SupabaseProtectedRoute userType="company">
                     <Layout><DashboardEmpresa /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/perfil-empresa" element={
-                  <ProtectedRoute userType="company">
+                  <SupabaseProtectedRoute userType="company">
                     <Layout><PerfilEmpresa /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/busca-profissionais-empresa" element={
-                  <ProtectedRoute userType="company">
+                  <SupabaseProtectedRoute userType="company">
                     <Layout><BuscaProfissionaisEmpresa /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/contratos-empresa" element={
-                  <ProtectedRoute userType="company">
+                  <SupabaseProtectedRoute userType="company">
                     <Layout><ContratosEmpresa /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/mensagens-empresa" element={
-                  <ProtectedRoute userType="company">
+                  <SupabaseProtectedRoute userType="company">
                     <Layout><MensagensEmpresa /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/assinatura-empresa" element={
-                  <ProtectedRoute userType="company">
+                  <SupabaseProtectedRoute userType="company">
                     <Layout><AssinaturaEmpresa /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
                 <Route path="/relatorios" element={
-                  <ProtectedRoute userType="company">
+                  <SupabaseProtectedRoute userType="company">
                     <Layout><RelatoriosEmpresa /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
 
                 {/* Admin Protected Routes */}
                 <Route path="/admin" element={
-                  <ProtectedRoute userType="admin">
+                  <SupabaseProtectedRoute userType="admin">
                     <Layout><DashboardAdmin /></Layout>
-                  </ProtectedRoute>
+                  </SupabaseProtectedRoute>
                 } />
 
                 {/* 404 Route */}
