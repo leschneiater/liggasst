@@ -33,7 +33,7 @@ const Error404: React.FC = () => {
             to="/planos"
             variant="outline"
             size="lg"
-            className="border-white text-color:'#193F2F' hover:bg-white hover:'#193F2F' w-full"
+            className="border-white text-color:'#193F2F' hover:bg-white hover text-color:'#193F2F' w-full"
           >
             Ver Planos
           </Button>
