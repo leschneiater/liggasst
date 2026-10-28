@@ -62,7 +62,7 @@ const DashboardAdmin = lazy(() => import('./pages/admin/DashboardAdmin'));
 
 function App() {
   return (
-    <Router>
+    <Router basename="/liggasst">
       <AuthProvider>
           <ScrollToTop />
           <div className="min-h-screen bg-gray-50">
