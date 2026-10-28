@@ -196,7 +196,8 @@ const Footer: React.FC = () => {
               <p className="text-white font-poppins font-semibold">2.500+ Empresas</p>
             </div>
           </div>
-        </div> */}
+        </div> 
+        */}
 
         {/* Bottom Section */}
         <div className="border-t border-green-medium mt-8 pt-8">
