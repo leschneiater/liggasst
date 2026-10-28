@@ -17,7 +17,7 @@ import {
   Camera,
   Upload
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from './ui/Button';
 import Input from './ui/Input';
 import toast from 'react-hot-toast';
@@ -55,7 +55,7 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
   const [cadastroSucesso, setCadastroSucesso] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const { signup } = useAuth();
+  const { signUp } = useSupabaseAuth();
   
   const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<CompanyFormData>();
   const watchPassword = watch('password');
@@ -134,27 +134,10 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
 
     setLoading(true);
     try {
-      const companyData = {
-        nomeEmpresa: data.nomeEmpresa,
-        cnpj: data.cnpj,
-        telefone: data.telefone,
-        cep: data.cep,
-        cidade: data.cidade,
-        estado: data.estado,
-        endereco: data.endereco,
-        segmento: data.segmento,
-        numeroFuncionarios: data.numeroFuncionarios,
-        nomeResponsavel: data.nomeResponsavel,
-        cargoResponsavel: data.cargoResponsavel,
-        emailResponsavel: data.emailResponsavel,
-        telefoneResponsavel: data.telefoneResponsavel,
-        descricaoEmpresa: data.descricaoEmpresa,
-        necessidades: data.necessidades || [],
-        tipo: 'company',
-        logoFile: logoFile
-      };
-
-      await signup(data.email, data.password, companyData, 'company');
+      await signUp(data.email, data.password, {
+        name: data.nomeEmpresa,
+        type: 'company',
+      });
       setCadastroSucesso(true);
     } catch (error) {
       console.error('Signup error:', error);
@@ -188,7 +171,7 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
           </h2>
           
           <p className="font-roboto text-gray-600 mb-6">
-            Sua conta foi criada com sucesso! Verifique seu e-mail para ativar a conta antes de fazer login.
+            Sua conta foi criada com sucesso! Você já pode fazer login na plataforma.
           </p>
           
           <div className="bg-green-light bg-opacity-20 p-4 rounded-lg mb-6">
@@ -196,7 +179,6 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
               Próximos Passos:
             </h3>
             <ul className="font-roboto text-sm text-green-deep space-y-1 text-left">
-              <li>• Verifique seu e-mail e clique no link de confirmação</li>
               <li>• Faça login na plataforma</li>
               <li>• Complete seu perfil empresarial</li>
               <li>• Explore profissionais disponíveis</li>

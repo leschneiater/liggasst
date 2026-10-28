@@ -17,7 +17,7 @@ import {
   Camera,
   Upload
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from './ui/Button';
 import Input from './ui/Input';
 import toast from 'react-hot-toast';
@@ -55,7 +55,7 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
   const [cadastroSucesso, setCadastroSucesso] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const { signup } = useAuth();
+  const { signUp } = useSupabaseAuth();
   
   const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<ProfessionalFormData>();
   const watchPassword = watch('password');
@@ -114,27 +114,10 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
 
     setLoading(true);
     try {
-      const professionalData = {
-        nome: data.nome,
-        telefone: data.telefone,
-        cpf: data.cpf,
-        cep: data.cep,
-        cidade: data.cidade,
-        estado: data.estado,
-        endereco: data.endereco,
-        formacao: data.formacao,
-        especializacao: data.especializacao,
-        experiencia: data.experiencia,
-        registro: data.registro,
-        raioAtendimento: data.raioAtendimento,
-        valorHora: data.valorHora,
-        disponibilidade: data.disponibilidade || [],
-        descricao: data.descricao,
-        tipo: 'professional',
-        photoFile: photoFile
-      };
-
-      await signup(data.email, data.password, professionalData, 'professional');
+      await signUp(data.email, data.password, {
+        name: data.nome,
+        type: 'professional',
+      });
       setCadastroSucesso(true);
     } catch (error) {
       console.error('Signup error:', error);
@@ -168,7 +151,7 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
           </h2>
           
           <p className="font-roboto text-gray-600 mb-6">
-            Sua conta foi criada com sucesso! Verifique seu e-mail para ativar a conta antes de fazer login.
+            Sua conta foi criada com sucesso! Você já pode fazer login na plataforma.
           </p>
           
           <div className="bg-green-light bg-opacity-20 p-4 rounded-lg mb-6">
@@ -176,7 +159,6 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
               Próximos Passos:
             </h3>
             <ul className="font-roboto text-sm text-green-deep space-y-1 text-left">
-              <li>• Verifique seu e-mail e clique no link de confirmação</li>
               <li>• Faça login na plataforma</li>
               <li>• Complete seu perfil profissional</li>
               <li>• Faça upload dos seus certificados</li>

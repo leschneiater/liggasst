@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, X, Building2, User } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useSupabaseAuth } from '../contexts/SupabaseAuthContext';
 import Button from './ui/Button';
 import Input from './ui/Input';
 import toast from 'react-hot-toast';
@@ -27,18 +27,17 @@ const LoginModal: React.FC<LoginModalProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { signIn } = useSupabaseAuth();
   
   const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     try {
-      await login(data.email, data.password);
+      await signIn(data.email, data.password);
       onClose();
       reset();
     } catch (error: any) {
-      console.error('Login error:', error);
       // Erro já tratado no contexto de autenticação
     } finally {
       setLoading(false);

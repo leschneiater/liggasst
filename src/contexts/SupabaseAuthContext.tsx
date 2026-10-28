@@ -71,7 +71,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         .from('users')
         .select('*')
         .eq('id', supabaseUser.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Erro ao carregar perfil:', error);
@@ -105,15 +105,13 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
 
       if (data.user) {
-        // Salvar dados adicionais na tabela users
         const { error: profileError } = await supabase
           .from('users')
           .insert({
             id: data.user.id,
             email,
+            name: userData?.name || null,
             type: userData?.type || 'professional',
-            ...userData,
-            created_at: new Date().toISOString()
           });
 
         if (profileError) {
@@ -121,7 +119,7 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
       }
       
-      toast.success('Conta criada com sucesso! Verifique seu email para confirmar.');
+      toast.success('Conta criada com sucesso! Você já pode fazer login.');
     } catch (error: any) {
       console.error('Erro no cadastro:', error);
       
