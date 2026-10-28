@@ -50,22 +50,24 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // Escutar mudanças de autenticação
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       
       if (session?.user) {
-        await loadUserProfile(session.user);
+        (async () => {
+          await loadUserProfile(session.user);
+          setLoading(false);
+        })();
       } else {
         setUser(null);
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+  const loadUserProfile = async (supabaseUser: SupabaseUser): Promise<User> => {
     try {
       const { data, error } = await supabase
         .from('users')
@@ -75,7 +77,6 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (error) {
         console.error('Erro ao carregar perfil:', error);
-        return;
       }
 
       const userData: User = {
@@ -86,8 +87,16 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
       };
 
       setUser(userData);
+      return userData;
     } catch (error) {
       console.error('Erro ao carregar dados do usuário:', error);
+      const fallback: User = {
+        id: supabaseUser.id,
+        email: supabaseUser.email!,
+        type: 'professional',
+      };
+      setUser(fallback);
+      return fallback;
     }
   };
 
@@ -143,7 +152,6 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     try {
-      // Autenticar usuário
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -153,19 +161,13 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
         throw error;
       }
 
-      toast.success('Login realizado com sucesso!');
-
       if (data.user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('type')
-          .eq('id', data.user.id)
-          .maybeSingle();
+        const profile = await loadUserProfile(data.user);
 
-        const userType = profile?.type || 'professional';
-        if (userType === 'professional') navigate('/dashboard-profissional');
-        else if (userType === 'company') navigate('/dashboard-empresa');
-        else if (userType === 'admin') navigate('/admin');
+        toast.success('Login realizado com sucesso!');
+        if (profile.type === 'professional') navigate('/dashboard-profissional');
+        else if (profile.type === 'company') navigate('/dashboard-empresa');
+        else if (profile.type === 'admin') navigate('/admin');
         else navigate('/dashboard');
       } else {
         navigate('/dashboard');
