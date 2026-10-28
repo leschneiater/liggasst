@@ -40,7 +40,7 @@ const Dashboard: React.FC = () => {
               onClick={handleLogout}
               loading={loading}
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-green-deep"
+              className="bg-green-deep text-green-deep border-white hover:bg-white hover:text-green-deep"
               icon={LogOut}
             >
               Sair
