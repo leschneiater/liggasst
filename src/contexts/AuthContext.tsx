@@ -272,10 +272,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      if (!data.user.email_confirmed_at) {
-        await supabase.auth.signOut();
-        throw new Error('Email not confirmed');
-      }
 
       setSession(data.session);
       const profile = await loadUser(data.user);
@@ -328,7 +324,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (signUpData.session) await supabase.auth.signOut();
-      toast.success('Conta criada. Confirme seu e-mail para entrar.');
+      toast.success(signUpData.session
+        ? 'Conta criada. Entre com seu e-mail e senha.'
+        : 'Conta criada. Confirme seu e-mail para entrar.');
     } catch (error) {
       const message = error instanceof Error ? error.message : '';
       toast.error(message.includes('already registered')
