@@ -192,8 +192,8 @@ const Footer: React.FC = () => {
                 <Users size={16} className="text-green-light" />
                 <span className="text-green-light text-sm font-roboto">Comunidade Ativa</span>
               </div>
-              <p className="text-white font-poppins font-semibold">5.000+ Profissionais</p>
-              <p className="text-white font-poppins font-semibold">2.500+ Empresas</p>
+              <p className="text-white font-poppins font-semibold">Profissionais</p>
+              <p className="text-white font-poppins font-semibold">Empresas</p>
             </div>
           </div>
         </div>
