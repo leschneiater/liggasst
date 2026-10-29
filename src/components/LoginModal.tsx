@@ -136,13 +136,13 @@ const LoginModal: React.FC<LoginModalProps> = ({
                 />
                 <span className="ml-2 font-roboto text-sm text-gray-600">Lembrar-me</span>
               </label>
-              <a
-                href="/recuperar-senha"
+              <Link
+                to="/auth/forgot-password"
                 className="font-roboto text-sm text-green-deep hover:text-green-medium"
                 onClick={handleClose}
               >
                 Esqueceu a senha?
-              </a>
+              </Link>
             </div>
 
             <Button
