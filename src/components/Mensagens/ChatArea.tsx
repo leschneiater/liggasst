@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { fetchMessages, sendMessage, markMessageAsRead, getProfilePublic } from '../../services/database';
+import { fetchMessages, sendMessage, markMessageAsRead, getProfilePublic, getProfessionalPublic } from '../../services/database';
 
 interface MessageRow {
   id: string;
@@ -66,7 +66,9 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
 
   useEffect(() => { load(true); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const t = setInterval(() => load(false), 15000);
+    const t = setInterval(() => {
+      if (document.visibilityState === 'visible') load(false);
+    }, 15000);
     return () => clearInterval(t);
   }, [load]);
 
@@ -96,8 +98,17 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
   // Resolver nome de uma contraparte nova (link ?para= sem mensagens ainda)
   useEffect(() => {
     if (activeId && !names[activeId]) {
-      getProfilePublic(activeId).then(r => {
-        setNames(prev => ({ ...prev, [activeId]: (r.success && r.data?.display_name) || 'Usuário' }));
+      getProfilePublic(activeId).then(async r => {
+        let nome = (r.success && r.data?.display_name) || '';
+        if (!nome) {
+          try {
+            const rp = await getProfessionalPublic(activeId);
+            nome = rp?.nome || 'Usuário';
+          } catch {
+            nome = 'Usuário';
+          }
+        }
+        setNames(prev => ({ ...prev, [activeId]: nome }));
       });
     }
   }, [activeId, names]);
