@@ -24,6 +24,79 @@ export const fetchProfessionals = async (filters: Filters = {}) => {
   }
 };
 
+export interface ProfessionalSearchRow {
+  professional_id: string;
+  display_name: string | null;
+  education: string | null;
+  specialization: string | null;
+  experience: string | null;
+  city: string | null;
+  state: string | null;
+  hourly_rate: number | null;
+  service_radius: string | null;
+  description: string | null;
+  availability: string[] | null;
+  avatar_path: string | null;
+}
+
+export interface ProfessionalSearchItem {
+  id: string;
+  nome: string;
+  formacao: string;
+  cidade: string;
+  estado: string;
+  experiencia: number | null;
+  valorHora: number | null;
+  raioAtendimento: number | null;
+  especializacoes: string[];
+  disponibilidade: string[];
+  descricao: string;
+}
+
+const parseLeadingInt = (value: string | null): number | null => {
+  if (!value) return null;
+  const match = value.match(/\d+/);
+  return match ? parseInt(match[0], 10) : null;
+};
+
+export const mapProfessionalSearchRow = (row: ProfessionalSearchRow): ProfessionalSearchItem => ({
+  id: row.professional_id,
+  nome: row.display_name || 'Profissional',
+  formacao: row.education || '',
+  cidade: row.city || '',
+  estado: row.state || '',
+  experiencia: parseLeadingInt(row.experience),
+  valorHora: row.hourly_rate ?? null,
+  raioAtendimento: parseLeadingInt(row.service_radius),
+  especializacoes: (row.specialization || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(item => item.length > 0),
+  disponibilidade: row.availability ?? [],
+  descricao: row.description || ''
+});
+
+export const searchProfessionals = async (params: {
+  state?: string;
+  city?: string;
+  specialization?: string;
+}): Promise<ProfessionalSearchItem[]> => {
+  const { data, error } = await supabase.rpc('search_professionals', {
+    p_state: params.state ?? null,
+    p_city: params.city ?? null,
+    p_specialization: params.specialization ?? null,
+  });
+  if (error) throw error;
+  return ((data ?? []) as ProfessionalSearchRow[]).map(mapProfessionalSearchRow);
+};
+
+export const getProfessionalPublic = async (id: string): Promise<ProfessionalSearchItem | null> => {
+  const { data, error } = await supabase.rpc('get_professional_public', { p_id: id });
+  if (error) throw error;
+  const row = ((data ?? []) as ProfessionalSearchRow[])[0];
+  return row ? mapProfessionalSearchRow(row) : null;
+};
+
 export const fetchCompanies = async (filters: Filters = {}) => {
   try {
     const { data, error } = await supabase.rpc('search_companies', {
