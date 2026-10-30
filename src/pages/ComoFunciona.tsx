@@ -24,59 +24,31 @@ const ComoFunciona: React.FC = () => {
     {
       icon: UserCheck,
       title: 'Analise Perfis',
-      description: 'Visualize certificações, experiências e avaliações de outros clientes'
+      description: 'Visualize formação, experiências e certificações informadas no perfil'
     },
     {
       icon: CheckCircle,
-      title: 'Contrate com Segurança',
-      description: 'Conecte-se diretamente e formalize parcerias com total transparência'
+      title: 'Publique sua Demanda',
+      description: 'Cadastre a necessidade da sua empresa e acompanhe o status no painel'
     }
   ];
 
-  const benefits = {
-    companies: [
-      'Acesso a profissionais certificados',
-      'Processos de contratação ágeis',
-      'Relatórios detalhados de SST',
-      'Suporte técnico especializado'
-    ],
-    professionals: [
-      'Oportunidades em todo o Brasil',
-      'Gestão simplificada de contratos',
-      'Networking profissional',
-      'Crescimento da reputação'
-    ]
-  };
-
-  const testimonials = [
+  const stepsProfissionais = [
     {
-      name: 'Maria Silva',
-      role: 'Gerente de Segurança - TechCorp',
-      content: 'Encontrei profissionais excelentes através da LiggaSST. A plataforma facilitou muito nosso processo de contratação.',
-      rating: 5,
-      company: 'TechCorp Ltda'
+      icon: UserCheck,
+      title: 'Crie seu Perfil',
+      description: 'Cadastre formação, especialidades e experiências'
     },
     {
-      name: 'João Santos',
-      role: 'Técnico em Segurança do Trabalho',
-      content: 'Consegui expandir minha carteira de clientes e organizar melhor meu trabalho. Recomendo para todos os colegas.',
-      rating: 5,
-      company: 'Profissional Autônomo'
+      icon: Search,
+      title: 'Apareça na Busca',
+      description: 'Empresas cadastradas encontram seu perfil por especialidade e localização'
     },
     {
-      name: 'Ana Costa',
-      role: 'Diretora - Indústria Moderna',
-      content: 'A qualidade dos profissionais é excepcional. Nossa empresa se sente muito mais segura com os serviços contratados.',
-      rating: 5,
-      company: 'Indústria Moderna'
+      icon: CheckCircle,
+      title: 'Acompanhe pelo Painel',
+      description: 'Novas áreas, como mensagens e contratos, aparecerão no seu painel quando estiverem ativas'
     }
-  ];
-
-  const stats = [
-    { number: '5.000+', label: 'Profissionais Cadastrados', icon: Users },
-    { number: '2.500+', label: 'Empresas Ativas', icon: Building2 },
-    { number: '15.000+', label: 'Contratos Realizados', icon: CheckCircle },
-    { number: '98%', label: 'Satisfação dos Clientes', icon: Star }
   ];
 
   return (
@@ -154,7 +126,7 @@ const ComoFunciona: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            {steps.map((step, index) => (
+            {stepsProfissionais.map((step, index) => (
               <div key={index} className="text-center group">
                 <div className="relative mb-6">
                   <div className="w-20 h-20 bg-green-light rounded-full flex items-center justify-center mx-auto group-hover:bg-green-medium transition-colors duration-300">
@@ -197,8 +169,8 @@ const ComoFunciona: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { icon: Clock, title: 'Rapidez', description: 'Encontre profissionais qualificados em minutos, não em semanas' },
-              { icon: Shield, title: 'Segurança', description: 'Todos os profissionais são verificados e certificados' },
-              { icon: Star, title: 'Qualidade', description: 'Sistema de avaliações garante a excelência dos serviços' }
+              { icon: Shield, title: 'Segurança', description: 'Busca e perfis completos restritos a usuários cadastrados e conectados' },
+              { icon: Star, title: 'Transparência', description: 'Áreas em implantação são sinalizadas dentro da plataforma, sem dados de exemplo' }
             ].map((beneficio, index) => (
               <div key={index} className="bg-neutral-gray p-8 rounded-2xl text-center hover:shadow-lg transition-shadow duration-300">
                 <div className="w-16 h-16 bg-green-deep rounded-full flex items-center justify-center mx-auto mb-4">
@@ -223,7 +195,7 @@ const ComoFunciona: React.FC = () => {
             Pronto para começar?
           </h2>
           <p className="font-roboto text-xl text-green-light mb-8">
-            Junte-se a milhares de empresas e profissionais que já confiam na LiggaSST
+            Cadastre-se gratuitamente e comece a usar a LiggaSST
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
