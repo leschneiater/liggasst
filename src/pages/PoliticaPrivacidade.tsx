@@ -285,19 +285,19 @@ const PoliticaPrivacidade: React.FC = () => {
               </h2>
               <div className="space-y-4">
                 <p className="font-roboto text-gray-700">
-                  Você pode exercer seus direitos, incluindo o pedido de exclusão dos seus
-                  dados pessoais, pelo e-mail contato@liggasst.com.br. Os pedidos são
-                  analisados e atendidos manualmente, sem custo. Quando não for possível
-                  atender de imediato, informamos os motivos.
+                  Você pode exercer seus direitos sobre seus dados pessoais, incluindo
+                  confirmação, acesso, correção, anonimização, portabilidade e exclusão,
+                  pelo e-mail contato@liggasst.com.br ou pelo telefone (11) 98886-1490,
+                  sem custo.
                 </p>
                 <p className="font-roboto text-gray-700">
-                  Alguns dados podem ser conservados quando a lei exigir ou permitir, como
-                  para cumprir obrigações legais ou regulatórias (art. 16 da LGPD). Nas
-                  conversas, as mensagens podem conter informações das duas pessoas
-                  envolvidas; por isso, ao atender um pedido de exclusão, agimos dentro
-                  dos limites técnicos da plataforma, e trechos em texto livre que
-                  mencionem você podem não ser totalmente removidos da conversa da outra
-                  pessoa.
+                  Ao receber um pedido, analisamos seu alcance e verificamos se há
+                  hipótese legal de conservação dos dados, como o cumprimento de
+                  obrigação legal ou regulatória (art. 16 da Lei nº 13.709/2018).
+                  Atendemos o pedido na medida do cabível e respondemos sempre com a
+                  fundamentação da decisão. Se um impedimento técnico exigir
+                  providências adicionais, informamos o tratamento e o encaminhamento
+                  que serão dados ao seu pedido.
                 </p>
               </div>
             </div>
