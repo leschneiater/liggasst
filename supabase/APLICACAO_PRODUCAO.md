@@ -59,3 +59,5 @@ Reparo: 20261030150000 registrada (ja aplicada manualmente as 12:04).
 Verificacao pos-aplicacao (catalogo): 6 funcoes private, 2 tabelas, 3 policies em conversation_blocks, 3 em message_reports, flag aberta=false, coluna is_test presente.
 
 Gate FECHADO em producao: envio/bloqueio/denuncia bloqueados para contas fora da allowlist; perfis is_test invisiveis na busca e no perfil publico para usuarios gerais.
+
+Pos-validacao (mesma sessao): E2E real aprovado (envio/resposta/bloqueio/desbloqueio/denuncia/painel admin), conta de teste e todos os registros removidos (cascata verificada: 0 ocorrencias; 2 contas reais intactas), gate ABERTO (private.messaging_flags.aberta=true) apos Deploy B (475d34b). PAT temporario do GitHub revogado.
