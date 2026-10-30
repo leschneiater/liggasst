@@ -26,16 +26,12 @@ const AssinaturaProfissional: React.FC = () => {
       icon: Star,
       popular: false,
       features: [
-        'Cadastro de perfil básico',
-        'Até 3 certificados',
-        'Receber até 5 contatos/mês',
-        'Suporte por e-mail',
-        'Acesso a biblioteca básica'
+        'Cadastro de perfil com formação e especialidades',
+        'Perfil visível na busca para empresas cadastradas',
+        'Acesso gratuito'
       ],
       limitations: [
-        'Sem destaque nas buscas',
-        'Relatórios limitados',
-        'Sem selo de verificado'
+        'Mensagens, contratos, avaliações e certificados ainda em implantação'
       ]
     },
     {
@@ -48,7 +44,6 @@ const AssinaturaProfissional: React.FC = () => {
         'Perfil completo com destaque',
         'Certificados ilimitados',
         'Contatos ilimitados',
-        'Selo de verificado',
         'Relatórios detalhados',
         'Biblioteca completa SST',
         'Suporte prioritário',
@@ -77,13 +72,6 @@ const AssinaturaProfissional: React.FC = () => {
 
   const currentPlanData = plans.find(p => p.id === currentPlan);
 
-  const handleUpgrade = (planId: string) => {
-    if (planId === currentPlan) return;
-    
-    toast.success(`Redirecionando para pagamento do plano ${plans.find(p => p.id === planId)?.name}`);
-    // Aqui você redirecionaria para o gateway de pagamento
-  };
-
   const handleCancelSubscription = () => {
     toast.success('Assinatura cancelada com sucesso');
     // Aqui você processaria o cancelamento
@@ -102,7 +90,7 @@ const AssinaturaProfissional: React.FC = () => {
             Minha Assinatura
           </h1>
           <p className="font-roboto text-gray-600">
-            Gerencie seu plano e aproveite todos os benefícios da LiggaSST
+            Veja seu plano atual e a proposta dos planos pagos, ainda não disponíveis para assinatura
           </p>
         </div>
 
@@ -174,6 +162,11 @@ const AssinaturaProfissional: React.FC = () => {
         </div>
 
         {/* Plans Grid */}
+        <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <p className="font-roboto text-sm text-blue-900">
+                Os planos pagos ainda não estão disponíveis para assinatura: valores e benefícios dos planos pagos são uma proposta em avaliação e podem mudar antes do lançamento. O plano gratuito reflete o que está disponível hoje.
+            </p>
+          </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {plans.map((plan) => (
             <div
@@ -182,14 +175,6 @@ const AssinaturaProfissional: React.FC = () => {
                 plan.popular ? 'ring-2 ring-green-medium transform scale-105' : 'border border-gray-100'
               } ${currentPlan === plan.id ? 'ring-2 ring-green-deep' : ''}`}
             >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-green-medium text-white px-4 py-2 rounded-full text-sm font-roboto font-medium">
-                    Mais Popular
-                  </span>
-                </div>
-              )}
-
               {currentPlan === plan.id && (
                 <div className="absolute -top-4 right-4">
                   <span className="bg-green-deep text-white px-3 py-1 rounded-full text-xs font-roboto font-medium">
@@ -236,18 +221,12 @@ const AssinaturaProfissional: React.FC = () => {
               </div>
 
               <Button
-                onClick={() => handleUpgrade(plan.id)}
-                variant={currentPlan === plan.id ? 'outline' : (plan.popular ? 'primary' : 'outline')}
+                variant="outline"
                 fullWidth
                 size="lg"
-                disabled={currentPlan === plan.id}
+                disabled
               >
-                {currentPlan === plan.id 
-                  ? 'Plano Atual' 
-                  : plan.price[billingCycle] === 0 
-                    ? 'Downgrade' 
-                    : 'Fazer Upgrade'
-                }
+                {currentPlan === plan.id ? 'Plano Atual' : 'Em breve'}
               </Button>
             </div>
           ))}
@@ -256,7 +235,7 @@ const AssinaturaProfissional: React.FC = () => {
         {/* Benefits Section */}
         <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
           <h2 className="font-poppins font-bold text-2xl text-soft-black mb-6 text-center">
-            Por que fazer upgrade?
+            O que os planos pagos pretendem oferecer
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -277,10 +256,10 @@ const AssinaturaProfissional: React.FC = () => {
                 <Shield size={24} className="text-green-600" />
               </div>
               <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                Selo Verificado
+                Perfil na Busca
               </h3>
               <p className="font-roboto text-sm text-gray-600">
-                Ganhe credibilidade com o selo de profissional verificado
+                Seu perfil aparece na busca de profissionais para empresas cadastradas
               </p>
             </div>
 
