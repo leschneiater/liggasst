@@ -5,9 +5,11 @@ import {
   Calendar,
   DollarSign,
   CheckCircle,
-  ArrowLeft
+  ArrowLeft,
+  MessageSquare
 } from 'lucide-react';
 import Button from '../components/ui/Button';
+import { useAuth } from '../contexts/AuthContext';
 import { getProfessionalPublic, ProfessionalSearchItem } from '../services/database';
 
 const iniciaisNome = (nome: string): string => {
@@ -25,6 +27,7 @@ const PerfilProfissionalPublico: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [activeTab, setActiveTab] = useState('sobre');
+  const { userType } = useAuth();
 
   const loadProfessional = async () => {
     if (!id) {
@@ -100,7 +103,7 @@ const PerfilProfissionalPublico: React.FC = () => {
     <div className="min-h-screen bg-neutral-gray py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Button
             onClick={handleGoBack}
             variant="outline"
@@ -109,6 +112,15 @@ const PerfilProfissionalPublico: React.FC = () => {
           >
             Voltar à Busca
           </Button>
+          {userType === 'company' && professional && (
+            <Button
+              onClick={() => navigate(`/mensagens-empresa?para=${professional.id}`)}
+              icon={MessageSquare}
+              size="sm"
+            >
+              Enviar Mensagem
+            </Button>
+          )}
         </div>
 
         {/* Header */}
@@ -162,13 +174,6 @@ const PerfilProfissionalPublico: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Contato ainda não disponível — factual, sem promessa */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-          <p className="font-roboto text-sm text-gray-600">
-            O contato com profissionais pela plataforma ainda não está disponível.
-          </p>
         </div>
 
         {/* Tabs */}

@@ -233,6 +233,18 @@ export const markMessageAsRead = async (messageId: string) => {
   }
 };
 
+export const getProfilePublic = async (id: string) => {
+  try {
+    await getAuthenticatedUser();
+    const { data, error } = await supabase.rpc('get_profile_public', { p_id: id }).maybeSingle();
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar perfil público:', error);
+    return { success: false, error };
+  }
+};
+
 export const publishDemand = async (demandData: ProfileData) => {
   try {
     const user = await getAuthenticatedUser();
