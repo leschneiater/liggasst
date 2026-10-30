@@ -15,7 +15,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { publishDemand, fetchOwnCompany, updateCompany, fetchDemands } from '../services/database';
+import { publishDemand, fetchOwnCompany, updateCompany } from '../services/database';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -100,8 +100,8 @@ const PubliqueDemanda: React.FC = () => {
       // 1) Contato primeiro: o update é idempotente (mesma linha do cadastro)
       //    e falhas ANTES do insert deixam o retry seguro, sem demanda duplicada.
       //    Se o insert commitar no servidor mas a resposta se perder
-      //    (timeout), a reconciliação abaixo detecta a demanda já criada e a
-      //    mensagem orienta conferir "Minhas Demandas" antes de nova tentativa.
+      //    (timeout), o resultado é tratado como desconhecido: a mensagem
+      //    orienta conferir "Minhas Demandas" antes de nova tentativa.
       //    Só campos preenchidos são enviados, para não sobrescrever o
       //    cadastro existente com vazio. O contato fica em companies (leitura
       //    restrita ao dono/admin), nunca na demanda, que é visível a todos
@@ -130,19 +130,9 @@ const PubliqueDemanda: React.FC = () => {
       });
       if (!result.success) {
         // Resultado desconhecido: o insert pode ter commitado no servidor e a
-        // resposta se perdeu. Reconcilia antes de qualquer nova tentativa:
-        // se a demanda já aparece em "Minhas Demandas", trata como publicada
-        // em vez de induzir um retry que duplicaria.
-        const check = await fetchDemands({ company_id: currentUser.id });
-        const jaExiste = check.success && Array.isArray(check.data) && check.data.some(
-          (d) => (d as { title?: string }).title === data.titulo
-            && Date.now() - new Date((d as { created_at?: string }).created_at ?? 0).getTime() < 10 * 60 * 1000
-        );
-        if (jaExiste) {
-          setDemandPublished(true);
-          toast.success('A demanda consta como publicada em "Minhas Demandas".');
-          return;
-        }
+        // resposta se perdeu. Não há como confirmar nem desfazer daqui —
+        // orienta conferir "Minhas Demandas" antes de qualquer nova tentativa
+        // (sem retry automático, sem assumir sucesso por título parecido).
         throw new Error('Publicação não confirmada');
       }
       setDemandPublished(true);
@@ -528,10 +518,8 @@ const PubliqueDemanda: React.FC = () => {
                     Como funciona:
                   </h3>
                   <ul className="font-roboto text-sm text-green-deep space-y-1">
-                    <li>• Sua demanda será publicada para profissionais qualificados</li>
-                    <li>• Você receberá propostas diretamente no seu e-mail</li>
-                    <li>• Analise os perfis e escolha o melhor profissional</li>
-                    <li>• Negocie diretamente com o profissional escolhido</li>
+                    <li>• Sua demanda é publicada e fica visível para os profissionais da plataforma</li>
+                    <li>• Você acompanha o status em "Minhas Demandas", no painel da empresa</li>
                   </ul>
                 </div>
 
