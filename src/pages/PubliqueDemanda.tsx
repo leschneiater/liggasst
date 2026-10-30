@@ -15,6 +15,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { publishDemand, fetchOwnCompany, updateCompany } from '../services/database';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -54,6 +55,20 @@ const PubliqueDemanda: React.FC = () => {
     }
   }, [currentUser, navigate]);
 
+  // Pré-preencher contato a partir do cadastro da empresa
+  useEffect(() => {
+    if (!currentUser) return;
+    fetchOwnCompany(currentUser.id).then((result) => {
+      if (!result.success || !result.data) return;
+      const company = result.data as Record<string, string | null>;
+      reset({
+        empresa: company.razao_social ?? '',
+        contato: company.responsible_name ?? '',
+        telefone: company.responsible_phone ?? '',
+      });
+    });
+  }, [currentUser, reset]);
+
   const tiposServico = [
     'PCMSO - Programa de Controle Médico de Saúde Ocupacional',
     'PGR - Programa de Gerenciamento de Riscos',
@@ -78,12 +93,59 @@ const PubliqueDemanda: React.FC = () => {
   const onSubmit = async (data: DemandFormData) => {
     setLoading(true);
     try {
-      // Simular publicação da demanda
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const descricaoCompleta = data.requisitos
+        ? `${data.descricao}\n\nRequisitos: ${data.requisitos}`
+        : data.descricao;
+      if (!currentUser) throw new Error('Usuário não autenticado');
+      // 1) Contato primeiro: o update é idempotente (mesma linha do cadastro)
+      //    e falhas ANTES do insert deixam o retry seguro, sem demanda duplicada.
+      //    Se o insert commitar no servidor mas a resposta se perder
+      //    (timeout), o resultado é tratado como desconhecido: a mensagem
+      //    orienta conferir "Minhas Demandas" antes de nova tentativa.
+      //    Só campos preenchidos são enviados, para não sobrescrever o
+      //    cadastro existente com vazio. O contato fica em companies (leitura
+      //    restrita ao dono/admin), nunca na demanda, que é visível a todos
+      //    os usuários autenticados.
+      const companyData: Record<string, string> = {};
+      if (data.empresa.trim()) companyData.razao_social = data.empresa.trim();
+      if (data.contato.trim()) companyData.responsible_name = data.contato.trim();
+      if (data.telefone.trim()) companyData.responsible_phone = data.telefone.trim();
+      if (Object.keys(companyData).length > 0) {
+        const companyResult = await updateCompany(currentUser.id, companyData);
+        if (!companyResult.success) throw new Error('Falha ao salvar contato');
+      }
+      // 2) Só chega aqui se o contato foi salvo: qualquer falha anterior
+      //    interrompe antes do insert, sem sucesso parcial anunciado.
+      const result = await publishDemand({
+        title: data.titulo,
+        description: descricaoCompleta,
+        service_type: data.tipoServico,
+        city: data.localizacao,
+        state: data.estado,
+        budget: data.orcamento ? Number(data.orcamento) : null,
+        deadline: data.prazo || null,
+        modalidade: data.modalidade,
+        urgencia: data.urgencia,
+        tipo_orcamento: data.tipoOrcamento,
+      });
+      if (!result.success) {
+        // Resultado desconhecido: o insert pode ter commitado no servidor e a
+        // resposta se perdeu. Não há como confirmar nem desfazer daqui —
+        // orienta conferir "Minhas Demandas" antes de qualquer nova tentativa
+        // (sem retry automático, sem assumir sucesso por título parecido).
+        throw new Error('Publicação não confirmada');
+      }
       setDemandPublished(true);
       toast.success('Demanda publicada com sucesso!');
     } catch (error) {
-      toast.error('Erro ao publicar demanda');
+      console.error('Erro ao publicar demanda:', error);
+      if (error instanceof Error && error.message === 'Falha ao salvar contato') {
+        toast.error('Não foi possível salvar os dados de contato. A demanda não foi publicada. Tente novamente.');
+      } else if (error instanceof Error && error.message === 'Publicação não confirmada') {
+        toast.error('Não foi possível confirmar a publicação. Verifique "Minhas Demandas" no painel antes de tentar de novo, para não criar uma demanda duplicada.');
+      } else {
+        toast.error('Erro ao publicar demanda. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -199,7 +261,7 @@ const PubliqueDemanda: React.FC = () => {
             Publique sua Demanda
           </h1>
           <p className="font-roboto text-gray-600">
-            Descreva sua necessidade e receba propostas de profissionais qualificados
+            Descreva a necessidade da sua empresa e publique a demanda na plataforma
           </p>
         </div>
 
@@ -423,6 +485,10 @@ const PubliqueDemanda: React.FC = () => {
                   Informações de Contato
                 </h2>
 
+                <p className="font-roboto text-sm text-gray-600 -mt-2">
+                  Estes dados ficam salvos no cadastro da sua empresa e não aparecem na demanda publicada.
+                </p>
+
                 <Input
                   label="Nome da Empresa"
                   icon={Building2}
@@ -452,10 +518,8 @@ const PubliqueDemanda: React.FC = () => {
                     Como funciona:
                   </h3>
                   <ul className="font-roboto text-sm text-green-deep space-y-1">
-                    <li>• Sua demanda será publicada para profissionais qualificados</li>
-                    <li>• Você receberá propostas diretamente no seu e-mail</li>
-                    <li>• Analise os perfis e escolha o melhor profissional</li>
-                    <li>• Negocie diretamente com o profissional escolhido</li>
+                    <li>• Sua demanda é publicada e fica registrada na plataforma</li>
+                    <li>• Você acompanha o status em "Minhas Demandas", no painel da empresa</li>
                   </ul>
                 </div>
 

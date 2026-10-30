@@ -15,10 +15,44 @@ import {
   BarChart3
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { fetchDemands } from '../../services/database';
 import Button from '../../components/ui/Button';
+
+interface DemandaRow {
+  id: string;
+  title: string;
+  service_type: string | null;
+  city: string | null;
+  state: string | null;
+  status: string;
+  created_at: string;
+}
+
+const statusDemanda: Record<string, string> = {
+  draft: 'Rascunho',
+  active: 'Ativa',
+  in_progress: 'Em andamento',
+  completed: 'Concluída',
+  cancelled: 'Cancelada',
+};
 
 const DashboardEmpresa: React.FC = () => {
   const { userData, currentUser } = useAuth();
+  const [demands, setDemands] = useState<DemandaRow[]>([]);
+  const [demandsLoading, setDemandsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    setDemandsLoading(true);
+    fetchDemands({ company_id: currentUser.id })
+      .then((result) => {
+        if (result.success && Array.isArray(result.data)) {
+          setDemands(result.data as DemandaRow[]);
+        }
+      })
+      .finally(() => setDemandsLoading(false));
+  }, [currentUser]);
+
   const [stats, setStats] = useState({
     profissionaisContratados: 0,
     projetosAtivos: 0,
@@ -162,6 +196,48 @@ const DashboardEmpresa: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Minhas Demandas (dados reais) */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-poppins font-semibold text-xl text-soft-black">
+              Minhas Demandas
+            </h2>
+            <Button as={Link} to="/publique-demanda" variant="outline" size="sm" icon={Plus}>
+              Nova Demanda
+            </Button>
+          </div>
+          {demandsLoading ? (
+            <p className="font-roboto text-gray-500 text-sm">Carregando demandas...</p>
+          ) : demands.length === 0 ? (
+            <p className="font-roboto text-gray-500 text-sm">
+              Nenhuma demanda publicada ainda. Publique a primeira para encontrar profissionais.
+            </p>
+          ) : (
+            <ul className="divide-y divide-gray-100">
+              {demands.map((demanda) => (
+                <li key={demanda.id} className="py-3 flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-roboto font-medium text-soft-black">{demanda.title}</p>
+                    <p className="font-roboto text-sm text-gray-500">
+                      {[demanda.service_type, [demanda.city, demanda.state].filter(Boolean).join(', ')]
+                        .filter(Boolean)
+                        .join(' • ')}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="inline-block px-2 py-1 text-xs font-roboto rounded-full bg-green-light text-green-deep">
+                      {statusDemanda[demanda.status] ?? demanda.status}
+                    </span>
+                    <p className="font-roboto text-xs text-gray-400 mt-1">
+                      {new Date(demanda.created_at).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
