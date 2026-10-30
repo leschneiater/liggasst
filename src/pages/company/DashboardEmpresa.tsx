@@ -115,7 +115,7 @@ const DashboardEmpresa: React.FC = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Button
                   as={Link}
-                  to="/busca-profissionais"
+                  to="/busca-profissionais-empresa"
                   variant="outline"
                   size="sm"
                   icon={Search}
