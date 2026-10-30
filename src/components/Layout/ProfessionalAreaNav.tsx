@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -24,6 +24,12 @@ export const professionalAreaPaths: string[] = menuItems.map((item) => item.path
 
 const ProfessionalAreaNav: React.FC = () => {
   const location = useLocation();
+  const activeRef = useRef<HTMLAnchorElement | null>(null);
+
+  // Keep the active item visible inside the horizontal scroll on small screens
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }, [location.pathname]);
 
   return (
     <nav
@@ -38,6 +44,7 @@ const ProfessionalAreaNav: React.FC = () => {
             return (
               <Link
                 key={item.path}
+                ref={isActive ? activeRef : undefined}
                 to={item.path}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center space-x-2 px-3 py-3 text-sm font-roboto font-medium whitespace-nowrap border-b-2 transition-colors duration-200 ${
