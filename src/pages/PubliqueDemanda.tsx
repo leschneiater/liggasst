@@ -261,7 +261,7 @@ const PubliqueDemanda: React.FC = () => {
             Publique sua Demanda
           </h1>
           <p className="font-roboto text-gray-600">
-            Descreva sua necessidade e receba propostas de profissionais qualificados
+            Descreva a necessidade da sua empresa e publique a demanda na plataforma
           </p>
         </div>
 
@@ -518,7 +518,7 @@ const PubliqueDemanda: React.FC = () => {
                     Como funciona:
                   </h3>
                   <ul className="font-roboto text-sm text-green-deep space-y-1">
-                    <li>• Sua demanda é publicada e fica visível para os profissionais da plataforma</li>
+                    <li>• Sua demanda é publicada e fica registrada na plataforma</li>
                     <li>• Você acompanha o status em "Minhas Demandas", no painel da empresa</li>
                   </ul>
                 </div>
