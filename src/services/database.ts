@@ -300,6 +300,69 @@ export const reportUser = async (reportedId: string, reason: string, details: st
   }
 };
 
+// Denuncias - administracao (RLS: so is_admin ve todas e atualiza)
+export interface ReportRow {
+  id: string;
+  reporter_id: string;
+  reported_id: string;
+  message_id: string | null;
+  reason: string;
+  details: string | null;
+  status: 'open' | 'reviewed' | 'actioned';
+  created_at: string;
+}
+
+export const fetchReports = async () => {
+  try {
+    await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('message_reports')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return { success: true, data: (data || []) as ReportRow[] };
+  } catch (error) {
+    console.error('Erro ao buscar denúncias:', error);
+    return { success: false, data: [] as ReportRow[], error };
+  }
+};
+
+export const updateReportStatus = async (reportId: string, status: 'reviewed' | 'actioned') => {
+  try {
+    await getAuthenticatedUser();
+    const { error } = await supabase
+      .from('message_reports')
+      .update({ status })
+      .eq('id', reportId);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao atualizar denúncia:', error);
+    return { success: false, error };
+  }
+};
+
+// Nomes de perfis para a administracao (profiles_select permite is_admin)
+export const fetchProfileNames = async (ids: string[]) => {
+  try {
+    await getAuthenticatedUser();
+    if (ids.length === 0) return { success: true, data: {} as Record<string, string> };
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, display_name')
+      .in('id', ids);
+    if (error) throw error;
+    const mapa: Record<string, string> = {};
+    for (const p of (data || []) as { id: string; display_name: string }[]) {
+      mapa[p.id] = p.display_name;
+    }
+    return { success: true, data: mapa };
+  } catch (error) {
+    console.error('Erro ao buscar nomes:', error);
+    return { success: false, data: {} as Record<string, string>, error };
+  }
+};
+
 export const getProfilePublic = async (id: string) => {
   try {
     await getAuthenticatedUser();

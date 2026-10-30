@@ -49,6 +49,7 @@ const MensagensProfissional = lazy(() => import('./pages/professional/MensagensP
 const AssinaturaProfissional = lazy(() => import('./pages/professional/AssinaturaProfissional'));
 const BuscaEmpresas = lazy(() => import('./pages/professional/BuscaEmpresas'));
 const DemandasDisponiveis = lazy(() => import('./pages/professional/DemandasDisponiveis'));
+const DenunciasAdmin = lazy(() => import('./pages/admin/DenunciasAdmin'));
 
 // Company Pages
 const DashboardEmpresa = lazy(() => import('./pages/company/DashboardEmpresa'));
@@ -208,6 +209,11 @@ function App() {
                 <Route path="/admin" element={
                   <ProtectedRoute userType="admin">
                     <Layout><DashboardAdmin /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/denuncias" element={
+                  <ProtectedRoute userType="admin">
+                    <Layout><DenunciasAdmin /></Layout>
                   </ProtectedRoute>
                 } />
 
