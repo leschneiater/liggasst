@@ -25,6 +25,13 @@ as $$
   );
 $$;
 
+-- Padrao de private.is_admin: revogar chamada direta publica, manter
+-- execute para authenticated (necessario a avaliacao da policy). O schema
+-- private nao e exposto pelo PostgREST, entao as funcoes nao sao
+-- chamaveis via API; a revogacao e defesa em profundidade.
+revoke all on function private.pode_iniciar(uuid, uuid) from public;
+grant execute on function private.pode_iniciar(uuid, uuid) to authenticated;
+
 -- Resposta em conversa existente: security definer evita
 -- autorreferência de messages na própria policy (recursão).
 create or replace function private.tem_conversa(a uuid, b uuid)
@@ -36,6 +43,9 @@ as $$
        or (m.sender_id = b and m.receiver_id = a)
   );
 $$;
+
+revoke all on function private.tem_conversa(uuid, uuid) from public;
+grant execute on function private.tem_conversa(uuid, uuid) to authenticated;
 
 drop policy if exists messages_insert on public.messages;
 create policy messages_insert on public.messages for insert to authenticated

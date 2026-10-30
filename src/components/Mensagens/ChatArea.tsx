@@ -3,7 +3,7 @@ import { useSearchParams, useLocation } from 'react-router-dom';
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { fetchMessages, sendMessage, markMessageAsRead, getProfilePublic, getProfessionalPublic } from '../../services/database';
+import { fetchMessages, sendMessage, markMessageAsRead, getProfilePublic, getProfessionalPublic, fetchCompanies } from '../../services/database';
 
 interface MessageRow {
   id: string;
@@ -112,11 +112,19 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
         if (!nome) {
           try {
             const rp = await getProfessionalPublic(activeId);
-            nome = rp?.nome || 'Usuário';
-          } catch {
-            nome = 'Usuário';
+            nome = rp?.nome || '';
+          } catch { /* nao e profissional */ }
+        }
+        if (!nome) {
+          // Contraparte empresa ainda sem mensagens: RPC publica de busca
+          // (ja expoe empresas aprovadas a autenticados)
+          const rc = await fetchCompanies();
+          if (rc.success && Array.isArray(rc.data)) {
+            const emp = (rc.data as { id: string; display_name: string }[]).find(e => e.id === activeId);
+            nome = emp?.display_name || '';
           }
         }
+        if (!nome) nome = 'Usuário';
         setNames(prev => ({ ...prev, [activeId]: nome }));
       });
     }
