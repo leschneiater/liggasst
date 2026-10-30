@@ -1,11 +1,22 @@
-# Drafts de policy de mensagens (NAO APLICAR sem decisao da proprietaria)
+# Rascunhos de políticas de mensagens — NÃO APLICAR em produção
 
-Dependem da decisao "quem pode iniciar conversa". Estrutura comum:
-- Resposta em conversa existente: sempre permitida para participantes (RLS ja limita leitura a participantes).
-- Inicio de conversa (primeiro par): controlado por private.pode_iniciar(a, b).
+Registro das variantes discutidas/preparadas. Apenas o que estiver em
+supabase/migrations/ com aprovação explícita de publicação será aplicado.
 
-Variantes:
-- draft_A_inicio_somente_empresa.sql: so empresa aprovada inicia com profissional aprovado; profissional so responde.
-- draft_B_inicio_ambos_papeis_opostos.sql: empresa<->profissional aprovados iniciam em ambas direcoes; exclui mesmo papel, admin e self.
+- draft_A_inicio_somente_empresa.sql — variante A (só empresa inicia).
+  SUPERADA pela decisão da usuária de 30/10/2026 ("ambos podem iniciar").
+- draft_B_inicio_ambos_papeis_opostos.sql — variante B, ESCOLHIDA;
+  espelho da migração preparada 20261030130000.
+- draft_C_resposta_exige_aprovado.sql — OPÇÃO aguardando decisão:
+  rejeitado/pendente não envia nem em conversa existente.
+  Validado localmente (C1 bloqueia rejeitado, C2 controle permite).
+- draft_D_bloqueio_usuarios.sql — OPÇÃO: bloqueio bilateral entre
+  usuários (conversation_blocks). Validado localmente (D1/D2 bloqueiam
+  ambos os sentidos, D3 controle, D4 bloqueado não vê bloqueios,
+  D5 desbloqueio restaura).
+- draft_E_denuncia.sql — OPÇÃO: denúncia para revisão da administração
+  (message_reports, mínimo sem UI de moderação). Validado localmente
+  (E1 cria, E2 terceiro não vê denúncia alheia).
 
-Ambas preservam: spoof bloqueado (sender = auth.uid), self bloqueado, FK de destinatario.
+Combinação: D e E são independentes entre si; C altera a mesma policy
+messages_insert — se aprovadas juntas, consolidar em uma única migração.
