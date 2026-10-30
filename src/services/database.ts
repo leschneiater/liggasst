@@ -405,3 +405,154 @@ export const fetchDemands = async (filters: Filters = {}) => {
     return { success: false, error };
   }
 };
+
+export interface Certificate {
+  id: string;
+  professional_id: string;
+  name: string;
+  issuer: string | null;
+  issued_at: string | null;
+  expires_at: string | null;
+  storage_path: string;
+  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  visible_to_companies: boolean;
+  created_at: string;
+}
+
+export const fetchMyCertificates = async () => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('professional_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar certificados:', error);
+    return { success: false, error };
+  }
+};
+
+export const createCertificate = async (certificate: {
+  name: string;
+  issuer?: string | null;
+  issued_at?: string | null;
+  expires_at?: string | null;
+  storage_path: string;
+  visible_to_companies?: boolean;
+}) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('certificates')
+      .insert({
+        professional_id: user.id,
+        name: certificate.name,
+        issuer: certificate.issuer ?? null,
+        issued_at: certificate.issued_at ?? null,
+        expires_at: certificate.expires_at ?? null,
+        storage_path: certificate.storage_path,
+        status: 'pending',
+        visible_to_companies: certificate.visible_to_companies ?? false,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao registrar certificado:', error);
+    return { success: false, error };
+  }
+};
+
+export const getCertificateSignedUrl = async (storagePath: string) => {
+  try {
+    const { data, error } = await supabase.storage
+      .from('documents')
+      .createSignedUrl(storagePath, 3600);
+    if (error) throw error;
+    return { success: true, signedUrl: data.signedUrl };
+  } catch (error) {
+    console.error('Erro ao gerar link do certificado:', error);
+    return { success: false, error };
+  }
+};
+
+export const setCertificateVisibility = async (certificateId: string, visible: boolean) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { error } = await supabase
+      .from('certificates')
+      .update({ visible_to_companies: visible })
+      .eq('id', certificateId)
+      .eq('professional_id', user.id);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao alterar visibilidade do certificado:', error);
+    return { success: false, error };
+  }
+};
+
+export interface SharedCertificate {
+  id: string;
+  name: string;
+  issuer: string | null;
+  issued_at: string | null;
+  expires_at: string | null;
+}
+
+export const fetchSharedCertificates = async (professionalId: string) => {
+  try {
+    const { data, error } = await supabase.rpc('get_professional_shared_certificates', {
+      p_professional_id: professionalId,
+    });
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar certificados compartilhados:', error);
+    return { success: false, error };
+  }
+};
+
+export const getSharedCertificateUrl = async (certificateId: string) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('shared-certificate-url', {
+      body: { certificate_id: certificateId },
+    });
+    if (error) throw error;
+    if (!data?.signedUrl) throw new Error('Link não retornado.');
+    return { success: true, signedUrl: data.signedUrl as string };
+  } catch (error) {
+    console.error('Erro ao abrir certificado compartilhado:', error);
+    return { success: false, error };
+  }
+};
+
+// Depende da policy certificates_delete (rascunho em supabase/drafts, não aplicada).
+export const deleteCertificate = async (certificateId: string, storagePath: string) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('certificates')
+      .delete()
+      .eq('id', certificateId)
+      .eq('professional_id', user.id)
+      .select('id');
+    if (error) throw error;
+    // delete sem linha afetada (id inexistente ou de outro dono) e falha:
+    // NAO remove o objeto do storage
+    if (!data || data.length === 0) throw new Error('Certificado não encontrado.');
+    const { error: storageError } = await supabase.storage.from('documents').remove([storagePath]);
+    if (storageError) {
+      console.error('Linha removida, mas o arquivo ficou no storage:', storageError);
+      return { success: true, warning: 'storage' };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao excluir certificado:', error);
+    return { success: false, error };
+  }
+};

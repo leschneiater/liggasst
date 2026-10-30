@@ -6,12 +6,16 @@ import {
   DollarSign,
   CheckCircle,
   ArrowLeft,
-  MessageSquare
+  MessageSquare,
+  Award,
+  Building2,
+  Eye
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { useMessagingDisponivel } from '../hooks/useMessagingDisponivel';
-import { getProfessionalPublic, ProfessionalSearchItem } from '../services/database';
+import toast from 'react-hot-toast';
+import { getProfessionalPublic, ProfessionalSearchItem, fetchSharedCertificates, getSharedCertificateUrl, SharedCertificate } from '../services/database';
 
 const iniciaisNome = (nome: string): string => {
   const partes = nome.trim().split(/\s+/).filter(p => /[A-Za-zÀ-ÿ]/.test(p[0] ?? ''));
@@ -29,6 +33,9 @@ const PerfilProfissionalPublico: React.FC = () => {
   const [loadError, setLoadError] = useState(false);
   const [activeTab, setActiveTab] = useState('sobre');
   const { userType } = useAuth();
+  const [certificados, setCertificados] = useState<SharedCertificate[] | null>(null);
+  const [certificadosErro, setCertificadosErro] = useState(false);
+  const [abrindoCertId, setAbrindoCertId] = useState<string | null>(null);
   const { disponivel: msgDisponivel } = useMessagingDisponivel();
 
   const loadProfessional = async () => {
@@ -52,6 +59,37 @@ const PerfilProfissionalPublico: React.FC = () => {
   useEffect(() => {
     loadProfessional();
   }, [id]);
+
+  const carregarCertificados = async (professionalId: string) => {
+    setCertificadosErro(false);
+    const r = await fetchSharedCertificates(professionalId);
+    if (r.success && Array.isArray(r.data)) {
+      setCertificados(r.data as SharedCertificate[]);
+    } else {
+      setCertificadosErro(true);
+    }
+  };
+
+  useEffect(() => {
+    if (userType === 'company' && professional && certificados === null && !certificadosErro) {
+      carregarCertificados(professional.id);
+    }
+  }, [userType, professional, certificados, certificadosErro]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const abrirCertificado = async (certificateId: string) => {
+    // janela aberta no gesto do usuario para nao ser bloqueada como popup;
+    // a URL assinada e atribuida quando chega
+    const janela = window.open('', '_blank', 'noopener,noreferrer');
+    setAbrindoCertId(certificateId);
+    const r = await getSharedCertificateUrl(certificateId);
+    setAbrindoCertId(null);
+    if (!r.success || !r.signedUrl) {
+      janela?.close();
+      toast.error('Não foi possível abrir o arquivo. O profissional pode ter removido o compartilhamento.');
+      return;
+    }
+    if (janela) janela.location.href = r.signedUrl;
+  };
 
   const handleGoBack = () => {
     navigate(-1);
@@ -184,7 +222,8 @@ const PerfilProfissionalPublico: React.FC = () => {
             <nav className="flex space-x-8 px-8">
               {[
                 { id: 'sobre', label: 'Sobre' },
-                { id: 'especializacoes', label: 'Especializações' }
+                { id: 'especializacoes', label: 'Especializações' },
+                ...(userType === 'company' ? [{ id: 'certificados', label: 'Certificados' }] : [])
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -252,6 +291,67 @@ const PerfilProfissionalPublico: React.FC = () => {
                 ) : (
                   <p className="font-roboto text-gray-600">
                     Este profissional ainda não informou especializações.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Certificados (somente empresas) */}
+            {activeTab === 'certificados' && userType === 'company' && (
+              <div>
+                <h3 className="font-poppins font-semibold text-lg text-soft-black mb-1">
+                  Certificados
+                </h3>
+                <p className="font-roboto text-sm text-gray-500 mb-4">
+                  Documentos que o profissional escolheu mostrar. O Ligga SST não verifica certificados.
+                </p>
+                {certificadosErro ? (
+                  <div>
+                    <p className="font-roboto text-gray-600 mb-2">Não foi possível carregar os certificados.</p>
+                    <button
+                      onClick={() => professional && carregarCertificados(professional.id)}
+                      className="text-green-deep font-roboto font-medium hover:underline"
+                    >
+                      Tentar novamente
+                    </button>
+                  </div>
+                ) : certificados === null ? (
+                  <p className="font-roboto text-gray-600">Carregando certificados...</p>
+                ) : certificados.length > 0 ? (
+                  <div className="space-y-4">
+                    {certificados.map((c) => (
+                      <div key={c.id} className="flex items-start p-4 bg-green-light bg-opacity-20 rounded-lg">
+                        <Award size={20} className="text-green-deep mr-3 mt-1 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-poppins font-semibold text-soft-black">{c.name}</h4>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 font-roboto text-sm text-gray-500 mt-1">
+                            {c.issuer && (
+                              <span className="flex items-center"><Building2 size={14} className="mr-1" />{c.issuer}</span>
+                            )}
+                            {c.issued_at && (
+                              <span className="flex items-center"><Calendar size={14} className="mr-1" />Emitido em {new Date(c.issued_at + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+                            )}
+                            {c.expires_at && (
+                              <span className="flex items-center"><Calendar size={14} className="mr-1" />Válido até {new Date(c.expires_at + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          icon={Eye}
+                          loading={abrindoCertId === c.id}
+                          onClick={() => abrirCertificado(c.id)}
+                          className="flex-shrink-0"
+                        >
+                          Abrir arquivo
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="font-roboto text-gray-600">
+                    Este profissional não compartilhou certificados.
                   </p>
                 )}
               </div>
