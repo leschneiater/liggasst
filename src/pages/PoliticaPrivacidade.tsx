@@ -88,6 +88,8 @@ const PoliticaPrivacidade: React.FC = () => {
                     <li>Facilitar conexões entre empresas e profissionais</li>
                     <li>Processar transações e pagamentos</li>
                     <li>Fornecer suporte ao cliente</li>
+                    <li>Viabilizar a comunicação entre empresas e profissionais pela área de mensagens</li>
+                    <li>Analisar denúncias e manter a segurança e a integridade da plataforma</li>
                   </ul>
                 </div>
                 <div>
@@ -165,6 +167,19 @@ const PoliticaPrivacidade: React.FC = () => {
                     autoridades competentes.
                   </p>
                 </div>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    5.4 Mensagens e Denúncias
+                  </h3>
+                  <p className="font-roboto text-gray-700">
+                    O conteúdo das mensagens trocadas na plataforma é visível apenas para
+                    os participantes da conversa. A administração da LiggaSST não acessa
+                    o conteúdo das mensagens. Quando um usuário registra uma denúncia, os
+                    dados da denúncia (motivo, informações fornecidas pelo denunciante,
+                    data e usuários envolvidos) ficam visíveis para a administração e são
+                    usados somente para analisar o caso e adotar as providências cabíveis.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -219,6 +234,10 @@ const PoliticaPrivacidade: React.FC = () => {
                   Mantemos seus dados pessoais apenas pelo tempo necessário para 
                   cumprir as finalidades descritas nesta política ou conforme 
                   exigido por lei.
+                </p>
+                <p className="font-roboto text-gray-700">
+                  Mensagens e denúncias seguem as regras gerais de retenção descritas
+                  nesta seção.
                 </p>
                 <div className="bg-neutral-gray p-4 rounded-lg">
                   <h4 className="font-poppins font-semibold text-soft-black mb-2">

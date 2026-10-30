@@ -174,12 +174,64 @@ const TermosUso: React.FC = () => {
               </div>
             </div>
 
+
+            {/* Mensagens */}
+            <div className="mb-12">
+              <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
+                6. Mensagens entre Usuários
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    6.1 Quem pode conversar
+                  </h3>
+                  <p className="font-roboto text-gray-700">
+                    Empresas e profissionais com cadastro aprovado podem iniciar conversas
+                    entre si pela plataforma. As mensagens devem ter finalidade profissional,
+                    relacionada à contratação e à prestação de serviços de Segurança do
+                    Trabalho.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    6.2 Conduta nas mensagens
+                  </h3>
+                  <p className="font-roboto text-gray-700">
+                    As regras de conduta (item 3.3) e as atividades proibidas (item 4)
+                    valem também para as mensagens trocadas na plataforma.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    6.3 Bloqueio
+                  </h3>
+                  <p className="font-roboto text-gray-700">
+                    Qualquer usuário pode bloquear outro usuário. O bloqueio impede o envio
+                    de novas mensagens entre os dois, nos dois sentidos, e não apaga o
+                    histórico da conversa. O usuário bloqueado não é informado sobre quem
+                    realizou o bloqueio.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    6.4 Denúncias
+                  </h3>
+                  <p className="font-roboto text-gray-700">
+                    O usuário pode denunciar à administração uma mensagem ou conduta
+                    inadequada. A administração analisa cada denúncia e registra seu
+                    andamento. Esse registro não é, por si só, uma medida sobre contas:
+                    suspensões ou encerramentos seguem a seção de Rescisão destes Termos.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Privacy and Data */}
             <div className="mb-12 bg-green-50 p-6 rounded-xl">
               <div className="flex items-center mb-4">
                 <Shield size={24} className="text-green-600 mr-3" />
                 <h2 className="font-poppins font-bold text-2xl text-green-800">
-                  6. Privacidade e Dados
+                  7. Privacidade e Dados
                 </h2>
               </div>
               <p className="font-roboto text-green-700">
@@ -192,12 +244,12 @@ const TermosUso: React.FC = () => {
             {/* Payment and Fees */}
             <div className="mb-12">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                7. Pagamentos e Taxas
+                8. Pagamentos e Taxas
               </h2>
               <div className="space-y-4">
                 <div>
                   <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                    7.1 Planos de Assinatura
+                    8.1 Planos de Assinatura
                   </h3>
                   <p className="font-roboto text-gray-700">
                     Oferecemos planos gratuitos e pagos. Os valores e condições estão 
@@ -206,7 +258,7 @@ const TermosUso: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                    7.2 Comissões
+                    8.2 Comissões
                   </h3>
                   <p className="font-roboto text-gray-700">
                     Podemos cobrar comissões sobre transações realizadas através da plataforma, 
@@ -215,7 +267,7 @@ const TermosUso: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                    7.3 Reembolsos
+                    8.3 Reembolsos
                   </h3>
                   <p className="font-roboto text-gray-700">
                     Reembolsos são processados conforme nossa política específica, 
@@ -228,7 +280,7 @@ const TermosUso: React.FC = () => {
             {/* Termination */}
             <div className="mb-12">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                8. Rescisão
+                9. Rescisão
               </h2>
               <p className="font-roboto text-gray-700 mb-4">
                 Qualquer parte pode encerrar o uso da plataforma a qualquer momento. 
@@ -244,7 +296,7 @@ const TermosUso: React.FC = () => {
             {/* Limitation of Liability */}
             <div className="mb-12">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                9. Limitação de Responsabilidade
+                10. Limitação de Responsabilidade
               </h2>
               <p className="font-roboto text-gray-700 mb-4">
                 A LiggaSST não se responsabiliza por danos diretos, indiretos, 
@@ -259,7 +311,7 @@ const TermosUso: React.FC = () => {
             {/* Changes to Terms */}
             <div className="mb-12">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                10. Alterações nos Termos
+                11. Alterações nos Termos
               </h2>
               <p className="font-roboto text-gray-700">
                 Podemos modificar estes termos a qualquer momento. Alterações significativas 
@@ -271,7 +323,7 @@ const TermosUso: React.FC = () => {
             {/* Governing Law */}
             <div className="mb-12">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                11. Lei Aplicável e Foro
+                12. Lei Aplicável e Foro
               </h2>
               <p className="font-roboto text-gray-700">
                 Estes termos são regidos pelas leis brasileiras. Qualquer disputa 
@@ -283,7 +335,7 @@ const TermosUso: React.FC = () => {
             {/* Contact */}
             <div className="bg-neutral-gray p-6 rounded-xl">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                12. Contato
+                13. Contato
               </h2>
               <p className="font-roboto text-gray-700 mb-4">
                 Para dúvidas sobre estes Termos de Uso, entre em contato conosco:
