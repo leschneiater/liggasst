@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ChunkErrorBoundary from './components/ChunkErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 
 // Loading component
@@ -89,6 +90,7 @@ function App() {
               }}
             />
             
+            <ChunkErrorBoundary>
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 {/* Public Routes */}
@@ -203,6 +205,7 @@ function App() {
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </Routes>
             </Suspense>
+          </ChunkErrorBoundary>
           </div>
       </AuthProvider>
     </Router>
