@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
-import { MessageSquare, Send, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Send, ArrowLeft, Ban, Flag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { fetchMessages, sendMessage, markMessageAsRead, getProfilePublic, getProfessionalPublic, fetchCompanies } from '../../services/database';
+import { fetchMessages, sendMessage, markMessageAsRead, getProfilePublic, getProfessionalPublic, fetchCompanies, fetchMyBlocks, blockUser, unblockUser, reportUser } from '../../services/database';
 
 interface MessageRow {
   id: string;
@@ -30,6 +30,11 @@ const formataHora = (iso: string) =>
 const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
   const { currentUser } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [bloqueados, setBloqueados] = useState<Set<string>>(new Set());
+  const [denunciaAberta, setDenunciaAberta] = useState(false);
+  const [denunciaMotivo, setDenunciaMotivo] = useState('spam');
+  const [denunciaDetalhes, setDenunciaDetalhes] = useState('');
+  const [denunciaEnviando, setDenunciaEnviando] = useState(false);
   const location = useLocation();
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [names, setNames] = useState<Record<string, string>>({});
@@ -44,6 +49,9 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
   const nomeDe = useCallback((id: string) => names[id] || 'Usuário', [names]);
 
   const load = useCallback(async (inicial = false) => {
+    fetchMyBlocks().then(rb => {
+      if (rb.success) setBloqueados(new Set(rb.data.map(b => b.blocked_id)));
+    });
     if (inicial) { setLoading(true); setError(false); }
     const result = await fetchMessages();
     if (!result.success || !Array.isArray(result.data)) {
@@ -220,13 +228,68 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
     </div>
   );
 
+  const bloqueadoPorMim = activeId ? bloqueados.has(activeId) : false;
+
+  const alternarBloqueio = async () => {
+    if (!activeId) return;
+    if (bloqueadoPorMim) {
+      const r = await unblockUser(activeId);
+      if (r.success) {
+        setBloqueados(prev => { const n = new Set(prev); n.delete(activeId); return n; });
+        toast.success('Conversa desbloqueada.');
+      } else {
+        toast.error('Não foi possível desbloquear. Tente novamente.');
+      }
+    } else {
+      const r = await blockUser(activeId);
+      if (r.success) {
+        setBloqueados(prev => new Set(prev).add(activeId));
+        toast.success('Conversa bloqueada. O histórico foi preservado.');
+      } else {
+        toast.error('Não foi possível bloquear. Tente novamente.');
+      }
+    }
+  };
+
+  const enviarDenuncia = async () => {
+    if (!activeId || !active) return;
+    setDenunciaEnviando(true);
+    const ultimaDele = [...active.messages].reverse().find(m => m.sender_id === activeId);
+    const r = await reportUser(activeId, denunciaMotivo, denunciaDetalhes.trim(), ultimaDele?.id);
+    setDenunciaEnviando(false);
+    if (r.success) {
+      toast.success('Denúncia registrada. A administração vai analisar.');
+      setDenunciaAberta(false);
+      setDenunciaMotivo('spam');
+      setDenunciaDetalhes('');
+    } else {
+      toast.error('Não foi possível registrar a denúncia. Tente novamente.');
+    }
+  };
+
   const conversaAtiva = active && (
     <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col min-w-0">
       <div className="p-4 border-b border-gray-100 flex items-center space-x-3">
         <button onClick={voltar} className="md:hidden text-gray-500 hover:text-soft-black" aria-label="Voltar">
           <ArrowLeft size={20} />
         </button>
-        <h2 className="font-poppins font-semibold text-soft-black truncate">{active.name}</h2>
+        <h2 className="font-poppins font-semibold text-soft-black truncate flex-1">{active.name}</h2>
+        <button
+          onClick={() => setDenunciaAberta(true)}
+          className="text-gray-400 hover:text-soft-black p-1"
+          title="Denunciar"
+          aria-label="Denunciar"
+        >
+          <Flag size={18} />
+        </button>
+        <button
+          onClick={alternarBloqueio}
+          className={`p-1 ${bloqueadoPorMim ? 'text-red-500' : 'text-gray-400 hover:text-soft-black'}`}
+          title={bloqueadoPorMim ? 'Desbloquear' : 'Bloquear'}
+          aria-label={bloqueadoPorMim ? 'Desbloquear' : 'Bloquear'}
+        >
+          <Ban size={18} />
+        </button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[24rem]">
         {active.messages.length === 0 && (
@@ -246,6 +309,16 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
         ))}
         <div ref={bottomRef} />
       </div>
+      {bloqueadoPorMim ? (
+        <div className="p-4 border-t border-gray-100 text-center">
+          <p className="font-roboto text-sm text-gray-500 mb-2">
+            Você bloqueou esta conversa. O histórico foi preservado.
+          </p>
+          <button onClick={alternarBloqueio} className="text-green-deep font-roboto font-medium text-sm hover:underline">
+            Desbloquear conversa
+          </button>
+        </div>
+      ) : (
       <div className="p-4 border-t border-gray-100">
         <div className="flex items-end space-x-2">
           <textarea
@@ -267,6 +340,53 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
           </button>
         </div>
       </div>
+      )}
+    </div>
+  );
+
+  const modalDenuncia = denunciaAberta && active && (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-label="Denunciar">
+      <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+        <h3 className="font-poppins font-semibold text-lg text-soft-black mb-1">Denunciar {active.name}</h3>
+        <p className="font-roboto text-sm text-gray-500 mb-4">
+          A denúncia é enviada para análise da administração.
+        </p>
+        <label className="block font-roboto text-sm text-gray-600 mb-1">Motivo</label>
+        <select
+          value={denunciaMotivo}
+          onChange={e => setDenunciaMotivo(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 font-roboto text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-green-deep"
+        >
+          <option value="spam">Spam</option>
+          <option value="assedio">Assédio</option>
+          <option value="conteudo-improprio">Conteúdo impróprio</option>
+          <option value="golpe">Suspeita de golpe</option>
+          <option value="outro">Outro</option>
+        </select>
+        <label className="block font-roboto text-sm text-gray-600 mb-1">Detalhes (opcional)</label>
+        <textarea
+          value={denunciaDetalhes}
+          onChange={e => setDenunciaDetalhes(e.target.value)}
+          rows={3}
+          maxLength={1000}
+          className="w-full resize-none border border-gray-200 rounded-lg px-3 py-2 font-roboto text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-green-deep"
+        />
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={() => setDenunciaAberta(false)}
+            className="font-roboto text-sm text-gray-500 hover:text-soft-black px-3 py-2"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={enviarDenuncia}
+            disabled={denunciaEnviando}
+            className="bg-green-deep text-white font-roboto font-medium text-sm rounded-lg px-4 py-2 hover:opacity-90 disabled:opacity-40"
+          >
+            {denunciaEnviando ? 'Enviando...' : 'Enviar denúncia'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 
@@ -285,6 +405,7 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
           </div>
         )}
       </div>
+      {modalDenuncia}
     </div>
   );
 };

@@ -233,6 +233,73 @@ export const markMessageAsRead = async (messageId: string) => {
   }
 };
 
+// Bloqueio entre usuarios (conversation_blocks)
+export const fetchMyBlocks = async () => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('conversation_blocks')
+      .select('blocked_id')
+      .eq('blocker_id', user.id);
+    if (error) throw error;
+    return { success: true, data: (data || []) as { blocked_id: string }[] };
+  } catch (error) {
+    console.error('Erro ao buscar bloqueios:', error);
+    return { success: false, data: [] as { blocked_id: string }[], error };
+  }
+};
+
+export const blockUser = async (blockedId: string) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { error } = await supabase
+      .from('conversation_blocks')
+      .insert({ blocker_id: user.id, blocked_id: blockedId });
+    if (error && error.code !== '23505') throw error; // ignora duplicado
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao bloquear usuário:', error);
+    return { success: false, error };
+  }
+};
+
+export const unblockUser = async (blockedId: string) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { error } = await supabase
+      .from('conversation_blocks')
+      .delete()
+      .eq('blocker_id', user.id)
+      .eq('blocked_id', blockedId);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao desbloquear usuário:', error);
+    return { success: false, error };
+  }
+};
+
+// Denuncia para a administracao (message_reports)
+export const reportUser = async (reportedId: string, reason: string, details: string, messageId?: string) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { error } = await supabase
+      .from('message_reports')
+      .insert({
+        reporter_id: user.id,
+        reported_id: reportedId,
+        reason,
+        details: details || null,
+        message_id: messageId || null
+      });
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao registrar denúncia:', error);
+    return { success: false, error };
+  }
+};
+
 export const getProfilePublic = async (id: string) => {
   try {
     await getAuthenticatedUser();
