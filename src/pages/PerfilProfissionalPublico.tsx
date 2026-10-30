@@ -79,7 +79,10 @@ const PerfilProfissionalPublico: React.FC = () => {
   const abrirCertificado = async (certificateId: string) => {
     // janela aberta no gesto do usuario para nao ser bloqueada como popup;
     // a URL assinada e atribuida quando chega
-    const janela = window.open('', '_blank', 'noopener,noreferrer');
+    const janela = window.open('', '_blank');
+    // protecao reverse-tabnabbing: mantemos a referencia para atribuir a URL
+    // assinada, mas a pagina de destino nao pode acessar window.opener
+    if (janela) janela.opener = null;
     setAbrindoCertId(certificateId);
     const r = await getSharedCertificateUrl(certificateId);
     setAbrindoCertId(null);
