@@ -33,6 +33,14 @@ interface Professional {
   descricao: string;
 }
 
+const iniciaisNome = (nome: string): string => {
+  const partes = nome.trim().split(/\s+/).filter(p => /[A-Za-zÀ-ÿ]/.test(p[0] ?? ''));
+  if (partes.length === 0) return '?';
+  const primeira = partes[0][0];
+  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
+  return (primeira + ultima).toUpperCase();
+};
+
 const BuscaProfissionais: React.FC = () => {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
@@ -455,7 +463,7 @@ const BuscaProfissionais: React.FC = () => {
                   <div className="flex items-start space-x-3 flex-1 min-w-0">
                     <div className="w-12 h-12 bg-green-light rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-green-medium transition-colors duration-300">
                       <span className="font-poppins font-bold text-sm text-green-deep group-hover:text-white">
-                        {professional.nome.split(' ').map(n => n[0]).join('')}
+                        {iniciaisNome(professional.nome)}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
