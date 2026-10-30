@@ -12,7 +12,7 @@ const PoliticaPrivacidade: React.FC = () => {
             Política de Privacidade
           </h1>
           <p className="font-roboto text-xl text-green-light">
-            Última atualização: Janeiro de 2024
+            Última atualização: 30 de outubro de 2026
           </p>
         </div>
       </section>

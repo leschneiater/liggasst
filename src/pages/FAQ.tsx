@@ -23,7 +23,7 @@ const FAQ: React.FC = () => {
       },
       {
         question: 'Como funciona a plataforma?',
-        answer: 'Empresas buscam profissionais de SST por especialidade e localização e visualizam os perfis cadastrados. Profissionais criam perfis com formação e certificações. As áreas de mensagens e contato direto ainda estão em implantação.'
+        answer: 'Empresas buscam profissionais de SST por especialidade e localização e visualizam os perfis cadastrados. Profissionais criam perfis com formação e certificações. Empresas e profissionais com cadastro aprovado conversam diretamente pela área de mensagens.'
       },
       {
         question: 'A LiggaSST é gratuita?',
@@ -61,7 +61,7 @@ const FAQ: React.FC = () => {
     profissionais: [
       {
         question: 'Como recebo oportunidades de trabalho?',
-        answer: 'Empresas encontram seu perfil pela busca. A área de mensagens e contato direto ainda está em implantação; quando estiver ativa, ela aparecerá no seu painel.'
+        answer: 'Empresas encontram seu perfil pela busca e podem iniciar uma conversa pelo seu perfil. As conversas ficam na Central de Mensagens do seu painel.'
       },
       {
         question: 'Preciso pagar comissão?',

@@ -175,7 +175,7 @@ const DashboardEmpresa: React.FC = () => {
                 Em implantação
               </h2>
               <p className="font-roboto text-sm text-gray-600">
-                Mensagens, contratos e gestão de projetos ainda estão sendo preparados. Quando cada área estiver ativa, ela aparecerá aqui no painel da empresa, sem dados de exemplo.
+                Contratos e gestão de projetos ainda estão sendo preparados. Quando cada área estiver ativa, ela aparecerá aqui no painel da empresa, sem dados de exemplo.
               </p>
             </div>
           </div>

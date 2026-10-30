@@ -143,7 +143,7 @@ const DashboardProfissional: React.FC = () => {
                 Em implantação
               </h2>
               <p className="font-roboto text-sm text-gray-600">
-                Mensagens, contratos, avaliações, busca de empresas e envio de certificados ainda estão sendo preparados. Quando cada área estiver ativa, ela aparecerá aqui no seu painel, sem dados de exemplo.
+                Contratos, avaliações, busca de empresas e envio de certificados ainda estão sendo preparados. Quando cada área estiver ativa, ela aparecerá aqui no seu painel, sem dados de exemplo.
               </p>
             </div>
           </div>
