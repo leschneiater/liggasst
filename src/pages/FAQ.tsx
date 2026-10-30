@@ -23,21 +23,21 @@ const FAQ: React.FC = () => {
       },
       {
         question: 'Como funciona a plataforma?',
-        answer: 'Empresas cadastram suas necessidades e buscam profissionais qualificados. Profissionais criam perfis com suas especializações e recebem oportunidades. A plataforma facilita o contato direto entre as partes.'
+        answer: 'Empresas buscam profissionais de SST por especialidade e localização e visualizam os perfis cadastrados. Profissionais criam perfis com formação e certificações. As áreas de mensagens e contato direto ainda estão em implantação.'
       },
       {
         question: 'A LiggaSST é gratuita?',
-        answer: 'Oferecemos planos gratuitos com funcionalidades básicas para empresas e profissionais. Para recursos avançados, temos planos pagos com diferentes níveis de benefícios.'
+        answer: 'Sim, no momento o cadastro e o uso da plataforma são gratuitos para empresas e profissionais. Estamos avaliando planos pagos com recursos adicionais; qualquer mudança será comunicada antes.'
       }
     ],
     cadastro: [
       {
         question: 'Como criar uma conta na LiggaSST?',
-        answer: 'Clique em "Cadastrar" no site, escolha se é profissional ou empresa, preencha os dados solicitados e confirme seu e-mail. Seu perfil estará ativo após a verificação.'
+        answer: 'Clique em "Cadastrar" no site, escolha se é profissional ou empresa e preencha os dados solicitados. Após o cadastro, você já consegue acessar o painel.'
       },
       {
         question: 'Quais documentos preciso para me cadastrar?',
-        answer: 'Profissionais precisam de CPF, certificações SST e comprovante de formação. Empresas precisam de CNPJ, dados do responsável técnico e documentos da empresa.'
+        answer: 'Profissionais informam CPF e suas certificações de SST; empresas informam CNPJ e dados da empresa. O envio de certificados pelo painel ainda está em implantação.'
       },
       {
         question: 'Como recuperar minha senha?',
@@ -47,57 +47,57 @@ const FAQ: React.FC = () => {
     planos: [
       {
         question: 'Quais são os planos disponíveis?',
-        answer: 'Oferecemos planos gratuitos e pagos para profissionais e empresas. Os planos pagos incluem recursos avançados como destaque nas buscas, relatórios detalhados e suporte prioritário.'
+        answer: 'Hoje o uso é gratuito para profissionais e empresas. Os planos pagos exibidos na página Planos são uma proposta em avaliação e ainda não estão disponíveis para assinatura.'
       },
       {
         question: 'Posso cancelar minha assinatura?',
-        answer: 'Sim, você pode cancelar sua assinatura a qualquer momento através do painel de controle. O acesso aos recursos premium permanece até o final do período pago.'
+        answer: 'Ainda não existe cobrança nem assinatura paga na plataforma. Quando os planos pagos forem lançados, as condições de cancelamento serão informadas antes da contratação.'
       },
       {
         question: 'Como funciona o pagamento?',
-        answer: 'Aceitamos cartão de crédito, boleto bancário e PIX. O pagamento é processado mensalmente ou anualmente, conforme o plano escolhido.'
+        answer: 'Nenhum pagamento é processado hoje. As formas de pagamento serão informadas quando os planos pagos forem lançados.'
       }
     ],
     profissionais: [
       {
         question: 'Como recebo oportunidades de trabalho?',
-        answer: 'Empresas visualizam seu perfil através da busca e entram em contato diretamente. Você recebe notificações por e-mail e na plataforma quando há interesse.'
+        answer: 'Empresas encontram seu perfil pela busca. A área de mensagens e contato direto ainda está em implantação; quando estiver ativa, ela aparecerá no seu painel.'
       },
       {
         question: 'Preciso pagar comissão?',
-        answer: 'Não cobramos comissão dos profissionais. Nossa receita vem das assinaturas dos planos premium. Você negocia diretamente com as empresas.'
+        answer: 'Não. No momento a plataforma é gratuita e não cobramos comissão dos profissionais.'
       },
       {
         question: 'Como faço upload dos meus certificados?',
-        answer: 'No seu painel, vá em "Certificados", clique em "Adicionar" e faça upload dos arquivos em PDF ou imagem. Verificamos a autenticidade dos documentos.'
+        answer: 'O envio de certificados pelo painel ainda está em implantação. Quando estiver ativo, os documentos enviados ficarão disponíveis no seu perfil. A LiggaSST não faz verificação de documentos.'
       }
     ],
     empresas: [
       {
         question: 'Como encontrar profissionais qualificados?',
-        answer: 'Use nossa ferramenta de busca com filtros por localização, especialidade, disponibilidade e avaliações. Visualize perfis completos antes de fazer contato.'
+        answer: 'Use a busca de profissionais com os filtros disponíveis e visualize os perfis cadastrados. As certificações exibidas são informadas pelos próprios profissionais e ainda não são verificadas pela plataforma.'
       },
       {
         question: 'Os profissionais são verificados?',
-        answer: 'Sim, verificamos todos os certificados e documentos enviados pelos profissionais. Perfis verificados recebem selo de confiança na plataforma.'
+        answer: 'Ainda não verificamos certificados ou documentos dos profissionais. Recomendamos solicitar a documentação diretamente ao profissional antes de contratar.'
       },
       {
         question: 'Posso gerenciar múltiplos projetos?',
-        answer: 'Sim, nos planos pagos você pode criar e gerenciar múltiplos projetos, acompanhar o andamento e manter histórico de todas as contratações.'
+        answer: 'A gestão de projetos ainda não está disponível. Hoje você pode publicar demandas e acompanhar o status no painel da empresa.'
       }
     ],
     seguranca: [
       {
         question: 'Meus dados estão seguros?',
-        answer: 'Sim, utilizamos criptografia de ponta e seguimos as melhores práticas de segurança. Seus dados são protegidos conforme a LGPD.'
+        answer: 'Sim. Cada usuário acessa apenas as próprias informações, e a busca de profissionais exige login. O tratamento de dados pessoais está descrito na nossa Política de Privacidade.'
       },
       {
         question: 'Como denunciar condutas inadequadas?',
-        answer: 'Temos um canal específico para denúncias. Clique em "Denunciar" no perfil do usuário ou entre em contato pelo suporte. Investigamos todos os casos.'
+        answer: 'Ainda não temos um botão de denúncia dentro da plataforma. Se você identificar uma conduta inadequada, fale com a gente pela página Contato.'
       },
       {
         question: 'Posso bloquear usuários?',
-        answer: 'Sim, você pode bloquear usuários que não deseja mais receber contato. Acesse as configurações de privacidade no seu painel.'
+        answer: 'Ainda não existe a opção de bloquear usuários. Se você tiver um problema com outro usuário, fale com a gente pela página Contato.'
       }
     ]
   };
