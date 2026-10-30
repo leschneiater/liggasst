@@ -61,66 +61,35 @@ const LandingPage: React.FC = () => {
     {
       icon: UserCheck,
       title: 'Analise Perfis',
-      description: 'Visualize certificações, experiências e avaliações de outros clientes'
+      description: 'Visualize formação, experiências e certificações informadas no perfil'
     },
     {
       icon: CheckCircle,
-      title: 'Contrate com Segurança',
-      description: 'Conecte-se diretamente e formalize parcerias com total transparência'
+      title: 'Publique sua Demanda',
+      description: 'Cadastre a necessidade da sua empresa e acompanhe o status no painel'
     }
   ];
 
   const benefits = {
     companies: [
-      'Acesso a profissionais certificados',
-      'Processos de contratação ágeis',
-      'Relatórios detalhados de SST',
-      'Suporte técnico especializado'
+      'Acesso a profissionais de SST de todo o Brasil',
+      'Busca por especialidade e localização',
+      'Publicação e acompanhamento de demandas',
+      'Perfis com formação e certificações informadas'
     ],
     professionals: [
-      'Oportunidades em todo o Brasil',
-      'Gestão simplificada de contratos',
-      'Networking profissional',
-      'Crescimento da reputação'
+      'Perfil visível para empresas cadastradas',
+      'Cadastro de certificados e especialidades',
+      'Acesso gratuito à plataforma',
+      'Presença digital profissional'
     ]
   };
-
-  const testimonials = [
-    {
-      name: 'Maria Silva',
-      role: 'Gerente de Segurança - TechCorp',
-      content: 'Encontrei profissionais excelentes através da LiggaSST. A plataforma facilitou muito nosso processo de contratação.',
-      rating: 5,
-      company: 'TechCorp Ltda'
-    },
-    {
-      name: 'João Santos',
-      role: 'Técnico em Segurança do Trabalho',
-      content: 'Consegui expandir minha carteira de clientes e organizar melhor meu trabalho. Recomendo para todos os colegas.',
-      rating: 5,
-      company: 'Profissional Autônomo'
-    },
-    {
-      name: 'Ana Costa',
-      role: 'Diretora - Indústria Moderna',
-      content: 'A qualidade dos profissionais é excepcional. Nossa empresa se sente muito mais segura com os serviços contratados.',
-      rating: 5,
-      company: 'Indústria Moderna'
-    }
-  ];
-
-  const stats = [
-    { number: '5.000+', label: 'Profissionais Cadastrados', icon: Users },
-    { number: '2.500+', label: 'Empresas Ativas', icon: Building2 },
-    { number: '15.000+', label: 'Contratos Realizados', icon: CheckCircle },
-    { number: '98%', label: 'Satisfação dos Clientes', icon: Star }
-  ];
 
   return (
     <>
       <Helmet>
         <title>LiggaSST - Conectando Profissionais de SST com Empresas</title>
-        <meta name="description" content="Encontre e contrate especialistas de Segurança do Trabalho qualificados em qualquer lugar do Brasil. Conecte-se com confiança e segurança." />
+        <meta name="description" content="Encontre especialistas de Segurança do Trabalho em qualquer lugar do Brasil e visualize perfis completos. Cadastro gratuito." />
         <meta name="keywords" content="segurança do trabalho, SST, profissionais SST, técnico segurança, engenheiro segurança, PCMSO, PPRA, NR, consultoria SST" />
         <link rel="canonical" href="https://liggasst.com.br/" />
       </Helmet>
@@ -134,14 +103,14 @@ const LandingPage: React.FC = () => {
               <div className="animate-slide-up">
                 <div className="inline-flex items-center bg-white bg-opacity-20 rounded-full px-4 py-2 mb-6">
                   <Shield size={16} className="mr-2" />
-                  <span className="text-sm font-roboto">Plataforma Verificada e Segura</span>
+                  <span className="text-sm font-roboto">Busca de profissionais restrita a usuários cadastrados</span>
                 </div>
                 <h1 className="font-poppins font-bold text-3xl md:text-4xl lg:text-6xl mb-6">
                   Profissionais de <span className="text-green-light">SST</span> onde você precisar
                 </h1>
                 <p className="font-roboto text-lg md:text-xl text-green-light mb-8 leading-relaxed">
-                  Encontre e contrate especialistas de Segurança do Trabalho qualificados em qualquer lugar do Brasil. 
-                  Conecte-se com confiança e segurança.
+                  Encontre especialistas de Segurança do Trabalho em qualquer lugar do Brasil 
+                  e visualize perfis completos. Cadastro gratuito.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                   <Button 
@@ -320,46 +289,6 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="py-12 md:py-20 bg-neutral-gray">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12 md:mb-16">
-              <h2 className="font-poppins font-bold text-2xl md:text-3xl lg:text-4xl text-soft-black mb-4">
-                O que nossos usuários dizem
-              </h2>
-              <p className="font-roboto text-lg md:text-xl text-gray-600">
-                Depoimentos reais de quem já usa a LiggaSST
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} size={16} className="text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="font-roboto text-gray-700 mb-4 italic">
-                    "{testimonial.content}"
-                  </p>
-                  <div className="border-t pt-4">
-                    <p className="font-poppins font-semibold text-soft-black">
-                      {testimonial.name}
-                    </p>
-                    <p className="font-roboto text-sm text-gray-600">
-                      {testimonial.role}
-                    </p>
-                    <p className="font-roboto text-xs text-green-deep mt-1">
-                      {testimonial.company}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Trust Section */}
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -368,20 +297,20 @@ const LandingPage: React.FC = () => {
                 Segurança e Confiança
               </h2>
               <p className="font-roboto text-lg text-gray-600 max-w-2xl mx-auto">
-                Sua segurança é nossa prioridade. Todos os profissionais são verificados e a plataforma é protegida.
+                Busca e perfis completos exigem login, e as áreas em implantação são sinalizadas dentro da plataforma.
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-green-light rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Shield size={24} className="text-green-deep" />
+                  <Users size={24} className="text-green-deep" />
                 </div>
                 <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                  Profissionais Verificados
+                  Cadastro Direto
                 </h3>
                 <p className="font-roboto text-gray-600 text-sm">
-                  Todos os certificados e documentos são verificados pela nossa equipe
+                  Profissionais concluem o cadastro e o perfil fica disponível na busca da plataforma
                 </p>
               </div>
               
@@ -390,10 +319,10 @@ const LandingPage: React.FC = () => {
                   <CheckCircle size={24} className="text-green-deep" />
                 </div>
                 <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                  Pagamentos Seguros
+                  Acesso Restrito
                 </h3>
                 <p className="font-roboto text-gray-600 text-sm">
-                  Transações protegidas e dados criptografados conforme LGPD
+                  Busca e perfis completos ficam visíveis apenas para usuários cadastrados e conectados
                 </p>
               </div>
               
@@ -402,10 +331,10 @@ const LandingPage: React.FC = () => {
                   <Star size={24} className="text-green-deep" />
                 </div>
                 <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                  Avaliações Reais
+                  Transparência
                 </h3>
                 <p className="font-roboto text-gray-600 text-sm">
-                  Sistema de avaliações transparente e verificado
+                  Áreas em implantação são sinalizadas dentro da plataforma, sem dados de exemplo fingindo serem reais
                 </p>
               </div>
             </div>
@@ -419,7 +348,7 @@ const LandingPage: React.FC = () => {
               Pronto para começar?
             </h2>
             <p className="font-roboto text-lg md:text-xl text-green-light mb-8">
-              Junte-se a milhares de empresas e profissionais que já confiam na LiggaSST
+              Cadastre-se gratuitamente e comece a usar a LiggaSST
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <button onClick={() => setIsCadastroEmpresaOpen(true)}>
