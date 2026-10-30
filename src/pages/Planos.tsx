@@ -18,16 +18,12 @@ const Planos: React.FC = () => {
       icon: Star,
       popular: false,
       features: [
-        'Cadastro de perfil básico',
-        'Até 3 certificados',
-        'Receber até 5 contatos/mês',
-        'Suporte por e-mail',
-        'Acesso a biblioteca básica'
+        'Cadastro de perfil com formação e especialidades',
+        'Perfil visível na busca para empresas cadastradas',
+        'Acesso gratuito'
       ],
       limitations: [
-        'Sem destaque nas buscas',
-        'Relatórios limitados',
-        'Sem selo de verificado'
+        'Mensagens, contratos, avaliações e certificados ainda em implantação',
       ]
     },
     {
@@ -40,7 +36,6 @@ const Planos: React.FC = () => {
         'Perfil completo com destaque',
         'Certificados ilimitados',
         'Contatos ilimitados',
-        'Selo de verificado',
         'Relatórios detalhados',
         'Biblioteca completa SST',
         'Suporte prioritário',
@@ -77,14 +72,11 @@ const Planos: React.FC = () => {
       features: [
         'Cadastro da empresa',
         'Busca por profissionais',
-        'Até 3 contatos/mês',
-        'Perfil básico da empresa',
-        'Suporte por e-mail'
+        'Publicação e acompanhamento de demandas',
+        'Perfil da empresa'
       ],
       limitations: [
-        'Sem acesso a relatórios',
-        'Funcionalidades limitadas',
-        'Sem gestão de equipe'
+        'Mensagens, contratos e relatórios ainda em implantação'
       ]
     },
     {
@@ -188,6 +180,11 @@ const Planos: React.FC = () => {
         {/* Plans Section */}
         <section className="py-20 bg-neutral-gray">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <p className="font-roboto text-sm text-blue-900">
+                Os planos pagos ainda não estão disponíveis para assinatura: valores e benefícios dos planos pagos são uma proposta em avaliação e podem mudar antes do lançamento. O plano gratuito reflete o que está disponível hoje.
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {planos.map((plano, index) => (
                 <div
@@ -196,14 +193,6 @@ const Planos: React.FC = () => {
                     plano.popular ? 'ring-2 ring-green-medium transform scale-105' : ''
                   }`}
                 >
-                  {plano.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-green-medium text-white px-4 py-2 rounded-full text-sm font-roboto font-medium">
-                        Mais Popular
-                      </span>
-                    </div>
-                  )}
-
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-green-light rounded-full flex items-center justify-center mx-auto mb-4">
                       <plano.icon size={24} className="text-green-deep" />
@@ -241,9 +230,10 @@ const Planos: React.FC = () => {
                     variant={plano.popular ? 'primary' : 'outline'}
                     fullWidth
                     size="lg"
+                    disabled={plano.price !== 'R$ 0' && plano.price !== 'Personalizado'}
                   >
                     {plano.price === 'R$ 0' ? 'Começar Grátis' : 
-                     plano.price === 'Personalizado' ? 'Entrar em Contato' : 'Assinar Agora'}
+                     plano.price === 'Personalizado' ? 'Entrar em Contato' : 'Em breve'}
                   </Button>
                 </div>
               ))}
@@ -263,19 +253,19 @@ const Planos: React.FC = () => {
             <div className="space-y-6">
               <div className="bg-neutral-gray p-6 rounded-xl">
                 <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                  Posso cancelar minha assinatura a qualquer momento?
+                  Os planos pagos já estão disponíveis?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  Sim, você pode cancelar sua assinatura a qualquer momento. O acesso permanece ativo até o final do período pago.
+                  Ainda não. Os valores e benefícios desta página são uma proposta em avaliação. Quando os planos pagos forem lançados, avisaremos os usuários cadastrados.
                 </p>
               </div>
 
               <div className="bg-neutral-gray p-6 rounded-xl">
                 <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                  Existe desconto para pagamento anual?
+                  Haverá desconto para pagamento anual?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  Sim, oferecemos 20% de desconto para assinaturas anuais em todos os planos pagos.
+                  A proposta inclui desconto para pagamento anual, mas as condições comerciais só serão confirmadas no lançamento dos planos pagos.
                 </p>
               </div>
 
@@ -284,7 +274,7 @@ const Planos: React.FC = () => {
                   O plano gratuito tem limitações?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  O plano gratuito oferece funcionalidades básicas com algumas limitações. Você pode upgrade a qualquer momento.
+                  O plano gratuito dá acesso às funcionalidades atuais da plataforma: cadastro de perfil, busca de profissionais e publicação de demandas. Áreas ainda em implantação são sinalizadas dentro da plataforma.
                 </p>
               </div>
             </div>

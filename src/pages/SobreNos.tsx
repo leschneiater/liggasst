@@ -15,7 +15,7 @@ const SobreNos: React.FC = () => {
     {
       icon: Shield,
       title: 'Segurança',
-      description: 'Priorizamos a segurança em todos os aspectos, desde a proteção de dados até a verificação de profissionais.'
+      description: 'Priorizamos a segurança em todos os aspectos, com acesso à busca restrito a usuários cadastrados e conectados.'
     },
     {
       icon: Heart,
@@ -32,13 +32,6 @@ const SobreNos: React.FC = () => {
       title: 'Colaboração',
       description: 'Acreditamos que juntos podemos criar ambientes de trabalho mais seguros e produtivos.'
     }
-  ];
-
-  const stats = [
-    { number: '5.000+', label: 'Profissionais Cadastrados' },
-    { number: '2.500+', label: 'Empresas Ativas' },
-    { number: '15.000+', label: 'Contratos Realizados' },
-    { number: '98%', label: 'Satisfação dos Clientes' }
   ];
 
   return (
@@ -132,33 +125,6 @@ const SobreNos: React.FC = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-green-deep text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="font-poppins font-bold text-3xl md:text-4xl mb-4">
-              Nossos Números
-            </h2>
-            <p className="font-roboto text-xl text-green-light">
-              Resultados que demonstram nosso impacto no mercado de SST
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="font-poppins font-bold text-4xl md:text-5xl text-green-light mb-2">
-                  {stat.number}
-                </div>
-                <div className="font-roboto text-white">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Story Section */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -171,9 +137,8 @@ const SobreNos: React.FC = () => {
           <div className="prose prose-lg mx-auto">
             <p className="font-roboto text-gray-700 text-lg leading-relaxed mb-6">
               A LiggaSST nasceu da necessidade de simplificar e modernizar a forma como 
-              empresas e profissionais de Segurança do Trabalho se conectam no Brasil. 
-              Fundada em 2023, nossa plataforma surgiu da experiência de profissionais 
-              que vivenciaram as dificuldades do setor.
+              empresas e profissionais de Segurança do Trabalho se conectam no Brasil, 
+              a partir da experiência de profissionais que vivenciaram as dificuldades do setor.
             </p>
 
             <p className="font-roboto text-gray-700 text-lg leading-relaxed mb-6">
@@ -184,10 +149,10 @@ const SobreNos: React.FC = () => {
             </p>
 
             <p className="font-roboto text-gray-700 text-lg leading-relaxed">
-              Hoje, somos a ponte que conecta milhares de profissionais e empresas, 
-              contribuindo para a criação de ambientes de trabalho mais seguros em 
-              todo o território nacional. Nossa tecnologia e dedicação continuam 
-              transformando o mercado de SST no Brasil.
+              Hoje, nossa plataforma conecta profissionais e empresas, contribuindo 
+              para a criação de ambientes de trabalho mais seguros. Seguimos 
+              desenvolvendo a LiggaSST com transparência: áreas em implantação são 
+              sinalizadas dentro da plataforma, sem dados de exemplo.
             </p>
           </div>
         </div>
@@ -262,7 +227,7 @@ const SobreNos: React.FC = () => {
             Faça Parte da Nossa História
           </h2>
           <p className="font-roboto text-xl text-green-light mb-8">
-            Junte-se a milhares de profissionais e empresas que já confiam na LiggaSST
+            Cadastre-se gratuitamente e comece a usar a LiggaSST
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
