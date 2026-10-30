@@ -3,23 +3,17 @@ import {
   Users, 
   Building2, 
   FileText, 
-  TrendingUp, 
   AlertTriangle,
   DollarSign,
-  Calendar,
   MapPin,
   Star,
   Activity,
   BarChart3,
-  PieChart,
   Download,
-  Filter,
   Search,
   Eye,
   MessageSquare,
   Shield,
-  Clock,
-  CheckCircle
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
@@ -39,7 +33,7 @@ const DashboardAdmin: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState('30d');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [recentActivity, setRecentActivity] = useState([
+  const [recentActivity] = useState([
     {
       id: 1,
       type: 'new_professional',
@@ -77,7 +71,7 @@ const DashboardAdmin: React.FC = () => {
     }
   ]);
 
-  const [topRegions, setTopRegions] = useState([
+  const [topRegions] = useState([
     { state: 'SP', professionals: 1250, companies: 450, growth: 12.5 },
     { state: 'RJ', professionals: 890, companies: 320, growth: 8.3 },
     { state: 'MG', professionals: 650, companies: 280, growth: 15.2 },
@@ -85,7 +79,7 @@ const DashboardAdmin: React.FC = () => {
     { state: 'PR', professionals: 380, companies: 160, growth: 9.1 }
   ]);
 
-  const [topProfessionals, setTopProfessionals] = useState([
+  const [topProfessionals] = useState([
     {
       id: 1,
       name: 'Maria Santos',
@@ -115,7 +109,7 @@ const DashboardAdmin: React.FC = () => {
     }
   ]);
 
-  const [topCompanies, setTopCompanies] = useState([
+  const [topCompanies] = useState([
     {
       id: 1,
       name: 'TechCorp Ltda',
@@ -460,7 +454,7 @@ const DashboardAdmin: React.FC = () => {
               Top Profissionais
             </h3>
             <div className="space-y-4">
-              {topProfessionals.map((professional, index) => (
+              {topProfessionals.map((professional) => (
                 <div key={professional.id} className="flex items-center justify-between p-4 bg-neutral-gray rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-green-light rounded-full flex items-center justify-center">
@@ -505,7 +499,7 @@ const DashboardAdmin: React.FC = () => {
               Top Empresas
             </h3>
             <div className="space-y-4">
-              {topCompanies.map((company, index) => (
+              {topCompanies.map((company) => (
                 <div key={company.id} className="flex items-center justify-between p-4 bg-neutral-gray rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">

@@ -41,7 +41,7 @@ const Register: React.FC = () => {
       };
       
       await signup(data.email, data.password, userData, data.userType);
-    } catch (error) {
+    } catch {
       // Erro já tratado no contexto
     }
   };

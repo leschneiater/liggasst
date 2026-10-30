@@ -25,9 +25,10 @@ const ForgotPassword: React.FC = () => {
 
       setEmailSent(true);
       toast.success('E-mail de recuperação enviado!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Password reset error:', error);
-      toast.error(error.message || 'Erro ao enviar e-mail de recuperação');
+      const message = error instanceof Error ? error.message : '';
+      toast.error(message || 'Erro ao enviar e-mail de recuperação');
     } finally {
       setLoading(false);
     }

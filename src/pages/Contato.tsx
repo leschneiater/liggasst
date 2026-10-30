@@ -49,7 +49,7 @@ ${data.mensagem}
       
       toast.success('Cliente de email aberto! Complete o envio da mensagem.');
       reset();
-    } catch (error) {
+    } catch {
       toast.error('Erro ao processar formulário. Tente novamente.');
     } finally {
       setLoading(false);

@@ -6,8 +6,7 @@ import {
   Heart, 
   Award, 
   Shield,
-  TrendingUp,
-  CheckCircle
+  TrendingUp
 } from 'lucide-react';
 
 const SobreNos: React.FC = () => {

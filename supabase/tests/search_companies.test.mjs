@@ -1,11 +1,18 @@
-// Teste local (PGlite) da RPC public.search_companies e do rascunho
-// supabase/drafts/draft_busca_empresas_exclui_teste.sql.
+// Teste local (PGlite) da RPC public.search_companies.
 //
 // Roda a cadeia REAL de migracoes do repositorio (supabase/migrations/*.sql)
 // sobre um Postgres embarcado, com shims minimos de auth/storage (PGlite nao
 // tem os schemas do Supabase). Depois exercita a funcao como role
 // authenticated com claims de JWT de usuarios distintos, a mesma leitura que
 // o PostgREST faz.
+//
+// Contrato verificado (estado final das migracoes):
+//   - so empresas aprovadas aparecem; pendente fica fora;
+//   - is_test some para usuario comum e continua visivel para conta no gate;
+//   - so perfis com role 'company' entram (conta admin com linha em
+//     companies NAO aparece - caso real encontrado em producao em 30/10);
+//   - filtros de estado/cidade/segmento e o shape da linha exposta ao front;
+//   - anon (nao logado) nao executa a RPC.
 //
 // Como rodar:  npm run test:rpc
 //
@@ -18,9 +25,6 @@ import path from 'path';
 
 const raiz = path.dirname(fileURLToPath(import.meta.url));
 const dirMigrations = path.join(raiz, '..', 'migrations');
-// A migracao sob teste (is_test na busca de empresas) e aplicada por ultimo,
-// separada da cadeia, para medir o comportamento antes e depois.
-const ARQ_MIGRACAO_TESTE = '20261030210000_busca_empresas_exclui_teste.sql';
 
 const db = new PGlite();
 let pass = 0, fail = 0;
@@ -71,17 +75,18 @@ const aplicar = async (sql) => {
 
 // ---------- cadeia real de migracoes ----------
 const arquivos = readdirSync(dirMigrations)
-  .filter((f) => f.endsWith('.sql') && f !== ARQ_MIGRACAO_TESTE)
+  .filter((f) => f.endsWith('.sql'))
   .sort();
 for (const arq of arquivos) {
   await aplicar(readFileSync(path.join(dirMigrations, arq), 'utf8'));
 }
-ok(true, `cadeia real aplicada (${arquivos.length} migracoes, sem a migracao sob teste)`);
+ok(true, `cadeia real aplicada (${arquivos.length} migracoes)`);
 
 // ---------- fixtures ----------
 // Usuarios: empresa aprovada SP, empresa pendente, empresa aprovada de teste,
-// empresa aprovada RJ/saude, profissional comum (visualizador) e profissional
-// no gate de validacao.
+// empresa aprovada RJ/saude, conta admin com linha em companies (caso real de
+// producao), profissional comum (visualizador) e profissional no gate de
+// validacao.
 const ids = {};
 const criarUsuario = async (email, meta) => {
   const { rows } = await db.query(
@@ -93,6 +98,7 @@ ids.empresaSP = await criarUsuario('sp@teste.local', { role: 'company', display_
 ids.empresaPend = await criarUsuario('pend@teste.local', { role: 'company', display_name: 'Empresa Pendente' });
 ids.empresaTeste = await criarUsuario('istest@teste.local', { role: 'company', display_name: 'Empresa IsTest' });
 ids.empresaRJ = await criarUsuario('rj@teste.local', { role: 'company', display_name: 'Empresa RJ Teste' });
+ids.admin = await criarUsuario('admin@teste.local', { role: 'admin', display_name: 'Admin Com Empresa' });
 ids.viewer = await criarUsuario('viewer@teste.local', { role: 'professional', display_name: 'Prof Viewer' });
 ids.gate = await criarUsuario('gate@teste.local', { role: 'professional', display_name: 'Prof Gate' });
 
@@ -106,6 +112,9 @@ await db.query(`update public.companies set segment = 'Saúde' where profile_id 
 // pendente DEPOIS do insert, estado ainda possivel para linhas antigas.
 await db.query(`update public.profiles set verification_status = 'pending' where id = $1`, [ids.empresaPend]);
 await db.query(`update public.profiles set is_test = true where id = $1`, [ids.empresaTeste]);
+// Conta admin aprovada COM linha em companies: o caso que vazava na busca
+// antes da migracao 20261030220000.
+await db.query(`insert into public.companies (profile_id, segment) values ($1, 'Educação')`, [ids.admin]);
 await db.query(`insert into private.messaging_allowlist (user_id) values ($1)`, [ids.gate]);
 
 // executa como um usuario autenticado especifico (mesma leitura do PostgREST)
@@ -121,23 +130,15 @@ const buscar = (uid, estado = null, cidade = null, segmento = null) =>
   comoUsuario(uid, 'select * from public.search_companies($1, $2, $3)', [estado, cidade, segmento]);
 const nomes = (rows) => rows.map((r) => r.display_name).sort();
 
-// ---------- antes do migracao: comportamento atual ----------
+// ---------- contrato de visibilidade ----------
 let r = await buscar(ids.viewer);
-ok(nomes(r).includes('Empresa SP Teste') && nomes(r).includes('Empresa RJ Teste'), 'atual: empresas aprovadas aparecem');
-ok(!nomes(r).includes('Empresa Pendente'), 'atual: pendente NAO aparece');
-ok(nomes(r).includes('Empresa IsTest'), 'atual: is_test APARECE (gap que a migracao fecha)');
-
-// ---------- aplica o rascunho real ----------
-await aplicar(readFileSync(path.join(dirMigrations, ARQ_MIGRACAO_TESTE), 'utf8'));
-ok(true, 'migracao sob teste aplicada sem erro');
-
-r = await buscar(ids.viewer);
-ok(nomes(r).includes('Empresa SP Teste') && nomes(r).includes('Empresa RJ Teste'), 'migracao: aprovadas continuam aparecendo');
-ok(!nomes(r).includes('Empresa Pendente'), 'migracao: pendente continua fora');
-ok(!nomes(r).includes('Empresa IsTest'), 'migracao: is_test some para usuario comum');
+ok(nomes(r).includes('Empresa SP Teste') && nomes(r).includes('Empresa RJ Teste'), 'empresas aprovadas aparecem');
+ok(!nomes(r).includes('Empresa Pendente'), 'pendente NAO aparece');
+ok(!nomes(r).includes('Empresa IsTest'), 'is_test some para usuario comum');
+ok(!nomes(r).includes('Admin Com Empresa'), 'conta admin com linha em companies NAO aparece (so role company)');
 
 r = await buscar(ids.gate);
-ok(nomes(r).includes('Empresa IsTest'), 'migracao: conta do gate de validacao ainda ve is_test');
+ok(nomes(r).includes('Empresa IsTest'), 'conta do gate de validacao ainda ve is_test');
 
 // ---------- filtros ----------
 r = await buscar(ids.viewer, 'SP');

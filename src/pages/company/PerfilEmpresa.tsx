@@ -6,7 +6,6 @@ import {
   Phone, 
   MapPin, 
   FileText,
-  Users,
   Save,
   Camera,
   User
@@ -92,7 +91,7 @@ const PerfilEmpresa: React.FC = () => {
     setLoading(true);
     try {
       await updateUserProfile(data);
-    } catch (error) {
+    } catch {
       toast.error('Erro ao atualizar perfil');
     } finally {
       setLoading(false);

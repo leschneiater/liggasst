@@ -21,5 +21,8 @@ jobs:
       - run: npm run check:secrets
       - run: npm run check:architecture
       - run: npm audit --omit=dev --audit-level=high
+      - run: npm run lint
       - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:rpc
       - run: npm run build

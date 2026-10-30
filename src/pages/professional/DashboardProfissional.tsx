@@ -6,8 +6,7 @@ import {
   MessageSquare, 
   Upload,
   Crown,
-  CheckCircle,
-  Plus
+  CheckCircle
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';

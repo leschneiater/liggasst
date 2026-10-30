@@ -50,7 +50,7 @@ const DemandasDisponiveis: React.FC = () => {
     setLoading(false);
   };
 
-  useEffect(() => { carregar(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { carregar(); }, []);
 
   const enviarMensagem = (d: Demanda) => {
     navigate(`/mensagens-profissional?para=${d.company_id}`, {

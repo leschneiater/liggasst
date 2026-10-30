@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Search, ArrowLeft, Mail, Phone } from 'lucide-react';
+import { Home, ArrowLeft, Mail, Phone } from 'lucide-react';
 import Button from '../components/ui/Button';
 
 const Error404: React.FC = () => {
