@@ -307,7 +307,7 @@ const LandingPage: React.FC = () => {
               Não encontrou o profissional ideal?
             </h2>
             <p className="font-roboto text-lg text-gray-600 mb-8">
-              Publique sua demanda e receba propostas de profissionais qualificados
+              Publique sua demanda e acompanhe o status no painel da empresa
             </p>
             <Button 
               onClick={() => handleProtectedAction(() => navigate('/publique-demanda'), 'publicar demanda')}
