@@ -278,10 +278,34 @@ const PoliticaPrivacidade: React.FC = () => {
               </div>
             </div>
 
+            {/* Atendimento de pedidos */}
+            <div className="mb-12">
+              <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
+                9. Como Atendemos Pedidos sobre seus Dados
+              </h2>
+              <div className="space-y-4">
+                <p className="font-roboto text-gray-700">
+                  Você pode exercer seus direitos, incluindo o pedido de exclusão dos seus
+                  dados pessoais, pelo e-mail contato@liggasst.com.br. Os pedidos são
+                  analisados e atendidos manualmente, sem custo. Quando não for possível
+                  atender de imediato, informamos os motivos.
+                </p>
+                <p className="font-roboto text-gray-700">
+                  Alguns dados podem ser conservados quando a lei exigir ou permitir, como
+                  para cumprir obrigações legais ou regulatórias (art. 16 da LGPD). Nas
+                  conversas, as mensagens podem conter informações das duas pessoas
+                  envolvidas; por isso, ao atender um pedido de exclusão, agimos dentro
+                  dos limites técnicos da plataforma, e trechos em texto livre que
+                  mencionem você podem não ser totalmente removidos da conversa da outra
+                  pessoa.
+                </p>
+              </div>
+            </div>
+
             {/* Cookies */}
             <div className="mb-12">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                9. Cookies e Tecnologias Similares
+                10. Cookies e Tecnologias Similares
               </h2>
               <div className="space-y-4">
                 <p className="font-roboto text-gray-700">
@@ -321,7 +345,7 @@ const PoliticaPrivacidade: React.FC = () => {
             {/* Changes to Policy */}
             <div className="mb-12">
               <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-                10. Alterações nesta Política
+                11. Alterações nesta Política
               </h2>
               <p className="font-roboto text-gray-700">
                 Podemos atualizar esta Política de Privacidade periodicamente. 
@@ -333,15 +357,15 @@ const PoliticaPrivacidade: React.FC = () => {
             {/* Contact DPO */}
             <div className="bg-green-50 p-6 rounded-xl">
               <h2 className="font-poppins font-bold text-2xl text-green-800 mb-4">
-                11. Contato - Encarregado de Dados
+                12. Contato sobre Dados Pessoais
               </h2>
               <p className="font-roboto text-green-700 mb-4">
                 Para exercer seus direitos ou esclarecer dúvidas sobre esta política, 
-                entre em contato com nosso Encarregado de Proteção de Dados:
+                fale com a gente pelo nosso canal de comunicação:
               </p>
               <div className="space-y-2 font-roboto text-green-700">
-                <p>E-mail: dpo@liggasst.com.br</p>
-                <p>Telefone: (11) 99999-9999</p>
+                <p>E-mail: contato@liggasst.com.br</p>
+                <p>Telefone: (11) 98886-1490</p>
                 <p>Endereço: São Paulo, SP - Brasil</p>
               </div>
             </div>

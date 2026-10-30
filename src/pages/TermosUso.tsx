@@ -341,8 +341,8 @@ const TermosUso: React.FC = () => {
                 Para dúvidas sobre estes Termos de Uso, entre em contato conosco:
               </p>
               <div className="space-y-2 font-roboto text-gray-700">
-                <p>E-mail: juridico@liggasst.com.br</p>
-                <p>Telefone: (11) 99999-9999</p>
+                <p>E-mail: contato@liggasst.com.br</p>
+                <p>Telefone: (11) 98886-1490</p>
                 <p>Endereço: São Paulo, SP - Brasil</p>
               </div>
             </div>
