@@ -554,7 +554,7 @@ const BuscaProfissionais: React.FC = () => {
                 )}
 
                 <p className="font-roboto text-xs text-gray-500 mb-3">
-                  Contato pela plataforma ainda não disponível.
+                  Para conversar, abra o perfil e envie uma mensagem pela plataforma.
                 </p>
                 <div className="flex space-x-2">
                   <Button 

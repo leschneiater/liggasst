@@ -5,7 +5,6 @@ import {
   Users, 
   Search,
   Plus,
-  Download,
   BarChart3,
   MessageSquare
 } from 'lucide-react';
@@ -143,16 +142,6 @@ const DashboardEmpresa: React.FC = () => {
                   className="h-20 flex-col"
                 >
                   Editar Empresa
-                </Button>
-                <Button
-                  as={Link}
-                  to="/downloads"
-                  variant="outline"
-                  size="sm"
-                  icon={Download}
-                  className="h-20 flex-col"
-                >
-                  Downloads
                 </Button>
                 {msgDisponivel && (
                   <Button
