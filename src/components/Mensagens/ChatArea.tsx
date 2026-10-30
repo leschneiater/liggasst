@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { MessageSquare, Send, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
@@ -30,6 +30,7 @@ const formataHora = (iso: string) =>
 const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
   const { currentUser } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [names, setNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -94,6 +95,14 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
 
   const active = conversations.find(c => c.counterpartId === activeId) ||
     (activeId ? { counterpartId: activeId, name: nomeDe(activeId), messages: [], unread: 0, lastAt: '' } : null);
+
+  // Nome passado pela navegação (ex.: lista de demandas) tem prioridade
+  useEffect(() => {
+    const nomeNav = (location.state as { nome?: string } | null)?.nome;
+    if (activeId && nomeNav && !names[activeId]) {
+      setNames(prev => ({ ...prev, [activeId]: nomeNav }));
+    }
+  }, [activeId, location.state, names]);
 
   // Resolver nome de uma contraparte nova (link ?para= sem mensagens ainda)
   useEffect(() => {

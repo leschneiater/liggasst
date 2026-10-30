@@ -12,6 +12,7 @@ import {
 
 const menuItems = [
   { path: '/dashboard-profissional', label: 'Painel', icon: LayoutDashboard },
+  { path: '/demandas-disponiveis', label: 'Demandas', icon: Search },
   { path: '/busca-empresas', label: 'Buscar Empresas', icon: Search },
   { path: '/mensagens-profissional', label: 'Mensagens', icon: MessageSquare },
   { path: '/contratos-profissional', label: 'Contratos', icon: FileText },

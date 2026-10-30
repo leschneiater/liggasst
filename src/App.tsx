@@ -48,6 +48,7 @@ const ContratosProfissional = lazy(() => import('./pages/professional/ContratosP
 const MensagensProfissional = lazy(() => import('./pages/professional/MensagensProfissional'));
 const AssinaturaProfissional = lazy(() => import('./pages/professional/AssinaturaProfissional'));
 const BuscaEmpresas = lazy(() => import('./pages/professional/BuscaEmpresas'));
+const DemandasDisponiveis = lazy(() => import('./pages/professional/DemandasDisponiveis'));
 
 // Company Pages
 const DashboardEmpresa = lazy(() => import('./pages/company/DashboardEmpresa'));
@@ -158,6 +159,11 @@ function App() {
                 <Route path="/busca-empresas" element={
                   <ProtectedRoute userType="professional">
                     <Layout><BuscaEmpresas /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/demandas-disponiveis" element={
+                  <ProtectedRoute userType="professional">
+                    <Layout><DemandasDisponiveis /></Layout>
                   </ProtectedRoute>
                 } />
 
