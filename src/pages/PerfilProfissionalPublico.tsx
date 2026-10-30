@@ -10,6 +10,14 @@ import {
 import Button from '../components/ui/Button';
 import { getProfessionalPublic, ProfessionalSearchItem } from '../services/database';
 
+const iniciaisNome = (nome: string): string => {
+  const partes = nome.trim().split(/\s+/).filter(p => /[A-Za-zÀ-ÿ]/.test(p[0] ?? ''));
+  if (partes.length === 0) return '?';
+  const primeira = partes[0][0];
+  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : '';
+  return (primeira + ultima).toUpperCase();
+};
+
 const PerfilProfissionalPublico: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -108,7 +116,7 @@ const PerfilProfissionalPublico: React.FC = () => {
           <div className="flex items-start space-x-6">
             <div className="w-24 h-24 bg-green-light rounded-full flex items-center justify-center flex-shrink-0">
               <span className="font-poppins font-bold text-2xl text-green-deep">
-                {professional.nome.split(' ').map(n => n[0]).join('')}
+                {iniciaisNome(professional.nome)}
               </span>
             </div>
 
