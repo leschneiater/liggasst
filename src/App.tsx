@@ -46,6 +46,7 @@ const PerfilProfissional = lazy(() => import('./pages/professional/PerfilProfiss
 const CertificadosProfissional = lazy(() => import('./pages/professional/CertificadosProfissional'));
 const ContratosProfissional = lazy(() => import('./pages/professional/ContratosProfissional'));
 const MensagensProfissional = lazy(() => import('./pages/professional/MensagensProfissional'));
+const MessagingRoute = lazy(() => import('./components/Mensagens/MessagingRoute'));
 const AssinaturaProfissional = lazy(() => import('./pages/professional/AssinaturaProfissional'));
 const BuscaEmpresas = lazy(() => import('./pages/professional/BuscaEmpresas'));
 const DemandasDisponiveis = lazy(() => import('./pages/professional/DemandasDisponiveis'));
@@ -149,7 +150,7 @@ function App() {
                 } />
                 <Route path="/mensagens-profissional" element={
                   <ProtectedRoute userType="professional">
-                    <Layout><MensagensProfissional /></Layout>
+                    <Layout><MessagingRoute destino="/dashboard-profissional"><MensagensProfissional /></MessagingRoute></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/assinatura-profissional" element={
@@ -191,7 +192,7 @@ function App() {
                 } />
                 <Route path="/mensagens-empresa" element={
                   <ProtectedRoute userType="company">
-                    <Layout><MensagensEmpresa /></Layout>
+                    <Layout><MessagingRoute destino="/dashboard-empresa"><MensagensEmpresa /></MessagingRoute></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/assinatura-empresa" element={

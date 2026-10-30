@@ -6,9 +6,11 @@ import {
   Search,
   Plus,
   Download,
-  BarChart3
+  BarChart3,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import { fetchDemands } from '../../services/database';
 import Button from '../../components/ui/Button';
 
@@ -32,6 +34,7 @@ const statusDemanda: Record<string, string> = {
 
 const DashboardEmpresa: React.FC = () => {
   const { userData, currentUser } = useAuth();
+  const { disponivel: msgDisponivel } = useMessagingDisponivel();
   const [demands, setDemands] = useState<DemandaRow[]>([]);
   const [demandsLoading, setDemandsLoading] = useState(true);
 
@@ -151,6 +154,18 @@ const DashboardEmpresa: React.FC = () => {
                 >
                   Downloads
                 </Button>
+                {msgDisponivel && (
+                  <Button
+                    as={Link}
+                    to="/mensagens-empresa"
+                    variant="outline"
+                    size="sm"
+                    icon={MessageSquare}
+                    className="h-20 flex-col"
+                  >
+                    Central Mensagens
+                  </Button>
+                )}
               </div>
             </div>
 

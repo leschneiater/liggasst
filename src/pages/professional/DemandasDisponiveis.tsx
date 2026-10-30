@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Calendar, DollarSign, MessageSquare } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import { fetchDemands, fetchCompanies } from '../../services/database';
 
 interface Demanda {
@@ -21,6 +22,7 @@ interface Demanda {
 const DemandasDisponiveis: React.FC = () => {
   const navigate = useNavigate();
   const [demandas, setDemandas] = useState<Demanda[]>([]);
+  const { disponivel: msgDisponivel } = useMessagingDisponivel();
   const [empresas, setEmpresas] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -115,14 +117,16 @@ const DemandasDisponiveis: React.FC = () => {
                       {d.service_type && <span>{d.service_type}</span>}
                     </div>
                   </div>
+                  {msgDisponivel && (
                   <Button
-                    onClick={() => enviarMensagem(d)}
-                    icon={MessageSquare}
-                    size="sm"
-                    className="flex-shrink-0"
-                  >
-                    Enviar Mensagem
-                  </Button>
+                      onClick={() => enviarMensagem(d)}
+                      icon={MessageSquare}
+                      size="sm"
+                      className="flex-shrink-0"
+                    >
+                      Enviar Mensagem
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import {
   LayoutDashboard,
   Search,
@@ -25,6 +26,10 @@ export const professionalAreaPaths: string[] = menuItems.map((item) => item.path
 
 const ProfessionalAreaNav: React.FC = () => {
   const location = useLocation();
+  const { disponivel: mensagensDisponivel } = useMessagingDisponivel();
+  const itensVisiveis = menuItems.filter(
+    (item) => item.path !== '/mensagens-profissional' || mensagensDisponivel
+  );
   const activeRef = useRef<HTMLAnchorElement | null>(null);
 
   // Keep the active item visible inside the horizontal scroll on small screens
@@ -39,7 +44,7 @@ const ProfessionalAreaNav: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex space-x-1 overflow-x-auto">
-          {menuItems.map((item) => {
+          {itensVisiveis.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             return (

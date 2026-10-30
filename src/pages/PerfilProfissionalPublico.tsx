@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
+import { useMessagingDisponivel } from '../hooks/useMessagingDisponivel';
 import { getProfessionalPublic, ProfessionalSearchItem } from '../services/database';
 
 const iniciaisNome = (nome: string): string => {
@@ -28,6 +29,7 @@ const PerfilProfissionalPublico: React.FC = () => {
   const [loadError, setLoadError] = useState(false);
   const [activeTab, setActiveTab] = useState('sobre');
   const { userType } = useAuth();
+  const { disponivel: msgDisponivel } = useMessagingDisponivel();
 
   const loadProfessional = async () => {
     if (!id) {
@@ -112,7 +114,7 @@ const PerfilProfissionalPublico: React.FC = () => {
           >
             Voltar à Busca
           </Button>
-          {userType === 'company' && professional && (
+          {userType === 'company' && professional && msgDisponivel && (
             <Button
               onClick={() => navigate(`/mensagens-empresa?para=${professional.id}`)}
               icon={MessageSquare}

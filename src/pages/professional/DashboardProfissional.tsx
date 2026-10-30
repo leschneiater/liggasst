@@ -10,10 +10,12 @@ import {
   Plus
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import Button from '../../components/ui/Button';
 
 const DashboardProfissional: React.FC = () => {
   const { userData } = useAuth();
+  const { disponivel: msgDisponivel } = useMessagingDisponivel();
   const [currentPlan] = useState('gratuito');
 
   return (
@@ -82,6 +84,7 @@ const DashboardProfissional: React.FC = () => {
               <FileText size={24} className="mb-2 text-green-deep" />
               <span className="text-xs font-medium">Histórico Contratos</span>
             </Button>
+            {msgDisponivel && (
             <Button
               as={Link}
               to="/mensagens-profissional"
@@ -91,6 +94,7 @@ const DashboardProfissional: React.FC = () => {
               <MessageSquare size={24} className="mb-2 text-green-deep" />
               <span className="text-xs font-medium">Central Mensagens</span>
             </Button>
+            )}
           </div>
         </div>
 
