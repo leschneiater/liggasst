@@ -15,7 +15,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { publishDemand, fetchOwnCompany, updateCompany } from '../services/database';
+import { publishDemand, fetchOwnCompany, updateCompany, fetchDemands } from '../services/database';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -99,10 +99,9 @@ const PubliqueDemanda: React.FC = () => {
       if (!currentUser) throw new Error('Usuário não autenticado');
       // 1) Contato primeiro: o update é idempotente (mesma linha do cadastro)
       //    e falhas ANTES do insert deixam o retry seguro, sem demanda duplicada.
-      //    Limite conhecido: se o insert da demanda commitar no servidor mas a
-      //    resposta se perder (timeout), um retry manual pode duplicar — cobrir
-      //    isso exigiria chave de idempotência ou consulta de reconciliação,
-      //    decisão de schema fora deste escopo.
+      //    Se o insert commitar no servidor mas a resposta se perder
+      //    (timeout), a reconciliação abaixo detecta a demanda já criada e a
+      //    mensagem orienta conferir "Minhas Demandas" antes de nova tentativa.
       //    Só campos preenchidos são enviados, para não sobrescrever o
       //    cadastro existente com vazio. O contato fica em companies (leitura
       //    restrita ao dono/admin), nunca na demanda, que é visível a todos
@@ -129,13 +128,31 @@ const PubliqueDemanda: React.FC = () => {
         urgencia: data.urgencia,
         tipo_orcamento: data.tipoOrcamento,
       });
-      if (!result.success) throw result.error ?? new Error('Falha ao publicar');
+      if (!result.success) {
+        // Resultado desconhecido: o insert pode ter commitado no servidor e a
+        // resposta se perdeu. Reconcilia antes de qualquer nova tentativa:
+        // se a demanda já aparece em "Minhas Demandas", trata como publicada
+        // em vez de induzir um retry que duplicaria.
+        const check = await fetchDemands({ company_id: currentUser.id });
+        const jaExiste = check.success && Array.isArray(check.data) && check.data.some(
+          (d) => (d as { title?: string }).title === data.titulo
+            && Date.now() - new Date((d as { created_at?: string }).created_at ?? 0).getTime() < 10 * 60 * 1000
+        );
+        if (jaExiste) {
+          setDemandPublished(true);
+          toast.success('A demanda consta como publicada em "Minhas Demandas".');
+          return;
+        }
+        throw new Error('Publicação não confirmada');
+      }
       setDemandPublished(true);
       toast.success('Demanda publicada com sucesso!');
     } catch (error) {
       console.error('Erro ao publicar demanda:', error);
       if (error instanceof Error && error.message === 'Falha ao salvar contato') {
         toast.error('Não foi possível salvar os dados de contato. A demanda não foi publicada. Tente novamente.');
+      } else if (error instanceof Error && error.message === 'Publicação não confirmada') {
+        toast.error('Não foi possível confirmar a publicação. Verifique "Minhas Demandas" no painel antes de tentar de novo, para não criar uma demanda duplicada.');
       } else {
         toast.error('Erro ao publicar demanda. Tente novamente.');
       }
