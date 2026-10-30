@@ -97,6 +97,26 @@ const PubliqueDemanda: React.FC = () => {
         ? `${data.descricao}\n\nRequisitos: ${data.requisitos}`
         : data.descricao;
       if (!currentUser) throw new Error('Usuário não autenticado');
+      // 1) Contato primeiro: o update é idempotente (mesma linha do cadastro)
+      //    e falhas ANTES do insert deixam o retry seguro, sem demanda duplicada.
+      //    Limite conhecido: se o insert da demanda commitar no servidor mas a
+      //    resposta se perder (timeout), um retry manual pode duplicar — cobrir
+      //    isso exigiria chave de idempotência ou consulta de reconciliação,
+      //    decisão de schema fora deste escopo.
+      //    Só campos preenchidos são enviados, para não sobrescrever o
+      //    cadastro existente com vazio. O contato fica em companies (leitura
+      //    restrita ao dono/admin), nunca na demanda, que é visível a todos
+      //    os usuários autenticados.
+      const companyData: Record<string, string> = {};
+      if (data.empresa.trim()) companyData.razao_social = data.empresa.trim();
+      if (data.contato.trim()) companyData.responsible_name = data.contato.trim();
+      if (data.telefone.trim()) companyData.responsible_phone = data.telefone.trim();
+      if (Object.keys(companyData).length > 0) {
+        const companyResult = await updateCompany(currentUser.id, companyData);
+        if (!companyResult.success) throw new Error('Falha ao salvar contato');
+      }
+      // 2) Só chega aqui se o contato foi salvo: qualquer falha anterior
+      //    interrompe antes do insert, sem sucesso parcial anunciado.
       const result = await publishDemand({
         title: data.titulo,
         description: descricaoCompleta,
@@ -110,22 +130,15 @@ const PubliqueDemanda: React.FC = () => {
         tipo_orcamento: data.tipoOrcamento,
       });
       if (!result.success) throw result.error ?? new Error('Falha ao publicar');
-      // Contato fica no cadastro da empresa (leitura restrita ao dono/admin),
-      // nunca na demanda, que é visível a todos os usuários autenticados.
-      const companyResult = await updateCompany(currentUser.id, {
-        razao_social: data.empresa,
-        responsible_name: data.contato,
-        responsible_phone: data.telefone,
-      });
       setDemandPublished(true);
-      if (companyResult.success) {
-        toast.success('Demanda publicada com sucesso!');
-      } else {
-        toast.success('Demanda publicada, mas os dados de contato não foram salvos. Atualize-os no perfil da empresa.');
-      }
+      toast.success('Demanda publicada com sucesso!');
     } catch (error) {
       console.error('Erro ao publicar demanda:', error);
-      toast.error('Erro ao publicar demanda. Tente novamente.');
+      if (error instanceof Error && error.message === 'Falha ao salvar contato') {
+        toast.error('Não foi possível salvar os dados de contato. A demanda não foi publicada. Tente novamente.');
+      } else {
+        toast.error('Erro ao publicar demanda. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
