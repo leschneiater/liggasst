@@ -104,7 +104,11 @@ function App() {
                 <Route path="/termos-de-uso" element={<Layout><TermosUso /></Layout>} />
                 <Route path="/politica-de-privacidade" element={<Layout><PoliticaPrivacidade /></Layout>} />
                 <Route path="/busca-profissionais" element={<Layout><BuscaProfissionais /></Layout>} />
-                <Route path="/publique-demanda" element={<Layout><PubliqueDemanda /></Layout>} />
+                <Route path="/publique-demanda" element={
+                  <ProtectedRoute userType="company">
+                    <Layout><PubliqueDemanda /></Layout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/perfil-profissional-publico/:id" element={<Layout><PerfilProfissionalPublico /></Layout>} />
                 <Route path="/recuperar-senha" element={<ForgotPassword />} />
 
