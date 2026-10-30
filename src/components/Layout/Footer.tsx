@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Shield, Award, Users } from 'lucide-react';
+import { Mail, Phone, MapPin, Users } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -19,18 +19,6 @@ const Footer: React.FC = () => {
               Conectando empresas com profissionais qualificados de Segurança do Trabalho em todo o Brasil. 
               Sua parceria segura e confiável para um ambiente de trabalho mais seguro.
             </p>
-            
-            {/* Trust Badges */}
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="flex items-center space-x-2 bg-green-medium bg-opacity-30 px-3 py-2 rounded-lg">
-                <Shield size={16} className="text-green-light" />
-                <span className="text-xs font-roboto text-green-light">LGPD Compliant</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-green-medium bg-opacity-30 px-3 py-2 rounded-lg">
-                <Award size={16} className="text-green-light" />
-                <span className="text-xs font-roboto text-green-light">Verificado</span>
-              </div>
-            </div>
             
             {/* Social Media Icons */}
             <div className="flex space-x-4">
