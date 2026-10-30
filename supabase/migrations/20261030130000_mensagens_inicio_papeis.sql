@@ -1,13 +1,17 @@
 -- ============================================================
 -- PREPARAÇÃO REVERSÍVEL — NÃO APLICAR EM PRODUÇÃO sem aprovação
 -- de publicação da Letícia.
--- Decisão de produto (Letícia, WhatsApp 30/10/2026 09:21):
--- "ambos podem iniciar a conversa" (empresa e profissional).
--- Esta migração separa INÍCIO de conversa de RESPOSTA:
---  - Resposta em conversa existente: sempre permitida ao
---    participante (como hoje).
+-- Decisões de produto da Letícia (WhatsApp):
+--  1) 30/10/2026 09:21: "ambos podem iniciar a conversa"
+--     (empresa e profissional).
+--  2) 30/10/2026 09:29: "perfeito! gostei da sugestão. podemos seguir"
+--     aprovando a proteção proposta: cadastro rejeitado/pendente NÃO
+--     envia mensagens, inclusive em conversas existentes.
+-- Regras resultantes na policy messages_insert:
+--  - Remetente precisa estar approved (resposta incluída).
+--  - Resposta em conversa existente: permitida a participante approved.
 --  - Início de conversa nova: apenas entre papéis opostos
---    (empresa <-> profissional) e ambos aprovados.
+--    (empresa <-> profissional), ambos approved.
 -- Reversão: reexecutar a policy messages_insert original da
 -- migração unify (sender = self, receiver <> self).
 -- ============================================================
@@ -47,11 +51,26 @@ $$;
 revoke all on function private.tem_conversa(uuid, uuid) from public;
 grant execute on function private.tem_conversa(uuid, uuid) to authenticated;
 
+-- Remetente precisa estar aprovado (decisao 2 do cabecalho: rejeitado
+-- ou pendente nao envia, nem em conversa existente).
+create or replace function private.remetente_ativo(a uuid)
+returns boolean language sql stable security definer set search_path = ''
+as $$
+  select exists (
+    select 1 from public.profiles s
+    where s.id = a and s.verification_status = 'approved'
+  );
+$$;
+
+revoke all on function private.remetente_ativo(uuid) from public;
+grant execute on function private.remetente_ativo(uuid) to authenticated;
+
 drop policy if exists messages_insert on public.messages;
 create policy messages_insert on public.messages for insert to authenticated
 with check (
   sender_id = (select auth.uid())
   and receiver_id <> (select auth.uid())
+  and (select private.remetente_ativo((select auth.uid())))
   and (
     (select private.tem_conversa((select auth.uid()), messages.receiver_id))
     or (select private.pode_iniciar((select auth.uid()), messages.receiver_id))
