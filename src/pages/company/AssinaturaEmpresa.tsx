@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Crown, 
   Check, 
@@ -29,14 +30,11 @@ const AssinaturaEmpresa: React.FC = () => {
       features: [
         'Cadastro da empresa',
         'Busca por profissionais',
-        'Até 3 contatos/mês',
-        'Perfil básico da empresa',
-        'Suporte por e-mail'
+        'Publicação e acompanhamento de demandas',
+        'Perfil da empresa'
       ],
       limitations: [
-        'Sem acesso a relatórios',
-        'Funcionalidades limitadas',
-        'Sem gestão de equipe'
+        'Mensagens, contratos e relatórios ainda em implantação'
       ]
     },
     {
@@ -77,17 +75,6 @@ const AssinaturaEmpresa: React.FC = () => {
 
   const currentPlanData = plans.find(p => p.id === currentPlan);
 
-  const handleUpgrade = (planId: string) => {
-    if (planId === currentPlan) return;
-    
-    if (planId === 'enterprise') {
-      toast.success('Redirecionando para contato comercial');
-    } else {
-      toast.success(`Redirecionando para pagamento do plano ${plans.find(p => p.id === planId)?.name}`);
-    }
-    // Aqui você redirecionaria para o gateway de pagamento ou contato
-  };
-
   const handleCancelSubscription = () => {
     toast.success('Assinatura cancelada com sucesso');
     // Aqui você processaria o cancelamento
@@ -106,7 +93,7 @@ const AssinaturaEmpresa: React.FC = () => {
             Assinatura da Empresa
           </h1>
           <p className="font-roboto text-gray-600">
-            Gerencie o plano da sua empresa e aproveite todos os recursos da LiggaSST
+            Veja o plano atual da sua empresa e a proposta dos planos pagos, ainda não disponíveis para assinatura
           </p>
         </div>
 
@@ -181,6 +168,11 @@ const AssinaturaEmpresa: React.FC = () => {
         </div>
 
         {/* Plans Grid */}
+        <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <p className="font-roboto text-sm text-blue-900">
+                Os planos pagos ainda não estão disponíveis para assinatura: valores e benefícios dos planos pagos são uma proposta em avaliação e podem mudar antes do lançamento. O plano gratuito reflete o que está disponível hoje.
+            </p>
+          </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {plans.map((plan) => (
             <div
@@ -189,14 +181,6 @@ const AssinaturaEmpresa: React.FC = () => {
                 plan.popular ? 'ring-2 ring-green-medium transform scale-105' : 'border border-gray-100'
               } ${currentPlan === plan.id ? 'ring-2 ring-green-deep' : ''}`}
             >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-green-medium text-white px-4 py-2 rounded-full text-sm font-roboto font-medium">
-                    Mais Popular
-                  </span>
-                </div>
-              )}
-
               {currentPlan === plan.id && (
                 <div className="absolute -top-4 right-4">
                   <span className="bg-green-deep text-white px-3 py-1 rounded-full text-xs font-roboto font-medium">
@@ -247,22 +231,15 @@ const AssinaturaEmpresa: React.FC = () => {
                 ))}
               </div>
 
-              <Button
-                onClick={() => handleUpgrade(plan.id)}
-                variant={currentPlan === plan.id ? 'outline' : (plan.popular ? 'primary' : 'outline')}
-                fullWidth
-                size="lg"
-                disabled={currentPlan === plan.id}
-              >
-                {currentPlan === plan.id 
-                  ? 'Plano Atual' 
-                  : plan.id === 'enterprise'
-                    ? 'Entrar em Contato'
-                    : typeof plan.price[billingCycle] === 'number' && plan.price[billingCycle] === 0
-                      ? 'Downgrade' 
-                      : 'Fazer Upgrade'
-                }
-              </Button>
+              {plan.id === 'enterprise' ? (
+                <Button as={Link} to="/contato" variant="outline" fullWidth size="lg">
+                  Entrar em Contato
+                </Button>
+              ) : (
+                <Button variant="outline" fullWidth size="lg" disabled>
+                  {currentPlan === plan.id ? 'Plano Atual' : 'Em breve'}
+                </Button>
+              )}
             </div>
           ))}
         </div>
@@ -270,7 +247,7 @@ const AssinaturaEmpresa: React.FC = () => {
         {/* Benefits Section */}
         <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
           <h2 className="font-poppins font-bold text-2xl text-soft-black mb-6 text-center">
-            Por que fazer upgrade?
+            O que os planos pagos pretendem oferecer
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
