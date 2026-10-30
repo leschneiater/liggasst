@@ -176,7 +176,10 @@ const CertificadosProfissional: React.FC = () => {
   const verArquivo = async (c: Certificate) => {
     // janela aberta no gesto do usuario para nao ser bloqueada como popup;
     // a URL assinada e atribuida quando chega
-    const janela = window.open('', '_blank', 'noopener,noreferrer');
+    const janela = window.open('', '_blank');
+    // protecao reverse-tabnabbing: mantemos a referencia para atribuir a URL
+    // assinada, mas a pagina de destino nao pode acessar window.opener
+    if (janela) janela.opener = null;
     setAbrindoId(c.id);
     const resultado = await getCertificateSignedUrl(c.storage_path);
     setAbrindoId(null);
