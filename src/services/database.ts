@@ -84,6 +84,38 @@ export const fetchUserProfile = async (userId: string) => {
   }
 };
 
+
+export const fetchOwnCompany = async (profileId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('profile_id', profileId)
+      .maybeSingle();
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar empresa:', error);
+    return { success: false, error };
+  }
+};
+
+export const updateCompany = async (profileId: string, companyData: ProfileData) => {
+  try {
+    const { data, error } = await supabase
+      .from('companies')
+      .update(companyData)
+      .eq('profile_id', profileId)
+      .select()
+      .single();
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao atualizar empresa:', error);
+    return { success: false, error };
+  }
+};
+
 export const sendMessage = async (senderId: string, receiverId: string, content: string) => {
   try {
     const user = await getAuthenticatedUser();
