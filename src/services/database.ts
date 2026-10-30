@@ -25,7 +25,8 @@ export const fetchProfessionals = async (filters: Filters = {}) => {
 };
 
 export interface ProfessionalSearchRow {
-  professional_id: string;
+  professional_id?: string;
+  id?: string;
   display_name: string | null;
   education: string | null;
   specialization: string | null;
@@ -60,7 +61,7 @@ const parseLeadingInt = (value: string | null): number | null => {
 };
 
 export const mapProfessionalSearchRow = (row: ProfessionalSearchRow): ProfessionalSearchItem => ({
-  id: row.professional_id,
+  id: row.professional_id ?? row.id ?? '',
   nome: row.display_name || 'Profissional',
   formacao: row.education || '',
   cidade: row.city || '',
