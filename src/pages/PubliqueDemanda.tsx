@@ -15,6 +15,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { publishDemand } from '../services/database';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -78,12 +79,24 @@ const PubliqueDemanda: React.FC = () => {
   const onSubmit = async (data: DemandFormData) => {
     setLoading(true);
     try {
-      // Simular publicação da demanda
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const descricaoCompleta = data.requisitos
+        ? `${data.descricao}\n\nRequisitos: ${data.requisitos}`
+        : data.descricao;
+      const result = await publishDemand({
+        title: data.titulo,
+        description: descricaoCompleta,
+        service_type: data.tipoServico,
+        city: data.localizacao,
+        state: data.estado,
+        budget: data.orcamento ? Number(data.orcamento) : null,
+        deadline: data.prazo || null,
+      });
+      if (!result.success) throw result.error ?? new Error('Falha ao publicar');
       setDemandPublished(true);
       toast.success('Demanda publicada com sucesso!');
     } catch (error) {
-      toast.error('Erro ao publicar demanda');
+      console.error('Erro ao publicar demanda:', error);
+      toast.error('Erro ao publicar demanda. Tente novamente.');
     } finally {
       setLoading(false);
     }
