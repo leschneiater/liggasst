@@ -1,12 +1,17 @@
 import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import ProfessionalAreaNav, { professionalAreaPaths } from './ProfessionalAreaNav';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const location = useLocation();
+  const isProfessionalArea = professionalAreaPaths.includes(location.pathname);
+
   // Scroll to top on page change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -15,6 +20,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      {isProfessionalArea && <ProfessionalAreaNav />}
       <main className="flex-grow">
         {children}
       </main>
