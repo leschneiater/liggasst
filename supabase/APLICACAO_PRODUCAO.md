@@ -8,7 +8,8 @@ oficial (ex.: `supabase db push`) for aprovada.
 
 - `20261030150000_busca_profissional_exclui_admin.sql` — APLICADA MANUALMENTE
   via SQL editor em 30/10/2026 ~12:04 (-03), com aprovação explícita da
-  usuária ("pode corrigir", 30/10/2026 12:03:16, WhatsApp). Verificado após
+  usuária ("pode corrigir", 30/10/2026 12:03:16, WhatsApp
+  wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYFjNFQjA0MEEzRTEwQjdCQkNENkY1QTAA). Verificado após
   aplicação: conta admin fora da busca e do perfil público por ID; registro
   em `professionals` preservado.
 - `20261030090000_get_professional_public.sql` — a função existe em produção
@@ -39,5 +40,6 @@ A aplicação manual via SQL editor NÃO registra a versão em
 ## Mudanças de dados fora de migration
 
 - 30/10/2026: `profiles.role = 'admin'` para lleschneiater@gmail.com, via
-  SQL editor, a pedido explícito da usuária (WhatsApp 11:09:36). Mudança de
+  SQL editor, a pedido explícito da usuária (WhatsApp 30/10/2026 11:09:36,
+  wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYFjNFQjBCNTgzNUJENEVGRTJFOTdFQjMA). Mudança de
   DADO, não de schema — `db push` não a toca nem a reverte.
