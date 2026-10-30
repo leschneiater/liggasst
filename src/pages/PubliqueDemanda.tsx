@@ -15,7 +15,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { publishDemand } from '../services/database';
+import { publishDemand, fetchOwnCompany, updateCompany } from '../services/database';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -55,6 +55,20 @@ const PubliqueDemanda: React.FC = () => {
     }
   }, [currentUser, navigate]);
 
+  // Pré-preencher contato a partir do cadastro da empresa
+  useEffect(() => {
+    if (!currentUser) return;
+    fetchOwnCompany(currentUser.id).then((result) => {
+      if (!result.success || !result.data) return;
+      const company = result.data as Record<string, string | null>;
+      reset({
+        empresa: company.razao_social ?? '',
+        contato: company.responsible_name ?? '',
+        telefone: company.responsible_phone ?? '',
+      });
+    });
+  }, [currentUser, reset]);
+
   const tiposServico = [
     'PCMSO - Programa de Controle Médico de Saúde Ocupacional',
     'PGR - Programa de Gerenciamento de Riscos',
@@ -82,6 +96,7 @@ const PubliqueDemanda: React.FC = () => {
       const descricaoCompleta = data.requisitos
         ? `${data.descricao}\n\nRequisitos: ${data.requisitos}`
         : data.descricao;
+      if (!currentUser) throw new Error('Usuário não autenticado');
       const result = await publishDemand({
         title: data.titulo,
         description: descricaoCompleta,
@@ -90,10 +105,24 @@ const PubliqueDemanda: React.FC = () => {
         state: data.estado,
         budget: data.orcamento ? Number(data.orcamento) : null,
         deadline: data.prazo || null,
+        modalidade: data.modalidade,
+        urgencia: data.urgencia,
+        tipo_orcamento: data.tipoOrcamento,
       });
       if (!result.success) throw result.error ?? new Error('Falha ao publicar');
+      // Contato fica no cadastro da empresa (leitura restrita ao dono/admin),
+      // nunca na demanda, que é visível a todos os usuários autenticados.
+      const companyResult = await updateCompany(currentUser.id, {
+        razao_social: data.empresa,
+        responsible_name: data.contato,
+        responsible_phone: data.telefone,
+      });
       setDemandPublished(true);
-      toast.success('Demanda publicada com sucesso!');
+      if (companyResult.success) {
+        toast.success('Demanda publicada com sucesso!');
+      } else {
+        toast.success('Demanda publicada, mas os dados de contato não foram salvos. Atualize-os no perfil da empresa.');
+      }
     } catch (error) {
       console.error('Erro ao publicar demanda:', error);
       toast.error('Erro ao publicar demanda. Tente novamente.');
@@ -435,6 +464,10 @@ const PubliqueDemanda: React.FC = () => {
                 <h2 className="font-poppins font-semibold text-xl text-soft-black mb-4">
                   Informações de Contato
                 </h2>
+
+                <p className="font-roboto text-sm text-gray-600 -mt-2">
+                  Estes dados ficam salvos no cadastro da sua empresa e não aparecem na demanda publicada.
+                </p>
 
                 <Input
                   label="Nome da Empresa"
