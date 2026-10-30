@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Plus, 
   Building2, 
   MapPin, 
   Calendar, 
@@ -45,7 +44,7 @@ const PubliqueDemanda: React.FC = () => {
   
   const { currentUser } = useAuth();
   
-  const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<DemandFormData>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<DemandFormData>();
 
   // Verificar se o usuário está logado
   useEffect(() => {

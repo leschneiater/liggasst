@@ -73,7 +73,7 @@ const PerfilProfissional: React.FC = () => {
     setLoading(true);
     try {
       await updateUserProfile(data);
-    } catch (error) {
+    } catch {
       toast.error('Erro ao atualizar perfil');
     } finally {
       setLoading(false);

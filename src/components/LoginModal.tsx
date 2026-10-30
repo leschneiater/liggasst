@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, X, Building2, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from './ui/Button';
 import Input from './ui/Input';
-import toast from 'react-hot-toast';
 
 interface LoginFormData {
   email: string;
@@ -37,7 +36,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
       await login(data.email, data.password);
       onClose();
       reset();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
       // Erro já tratado no contexto de autenticação
     } finally {

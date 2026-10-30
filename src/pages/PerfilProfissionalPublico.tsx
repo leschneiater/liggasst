@@ -74,7 +74,7 @@ const PerfilProfissionalPublico: React.FC = () => {
     if (userType === 'company' && professional && certificados === null && !certificadosErro) {
       carregarCertificados(professional.id);
     }
-  }, [userType, professional, certificados, certificadosErro]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userType, professional, certificados, certificadosErro]);
 
   const abrirCertificado = async (certificateId: string) => {
     // janela aberta no gesto do usuario para nao ser bloqueada como popup;

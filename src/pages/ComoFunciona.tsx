@@ -9,8 +9,7 @@ import {
   Shield,
   Clock,
   Star,
-  ArrowRight,
-  Users
+  ArrowRight
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 

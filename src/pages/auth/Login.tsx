@@ -20,7 +20,7 @@ const Login: React.FC = () => {
     try {
       await login(data.email, data.password);
       // Redirecionamento é feito no contexto de autenticação
-    } catch (error) {
+    } catch {
       // Erro já tratado no contexto
     }
   };

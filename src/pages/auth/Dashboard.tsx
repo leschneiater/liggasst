@@ -17,7 +17,7 @@ const Dashboard: React.FC = () => {
   const handleLogout = async () => {
     try {
       await signOut();
-    } catch (error) {
+    } catch {
       // Erro já tratado no contexto
     }
   };

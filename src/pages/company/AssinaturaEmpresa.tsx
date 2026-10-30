@@ -5,7 +5,6 @@ import {
   Check, 
   X, 
   CreditCard, 
-  Calendar,
   Star,
   Zap,
   Shield,

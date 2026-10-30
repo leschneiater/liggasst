@@ -43,7 +43,7 @@ const DenunciasAdmin: React.FC = () => {
     setLoading(false);
   };
 
-  useEffect(() => { carregar(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { carregar(); }, []);
 
   const mudarStatus = async (id: string, status: 'reviewed' | 'actioned') => {
     setAtualizando(id);
