@@ -43,3 +43,19 @@ A aplicação manual via SQL editor NÃO registra a versão em
   SQL editor, a pedido explícito da usuária (WhatsApp 30/10/2026 11:09:36,
   wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYFjNFQjBCNTgzNUJENEVGRTJFOTdFQjMA). Mudança de
   DADO, não de schema — `db push` não a toca nem a reverte.
+
+## 2026-10-30 (tarde) — Mensageria real + gate de lancamento
+
+Autorizacao da usuaria (WhatsApp): "pode" 12:54:22 (wamid...FjNFQjA5MDg3QTlEQUMyQ0NBNzc5MDUA), em resposta ao pedido de publicacao completa com conta profissional temporaria, testes e limpeza (wamid...EjY4Q0ZFQTQzRDg5RDE4QTMyRgA=). Continuidade confirmada: "pode continuar" 13:13:39 (wamid...FjNFQjA0QjE4Q0MzRUQzRDFCNTU3OTUA).
+
+Aplicadas via SQL editor (marcador de frescor por run) e registradas em supabase_migrations.schema_migrations:
+- 20261030120000 get_profile_public (RPC de contraparte da conversa)
+- 20261030130000 mensagens_inicio_papeis (inicio por papeis + remetente aprovado)
+- 20261030140000 bloqueio_denuncia (conversation_blocks + message_reports)
+- 20261030160000 messaging_gate (allowlist private, flag fechada, profiles.is_test, gates de insert, exclusao de is_test da busca/perfil)
+- 20261030160001 is_test_guard (trigger: usuario autenticado nao altera o proprio is_test)
+Reparo: 20261030150000 registrada (ja aplicada manualmente as 12:04).
+
+Verificacao pos-aplicacao (catalogo): 6 funcoes private, 2 tabelas, 3 policies em conversation_blocks, 3 em message_reports, flag aberta=false, coluna is_test presente.
+
+Gate FECHADO em producao: envio/bloqueio/denuncia bloqueados para contas fora da allowlist; perfis is_test invisiveis na busca e no perfil publico para usuarios gerais.
