@@ -173,11 +173,12 @@ const PoliticaPrivacidade: React.FC = () => {
                   </h3>
                   <p className="font-roboto text-gray-700">
                     O conteúdo das mensagens trocadas na plataforma é visível apenas para
-                    os participantes da conversa. A administração da LiggaSST não acessa
-                    o conteúdo das mensagens. Quando um usuário registra uma denúncia, os
+                    os participantes da conversa. A administração da LiggaSST não tem
+                    acesso geral às conversas. Quando um usuário registra uma denúncia, os
                     dados da denúncia (motivo, informações fornecidas pelo denunciante,
-                    data e usuários envolvidos) ficam visíveis para a administração e são
-                    usados somente para analisar o caso e adotar as providências cabíveis.
+                    que podem incluir trechos ou descrições da conversa, data e usuários
+                    envolvidos) ficam visíveis para a administração e são usados somente
+                    para analisar o caso e adotar as providências cabíveis.
                   </p>
                 </div>
               </div>
