@@ -22,6 +22,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import AdminAreaNav from '../../components/Layout/AdminAreaNav';
 
 const DashboardAdmin: React.FC = () => {
   const [stats, setStats] = useState({
@@ -201,7 +202,9 @@ const DashboardAdmin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-gray py-8">
+    <div className="min-h-screen bg-neutral-gray">
+      <AdminAreaNav />
+      <div className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -591,6 +594,7 @@ const DashboardAdmin: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

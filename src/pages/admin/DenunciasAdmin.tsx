@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Flag, CheckCircle, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
+import AdminAreaNav from '../../components/Layout/AdminAreaNav';
 import { fetchReports, updateReportStatus, fetchProfileNames, ReportRow } from '../../services/database';
 
 const ROTULOS_MOTIVO: Record<string, string> = {
@@ -59,12 +60,17 @@ const DenunciasAdmin: React.FC = () => {
   const visiveis = filtro === 'open' ? denuncias.filter(d => d.status === 'open') : denuncias;
 
   return (
-    <div className="min-h-screen bg-neutral-gray py-8">
+    <div className="min-h-screen bg-neutral-gray">
+      <AdminAreaNav />
+      <div className="py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <h1 className="font-poppins font-bold text-3xl text-soft-black mb-2">Denúncias</h1>
             <p className="font-roboto text-gray-600">Denúncias de mensagens enviadas pelos usuários</p>
+            <p className="font-roboto text-xs text-gray-400 mt-1">
+              Os botões apenas registram o andamento da análise; medidas sobre contas são tomadas separadamente pela administração.
+            </p>
           </div>
           <div className="flex gap-2">
             <button
@@ -138,17 +144,19 @@ const DenunciasAdmin: React.FC = () => {
                       {new Date(d.created_at).toLocaleString('pt-BR')}
                     </p>
                   </div>
-                  {d.status === 'open' && (
+                  {d.status !== 'actioned' && (
                     <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
-                      <Button
-                        onClick={() => mudarStatus(d.id, 'reviewed')}
-                        icon={Eye}
-                        size="sm"
-                        variant="outline"
-                        disabled={atualizando === d.id}
-                      >
-                        Marcar analisada
-                      </Button>
+                      {d.status === 'open' && (
+                        <Button
+                          onClick={() => mudarStatus(d.id, 'reviewed')}
+                          icon={Eye}
+                          size="sm"
+                          variant="outline"
+                          disabled={atualizando === d.id}
+                        >
+                          Marcar analisada
+                        </Button>
+                      )}
                       <Button
                         onClick={() => mudarStatus(d.id, 'actioned')}
                         icon={CheckCircle}
@@ -165,6 +173,7 @@ const DenunciasAdmin: React.FC = () => {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };

@@ -167,7 +167,7 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
       setMessages(prev => [...prev, result.data as MessageRow]);
       setDraft('');
     } else {
-      toast.error('Não foi possível enviar. Tente novamente.');
+      toast.error('Não foi possível enviar esta mensagem.');
     }
   };
 
