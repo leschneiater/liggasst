@@ -108,3 +108,25 @@ contracts_insert + contracts_select em contracts, triggers
 contrato_guarda_transicao e demanda_guarda_transicao enabled=O, grants de
 authenticated em contracts = SELECT+INSERT (sem UPDATE), coluna title text
 presente.
+
+## 2026-10-31 (madrugada) — Isolamento de demandas de teste na vitrine
+
+Autorizacao da usuaria (WhatsApp): "Pode" 00:51:25
+(wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYIEE1NjNFM0I4QzYyQTRCMkZBRUI2MTUyMzI5QUYzNDg4AA==),
+em resposta a proposta (wamid.HBgNNTUxMTkxNDMyMzI2NBUCABEYEkUxMzQ2M0QzNzNCRDk4OUY4MQA=)
+de aplicar o isolamento no banco e no repo com credencial temporaria revogada
+ao final, e retomar o teste completo de contratos+demandas com contas e
+registros temporarios removidos ao final. Caveat informado: registros de
+teste aparecem temporariamente nos numeros do painel admin.
+
+Aplicada via SQL editor:
+- 20261031020000_demandas_isolamento_teste (funcao
+  private.perfil_de_teste(uuid); policy demands_select ganha gate is_test no
+  ramo status='active': demanda de empresa is_test some da vitrine para
+  contas comuns; dona, admin e gate messaging_allowlist seguem vendo).
+  Registrada em supabase_migrations.schema_migrations. Nenhum dado alterado.
+
+Verificacao pos-aplicacao (catalogo read-only): funcao
+private.perfil_de_teste presente; qual da demands_select com a clausula
+(NOT perfil_de_teste OR messaging_tester) no ramo active; versao
+20261031020000 presente em schema_migrations.
