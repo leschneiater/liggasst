@@ -1,4 +1,4 @@
-// PREPARACAO LOCAL — nao implantada. Primeira Edge Function do projeto.
+// Implantada (verificada ativa em 30/10/2026). Primeira Edge Function do projeto.
 // Gera URL assinada curta (5 min) para o arquivo de um certificado que o dono
 // escolheu mostrar. Somente contas empresa autenticadas. Revogar o flag bloqueia
 // novas URLs imediatamente; URLs ja emitidas valem ate expirar (<= 5 min).

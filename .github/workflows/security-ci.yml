@@ -25,4 +25,5 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run test:rpc
+      - run: npm run test:trainings
       - run: npm run build

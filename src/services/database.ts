@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { TrainingAudience, TrainingStatus, treinamentoVisivelPara } from '../utils/treinamentos';
 
 type Filters = Record<string, unknown>;
 type ProfileData = Record<string, unknown>;
@@ -725,5 +726,152 @@ export const fetchAdminDemands = async () => {
   } catch (error) {
     console.error('Erro ao buscar demandas para o relatório:', error);
     return { success: false, data: [] as AdminDemandRow[], error };
+  }
+};
+
+// =====================
+// Treinamentos (módulo admin) — depende do rascunho supabase/drafts/draft_trainings.sql
+// (não aplicado) e da Edge Function training-file-url (preparada, não implantada).
+// =====================
+
+export { treinamentoVisivelPara };
+export type { TrainingAudience, TrainingStatus };
+
+export const fetchTrainingsAdmin = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('trainings')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return { success: true, data: (data ?? []) as TrainingRow[] };
+  } catch (error) {
+    console.error('Erro ao buscar treinamentos (admin):', error);
+    return { success: false, data: [] as TrainingRow[], error };
+  }
+};
+
+// Leitura do membro: a RLS já devolve só os publicados do público dele.
+export const fetchTrainingsMembro = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('trainings')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return { success: true, data: (data ?? []) as TrainingRow[] };
+  } catch (error) {
+    console.error('Erro ao buscar treinamentos:', error);
+    return { success: false, data: [] as TrainingRow[], error };
+  }
+};
+
+export const createTraining = async (treinamento: {
+  title: string;
+  description?: string;
+  audience: TrainingAudience;
+  youtube_url?: string | null;
+  pdf_path?: string | null;
+  link_url?: string | null;
+  status?: TrainingStatus;
+}) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('trainings')
+      .insert({
+        title: treinamento.title,
+        description: treinamento.description ?? '',
+        audience: treinamento.audience,
+        youtube_url: treinamento.youtube_url ?? null,
+        pdf_path: treinamento.pdf_path ?? null,
+        link_url: treinamento.link_url ?? null,
+        status: treinamento.status ?? 'draft',
+        created_by: user.id,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return { success: true, data: data as TrainingRow };
+  } catch (error) {
+    console.error('Erro ao criar treinamento:', error);
+    return { success: false, error };
+  }
+};
+
+export const updateTraining = async (
+  id: string,
+  mudancas: Partial<Pick<TrainingRow, 'title' | 'description' | 'audience' | 'youtube_url' | 'pdf_path' | 'link_url' | 'status'>>,
+) => {
+  try {
+    const { data, error } = await supabase
+      .from('trainings')
+      .update({ ...mudancas, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return { success: true, data: data as TrainingRow };
+  } catch (error) {
+    console.error('Erro ao atualizar treinamento:', error);
+    return { success: false, error };
+  }
+};
+
+export const uploadTrainingPdf = async (trainingId: string, file: File) => {
+  try {
+    if (file.type !== 'application/pdf') throw new Error('Apenas PDF.');
+    if (file.size > 10 * 1024 * 1024) throw new Error('PDF acima de 10 MB.');
+    const path = `${trainingId}.pdf`;
+    const { error } = await supabase.storage
+      .from('trainings')
+      .upload(path, file, { upsert: true, contentType: 'application/pdf' });
+    if (error) throw error;
+    return { success: true, path };
+  } catch (error) {
+    console.error('Erro ao enviar PDF do treinamento:', error);
+    return { success: false, error };
+  }
+};
+
+// Membro (e admin) abrem o PDF via Edge Function, que confere papel/público
+// antes de assinar. URL assinada tem validade curta e não é DRM.
+export const getTrainingPdfUrl = async (trainingId: string) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('training-file-url', {
+      body: { training_id: trainingId },
+    });
+    if (error) throw error;
+    if (!data?.signedUrl) throw new Error('Link não retornado.');
+    return { success: true, signedUrl: data.signedUrl as string };
+  } catch (error) {
+    console.error('Erro ao abrir PDF do treinamento:', error);
+    return { success: false, error };
+  }
+};
+
+export const deleteTraining = async (id: string, pdfPath: string | null) => {
+  try {
+    const { data, error } = await supabase
+      .from('trainings')
+      .delete()
+      .eq('id', id)
+      .select('id');
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error('Treinamento não encontrado.');
+    // Só remove paths no formato gerado pelo upload (<uuid>.pdf): nunca
+    // apaga caminho arbitrário do bucket (inclusive PDF de outro treinamento).
+    if (pdfPath && /^[0-9a-f-]{36}\.pdf$/.test(pdfPath)) {
+      const { error: storageError } = await supabase.storage.from('trainings').remove([pdfPath]);
+      if (storageError) {
+        console.error('Linha removida, mas o PDF ficou no storage:', storageError);
+        return { success: true, warning: 'storage' };
+      }
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao excluir treinamento:', error);
+    return { success: false, error };
   }
 };
