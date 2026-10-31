@@ -40,6 +40,7 @@ interface CompanyFormData {
   telefoneResponsavel: string;
   descricaoEmpresa: string;
   necessidades: string[];
+  termosAceitos: boolean;
 }
 
 interface CadastroEmpresaModalProps {
@@ -58,6 +59,28 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
   
   const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<CompanyFormData>();
   const watchPassword = watch('password');
+
+  const rotulosCampos: Record<keyof CompanyFormData, string> = {
+    nomeEmpresa: 'Nome da Empresa',
+    cnpj: 'CNPJ',
+    email: 'E-mail',
+    ['password']: 'Senha',
+    ['confirmPassword']: 'Confirmar Senha',
+    telefone: 'Telefone',
+    cep: 'CEP',
+    cidade: 'Cidade',
+    estado: 'Estado',
+    endereco: 'Endereço',
+    segmento: 'Segmento',
+    numeroFuncionarios: 'Número de Funcionários',
+    nomeResponsavel: 'Nome do Responsável',
+    cargoResponsavel: 'Cargo do Responsável',
+    emailResponsavel: 'E-mail do Responsável',
+    telefoneResponsavel: 'Telefone do Responsável',
+    descricaoEmpresa: 'Descrição da Empresa',
+    necessidades: 'Necessidades',
+    termosAceitos: 'Termos de Uso e Política de Privacidade',
+  };
 
   const segmentos = [
     'Indústria Alimentícia',
@@ -187,7 +210,7 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
           </h2>
           
           <p className="font-roboto text-gray-600 mb-6">
-            Sua conta foi criada com sucesso! Verifique seu e-mail para ativar a conta antes de fazer login.
+            Sua conta foi criada com sucesso! Faça login com seu e-mail e senha para começar.
           </p>
           
           <div className="bg-green-light bg-opacity-20 p-4 rounded-lg mb-6">
@@ -195,10 +218,10 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
               Próximos Passos:
             </h3>
             <ul className="font-roboto text-sm text-green-deep space-y-1 text-left">
-              <li>• Verifique seu e-mail e clique no link de confirmação</li>
-              <li>• Faça login na plataforma</li>
-              <li>• Complete seu perfil empresarial</li>
-              <li>• Explore profissionais disponíveis</li>
+              <li>• Faça login com seu e-mail e senha</li>
+              <li>• Complete o perfil da empresa</li>
+              <li>• Publique demandas de SST</li>
+              <li>• Busque profissionais disponíveis</li>
             </ul>
           </div>
           
@@ -392,7 +415,7 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
                     ))}
                   </select>
                   {errors.estado && (
-                    <p className="text-red-500 text-sm font-roboto">{errors.estado.message}</p>
+                    <p className="text-red-500 text-sm font-roboto" role="alert">{errors.estado.message}</p>
                   )}
                 </div>
               </div>
@@ -419,7 +442,7 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
                     ))}
                   </select>
                   {errors.segmento && (
-                    <p className="text-red-500 text-sm font-roboto">{errors.segmento.message}</p>
+                    <p className="text-red-500 text-sm font-roboto" role="alert">{errors.segmento.message}</p>
                   )}
                 </div>
 
@@ -437,7 +460,7 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
                     ))}
                   </select>
                   {errors.numeroFuncionarios && (
-                    <p className="text-red-500 text-sm font-roboto">{errors.numeroFuncionarios.message}</p>
+                    <p className="text-red-500 text-sm font-roboto" role="alert">{errors.numeroFuncionarios.message}</p>
                   )}
                 </div>
               </div>
@@ -532,18 +555,18 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
                   Próximos Passos:
                 </h3>
                 <ul className="font-roboto text-sm text-green-deep space-y-1">
-                  <li>• Verificaremos os dados da empresa</li>
-                  <li>• Enviaremos um e-mail de confirmação</li>
-                  <li>• Ative sua conta pelo e-mail</li>
-                  <li>• Faça login e complete seu perfil</li>
+                  <li>• Sua conta fica ativa logo após o cadastro</li>
+                  <li>• Faça login com e-mail e senha</li>
+                  <li>• Publique demandas de SST</li>
+                  <li>• Profissionais podem encontrar sua empresa na busca</li>
                 </ul>
               </div>
 
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  required
                   className="rounded border-gray-300 text-green-deep focus:ring-green-deep"
+                  {...register('termosAceitos', { required: 'É necessário aceitar os Termos de Uso e a Política de Privacidade' })}
                 />
                 <span className="ml-2 font-roboto text-sm text-gray-600">
                   Aceito os{' '}
@@ -564,6 +587,26 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
                   </Link>
                 </span>
               </div>
+
+              {errors.termosAceitos && (
+                <p className="text-red-500 text-sm font-roboto" role="alert">{errors.termosAceitos.message}</p>
+              )}
+
+              {Object.keys(errors).length > 0 && (
+                <div className="bg-red-50 border border-red-300 rounded-lg p-4" role="alert">
+                  <p className="font-roboto font-medium text-red-700 text-sm mb-2">
+                    Não foi possível criar a conta. Corrija os campos abaixo:
+                  </p>
+                  <ul className="font-roboto text-sm text-red-700 space-y-1 list-disc list-inside">
+                    {Object.entries(errors).map(([campo, erro]) => (
+                      <li key={campo}>
+                        <span className="font-medium">{rotulosCampos[campo as keyof CompanyFormData] ?? campo}:</span>{' '}
+                        {erro?.message}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <Button type="submit" loading={loading} fullWidth size="lg">
                 Criar Conta
