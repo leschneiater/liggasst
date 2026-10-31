@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Flag } from 'lucide-react';
+import { LayoutDashboard, Flag, GraduationCap } from 'lucide-react';
 
 const menuItems = [
   { path: '/admin', label: 'Painel', icon: LayoutDashboard },
   { path: '/admin/denuncias', label: 'Denúncias', icon: Flag },
+  { path: '/admin/treinamentos', label: 'Treinamentos', icon: GraduationCap },
 ];
 
 const AdminAreaNav: React.FC = () => {

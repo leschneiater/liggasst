@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import ProfessionalAreaNav, { professionalAreaPaths } from './ProfessionalAreaNav';
+import CompanyAreaNav from './CompanyAreaNav';
+import { companyAreaPaths } from './companyMenu';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,6 +13,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const isProfessionalArea = professionalAreaPaths.includes(location.pathname);
+  const isCompanyArea = companyAreaPaths.includes(location.pathname);
 
   // Scroll to top on page change
   useEffect(() => {
@@ -21,6 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen flex flex-col">
       <Header />
       {isProfessionalArea && <ProfessionalAreaNav />}
+      {isCompanyArea && <CompanyAreaNav />}
       <main className="flex-grow">
         {children}
       </main>

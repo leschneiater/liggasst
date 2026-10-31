@@ -6,6 +6,7 @@ import {
   Search,
   Plus,
   BarChart3,
+  GraduationCap,
   MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -132,6 +133,16 @@ const DashboardEmpresa: React.FC = () => {
                   className="h-20 flex-col"
                 >
                   Relatórios
+                </Button>
+                <Button
+                  as={Link}
+                  to="/treinamentos-empresa"
+                  variant="outline"
+                  size="sm"
+                  icon={GraduationCap}
+                  className="h-20 flex-col"
+                >
+                  Treinamentos
                 </Button>
                 <Button
                   as={Link}
