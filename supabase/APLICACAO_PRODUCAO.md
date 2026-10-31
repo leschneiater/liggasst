@@ -130,3 +130,13 @@ Verificacao pos-aplicacao (catalogo read-only): funcao
 private.perfil_de_teste presente; qual da demands_select com a clausula
 (NOT perfil_de_teste OR messaging_tester) no ramo active; versao
 20261031020000 presente em schema_migrations.
+
+## 2026-10-31 — 20261031030000_grant_companies_razao_social (PR #24)
+
+Correcao aprovada pela proprietaria (WhatsApp "Pode" 01:06 BRT, wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYIEE1OTI4RDVFOTVFNDgxRUVGNUJFMzJCQTJGMEFDQjk3AA==): `grant update (razao_social) on public.companies to authenticated;`
+
+Bug: coluna razao_social (20261029230000) fora do GRANT por coluna do unify — Publicar Demanda falhava com 42501 na etapa de contato.
+
+Aplicacao: SQL editor do Supabase (projeto ilvrcozeqbdgeuzjgpvf) em 2026-10-31 ~04:07 UTC.
+Verificacao: update como role authenticated com JWT da empresa retornou 1 row (antes: 42501 permission denied); versao registrada em supabase_migrations.schema_migrations; publicacao de demanda pela UI validada de ponta a ponta com conta de teste.
+Teste PGlite: npm run test:companies-contato — 8/8 (dona positivo; outra empresa/profissional/anon negativo; grant segue por coluna). Red->green confirmado.
