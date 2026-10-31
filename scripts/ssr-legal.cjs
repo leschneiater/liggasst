@@ -29,9 +29,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// ../ligga-repo/node_modules/react/cjs/react.production.min.js
+// ../../downloads/ligga-repo/node_modules/react/cjs/react.production.min.js
 var require_react_production_min = __commonJS({
-  "../ligga-repo/node_modules/react/cjs/react.production.min.js"(exports2) {
+  "../../downloads/ligga-repo/node_modules/react/cjs/react.production.min.js"(exports2) {
     "use strict";
     var l = Symbol.for("react.element");
     var n = Symbol.for("react.portal");
@@ -302,9 +302,9 @@ var require_react_production_min = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react/cjs/react.development.js
+// ../../downloads/ligga-repo/node_modules/react/cjs/react.development.js
 var require_react_development = __commonJS({
-  "../ligga-repo/node_modules/react/cjs/react.development.js"(exports2, module2) {
+  "../../downloads/ligga-repo/node_modules/react/cjs/react.development.js"(exports2, module2) {
     "use strict";
     if (process.env.NODE_ENV !== "production") {
       (function() {
@@ -2176,9 +2176,9 @@ var require_react_development = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react/index.js
+// ../../downloads/ligga-repo/node_modules/react/index.js
 var require_react = __commonJS({
-  "../ligga-repo/node_modules/react/index.js"(exports2, module2) {
+  "../../downloads/ligga-repo/node_modules/react/index.js"(exports2, module2) {
     "use strict";
     if (process.env.NODE_ENV === "production") {
       module2.exports = require_react_production_min();
@@ -2188,9 +2188,9 @@ var require_react = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.production.min.js
+// ../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.production.min.js
 var require_react_dom_server_legacy_node_production_min = __commonJS({
-  "../ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.production.min.js"(exports2) {
+  "../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.production.min.js"(exports2) {
     "use strict";
     var ea = require_react();
     var fa = require("stream");
@@ -3744,9 +3744,9 @@ var require_react_dom_server_legacy_node_production_min = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.production.min.js
+// ../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.production.min.js
 var require_react_dom_server_node_production_min = __commonJS({
-  "../ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.production.min.js"(exports2) {
+  "../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.production.min.js"(exports2) {
     "use strict";
     var aa = require("util");
     var ba = require_react();
@@ -5424,17 +5424,17 @@ var require_react_dom_server_node_production_min = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js
+// ../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js
 var require_react_dom_server_legacy_node_development = __commonJS({
-  "../ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js"(exports2) {
+  "../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js"(exports2) {
     "use strict";
     if (process.env.NODE_ENV !== "production") {
       (function() {
         "use strict";
-        var React2 = require_react();
+        var React4 = require_react();
         var stream = require("stream");
         var ReactVersion = "18.3.1";
-        var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React4.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function warn(format) {
           {
             {
@@ -7329,7 +7329,7 @@ var require_react_dom_server_legacy_node_development = __commonJS({
         }
         function flattenOptionChildren(children) {
           var content = "";
-          React2.Children.forEach(children, function(child) {
+          React4.Children.forEach(children, function(child) {
             if (child == null) {
               return;
             }
@@ -10828,17 +10828,17 @@ var require_react_dom_server_legacy_node_development = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.development.js
+// ../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.development.js
 var require_react_dom_server_node_development = __commonJS({
-  "../ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.development.js"(exports2) {
+  "../../downloads/ligga-repo/node_modules/react-dom/cjs/react-dom-server.node.development.js"(exports2) {
     "use strict";
     if (process.env.NODE_ENV !== "production") {
       (function() {
         "use strict";
-        var React2 = require_react();
+        var React4 = require_react();
         var util = require("util");
         var ReactVersion = "18.3.1";
-        var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React4.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function warn(format) {
           {
             {
@@ -12830,7 +12830,7 @@ var require_react_dom_server_node_development = __commonJS({
         }
         function flattenOptionChildren(children) {
           var content = "";
-          React2.Children.forEach(children, function(child) {
+          React4.Children.forEach(children, function(child) {
             if (child == null) {
               return;
             }
@@ -16216,9 +16216,9 @@ var require_react_dom_server_node_development = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react-dom/server.node.js
+// ../../downloads/ligga-repo/node_modules/react-dom/server.node.js
 var require_server_node = __commonJS({
-  "../ligga-repo/node_modules/react-dom/server.node.js"(exports2) {
+  "../../downloads/ligga-repo/node_modules/react-dom/server.node.js"(exports2) {
     "use strict";
     var l;
     var s;
@@ -16238,9 +16238,9 @@ var require_server_node = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/lucide-react/dist/cjs/lucide-react.js
+// ../../downloads/ligga-repo/node_modules/lucide-react/dist/cjs/lucide-react.js
 var require_lucide_react = __commonJS({
-  "../ligga-repo/node_modules/lucide-react/dist/cjs/lucide-react.js"(exports2) {
+  "../../downloads/ligga-repo/node_modules/lucide-react/dist/cjs/lucide-react.js"(exports2) {
     "use strict";
     var react = require_react();
     var defaultAttributes = {
@@ -33429,1331 +33429,46 @@ var require_lucide_react = __commonJS({
   }
 });
 
-// ../ligga-repo/node_modules/react/cjs/react-jsx-runtime.production.min.js
-var require_react_jsx_runtime_production_min = __commonJS({
-  "../ligga-repo/node_modules/react/cjs/react-jsx-runtime.production.min.js"(exports2) {
-    "use strict";
-    var f = require_react();
-    var k = Symbol.for("react.element");
-    var l = Symbol.for("react.fragment");
-    var m = Object.prototype.hasOwnProperty;
-    var n = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner;
-    var p = { key: true, ref: true, __self: true, __source: true };
-    function q(c, a, g) {
-      var b, d = {}, e = null, h = null;
-      void 0 !== g && (e = "" + g);
-      void 0 !== a.key && (e = "" + a.key);
-      void 0 !== a.ref && (h = a.ref);
-      for (b in a) m.call(a, b) && !p.hasOwnProperty(b) && (d[b] = a[b]);
-      if (c && c.defaultProps) for (b in a = c.defaultProps, a) void 0 === d[b] && (d[b] = a[b]);
-      return { $$typeof: k, type: c, key: e, ref: h, props: d, _owner: n.current };
-    }
-    exports2.Fragment = l;
-    exports2.jsx = q;
-    exports2.jsxs = q;
-  }
-});
-
-// ../ligga-repo/node_modules/react/cjs/react-jsx-runtime.development.js
-var require_react_jsx_runtime_development = __commonJS({
-  "../ligga-repo/node_modules/react/cjs/react-jsx-runtime.development.js"(exports2) {
-    "use strict";
-    if (process.env.NODE_ENV !== "production") {
-      (function() {
-        "use strict";
-        var React2 = require_react();
-        var REACT_ELEMENT_TYPE = Symbol.for("react.element");
-        var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-        var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-        var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-        var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-        var REACT_PROVIDER_TYPE = Symbol.for("react.provider");
-        var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-        var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-        var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-        var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
-        var REACT_MEMO_TYPE = Symbol.for("react.memo");
-        var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-        var REACT_OFFSCREEN_TYPE = Symbol.for("react.offscreen");
-        var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
-        var FAUX_ITERATOR_SYMBOL = "@@iterator";
-        function getIteratorFn(maybeIterable) {
-          if (maybeIterable === null || typeof maybeIterable !== "object") {
-            return null;
-          }
-          var maybeIterator = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL];
-          if (typeof maybeIterator === "function") {
-            return maybeIterator;
-          }
-          return null;
-        }
-        var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-        function error(format) {
-          {
-            {
-              for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-                args[_key2 - 1] = arguments[_key2];
-              }
-              printWarning("error", format, args);
-            }
-          }
-        }
-        function printWarning(level, format, args) {
-          {
-            var ReactDebugCurrentFrame2 = ReactSharedInternals.ReactDebugCurrentFrame;
-            var stack = ReactDebugCurrentFrame2.getStackAddendum();
-            if (stack !== "") {
-              format += "%s";
-              args = args.concat([stack]);
-            }
-            var argsWithFormat = args.map(function(item) {
-              return String(item);
-            });
-            argsWithFormat.unshift("Warning: " + format);
-            Function.prototype.apply.call(console[level], console, argsWithFormat);
-          }
-        }
-        var enableScopeAPI = false;
-        var enableCacheElement = false;
-        var enableTransitionTracing = false;
-        var enableLegacyHidden = false;
-        var enableDebugTracing = false;
-        var REACT_MODULE_REFERENCE;
-        {
-          REACT_MODULE_REFERENCE = Symbol.for("react.module.reference");
-        }
-        function isValidElementType(type) {
-          if (typeof type === "string" || typeof type === "function") {
-            return true;
-          }
-          if (type === REACT_FRAGMENT_TYPE || type === REACT_PROFILER_TYPE || enableDebugTracing || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || enableLegacyHidden || type === REACT_OFFSCREEN_TYPE || enableScopeAPI || enableCacheElement || enableTransitionTracing) {
-            return true;
-          }
-          if (typeof type === "object" && type !== null) {
-            if (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || // This needs to include all possible module reference object
-            // types supported by any Flight configuration anywhere since
-            // we don't know which Flight build this will end up being used
-            // with.
-            type.$$typeof === REACT_MODULE_REFERENCE || type.getModuleId !== void 0) {
-              return true;
-            }
-          }
-          return false;
-        }
-        function getWrappedName(outerType, innerType, wrapperName) {
-          var displayName = outerType.displayName;
-          if (displayName) {
-            return displayName;
-          }
-          var functionName = innerType.displayName || innerType.name || "";
-          return functionName !== "" ? wrapperName + "(" + functionName + ")" : wrapperName;
-        }
-        function getContextName(type) {
-          return type.displayName || "Context";
-        }
-        function getComponentNameFromType(type) {
-          if (type == null) {
-            return null;
-          }
-          {
-            if (typeof type.tag === "number") {
-              error("Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue.");
-            }
-          }
-          if (typeof type === "function") {
-            return type.displayName || type.name || null;
-          }
-          if (typeof type === "string") {
-            return type;
-          }
-          switch (type) {
-            case REACT_FRAGMENT_TYPE:
-              return "Fragment";
-            case REACT_PORTAL_TYPE:
-              return "Portal";
-            case REACT_PROFILER_TYPE:
-              return "Profiler";
-            case REACT_STRICT_MODE_TYPE:
-              return "StrictMode";
-            case REACT_SUSPENSE_TYPE:
-              return "Suspense";
-            case REACT_SUSPENSE_LIST_TYPE:
-              return "SuspenseList";
-          }
-          if (typeof type === "object") {
-            switch (type.$$typeof) {
-              case REACT_CONTEXT_TYPE:
-                var context = type;
-                return getContextName(context) + ".Consumer";
-              case REACT_PROVIDER_TYPE:
-                var provider = type;
-                return getContextName(provider._context) + ".Provider";
-              case REACT_FORWARD_REF_TYPE:
-                return getWrappedName(type, type.render, "ForwardRef");
-              case REACT_MEMO_TYPE:
-                var outerName = type.displayName || null;
-                if (outerName !== null) {
-                  return outerName;
-                }
-                return getComponentNameFromType(type.type) || "Memo";
-              case REACT_LAZY_TYPE: {
-                var lazyComponent = type;
-                var payload = lazyComponent._payload;
-                var init = lazyComponent._init;
-                try {
-                  return getComponentNameFromType(init(payload));
-                } catch (x) {
-                  return null;
-                }
-              }
-            }
-          }
-          return null;
-        }
-        var assign = Object.assign;
-        var disabledDepth = 0;
-        var prevLog;
-        var prevInfo;
-        var prevWarn;
-        var prevError;
-        var prevGroup;
-        var prevGroupCollapsed;
-        var prevGroupEnd;
-        function disabledLog() {
-        }
-        disabledLog.__reactDisabledLog = true;
-        function disableLogs() {
-          {
-            if (disabledDepth === 0) {
-              prevLog = console.log;
-              prevInfo = console.info;
-              prevWarn = console.warn;
-              prevError = console.error;
-              prevGroup = console.group;
-              prevGroupCollapsed = console.groupCollapsed;
-              prevGroupEnd = console.groupEnd;
-              var props = {
-                configurable: true,
-                enumerable: true,
-                value: disabledLog,
-                writable: true
-              };
-              Object.defineProperties(console, {
-                info: props,
-                log: props,
-                warn: props,
-                error: props,
-                group: props,
-                groupCollapsed: props,
-                groupEnd: props
-              });
-            }
-            disabledDepth++;
-          }
-        }
-        function reenableLogs() {
-          {
-            disabledDepth--;
-            if (disabledDepth === 0) {
-              var props = {
-                configurable: true,
-                enumerable: true,
-                writable: true
-              };
-              Object.defineProperties(console, {
-                log: assign({}, props, {
-                  value: prevLog
-                }),
-                info: assign({}, props, {
-                  value: prevInfo
-                }),
-                warn: assign({}, props, {
-                  value: prevWarn
-                }),
-                error: assign({}, props, {
-                  value: prevError
-                }),
-                group: assign({}, props, {
-                  value: prevGroup
-                }),
-                groupCollapsed: assign({}, props, {
-                  value: prevGroupCollapsed
-                }),
-                groupEnd: assign({}, props, {
-                  value: prevGroupEnd
-                })
-              });
-            }
-            if (disabledDepth < 0) {
-              error("disabledDepth fell below zero. This is a bug in React. Please file an issue.");
-            }
-          }
-        }
-        var ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher;
-        var prefix;
-        function describeBuiltInComponentFrame(name, source, ownerFn) {
-          {
-            if (prefix === void 0) {
-              try {
-                throw Error();
-              } catch (x) {
-                var match = x.stack.trim().match(/\n( *(at )?)/);
-                prefix = match && match[1] || "";
-              }
-            }
-            return "\n" + prefix + name;
-          }
-        }
-        var reentry = false;
-        var componentFrameCache;
-        {
-          var PossiblyWeakMap = typeof WeakMap === "function" ? WeakMap : Map;
-          componentFrameCache = new PossiblyWeakMap();
-        }
-        function describeNativeComponentFrame(fn, construct) {
-          if (!fn || reentry) {
-            return "";
-          }
-          {
-            var frame = componentFrameCache.get(fn);
-            if (frame !== void 0) {
-              return frame;
-            }
-          }
-          var control;
-          reentry = true;
-          var previousPrepareStackTrace = Error.prepareStackTrace;
-          Error.prepareStackTrace = void 0;
-          var previousDispatcher;
-          {
-            previousDispatcher = ReactCurrentDispatcher.current;
-            ReactCurrentDispatcher.current = null;
-            disableLogs();
-          }
-          try {
-            if (construct) {
-              var Fake = function() {
-                throw Error();
-              };
-              Object.defineProperty(Fake.prototype, "props", {
-                set: function() {
-                  throw Error();
-                }
-              });
-              if (typeof Reflect === "object" && Reflect.construct) {
-                try {
-                  Reflect.construct(Fake, []);
-                } catch (x) {
-                  control = x;
-                }
-                Reflect.construct(fn, [], Fake);
-              } else {
-                try {
-                  Fake.call();
-                } catch (x) {
-                  control = x;
-                }
-                fn.call(Fake.prototype);
-              }
-            } else {
-              try {
-                throw Error();
-              } catch (x) {
-                control = x;
-              }
-              fn();
-            }
-          } catch (sample) {
-            if (sample && control && typeof sample.stack === "string") {
-              var sampleLines = sample.stack.split("\n");
-              var controlLines = control.stack.split("\n");
-              var s = sampleLines.length - 1;
-              var c = controlLines.length - 1;
-              while (s >= 1 && c >= 0 && sampleLines[s] !== controlLines[c]) {
-                c--;
-              }
-              for (; s >= 1 && c >= 0; s--, c--) {
-                if (sampleLines[s] !== controlLines[c]) {
-                  if (s !== 1 || c !== 1) {
-                    do {
-                      s--;
-                      c--;
-                      if (c < 0 || sampleLines[s] !== controlLines[c]) {
-                        var _frame = "\n" + sampleLines[s].replace(" at new ", " at ");
-                        if (fn.displayName && _frame.includes("<anonymous>")) {
-                          _frame = _frame.replace("<anonymous>", fn.displayName);
-                        }
-                        {
-                          if (typeof fn === "function") {
-                            componentFrameCache.set(fn, _frame);
-                          }
-                        }
-                        return _frame;
-                      }
-                    } while (s >= 1 && c >= 0);
-                  }
-                  break;
-                }
-              }
-            }
-          } finally {
-            reentry = false;
-            {
-              ReactCurrentDispatcher.current = previousDispatcher;
-              reenableLogs();
-            }
-            Error.prepareStackTrace = previousPrepareStackTrace;
-          }
-          var name = fn ? fn.displayName || fn.name : "";
-          var syntheticFrame = name ? describeBuiltInComponentFrame(name) : "";
-          {
-            if (typeof fn === "function") {
-              componentFrameCache.set(fn, syntheticFrame);
-            }
-          }
-          return syntheticFrame;
-        }
-        function describeFunctionComponentFrame(fn, source, ownerFn) {
-          {
-            return describeNativeComponentFrame(fn, false);
-          }
-        }
-        function shouldConstruct(Component) {
-          var prototype = Component.prototype;
-          return !!(prototype && prototype.isReactComponent);
-        }
-        function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
-          if (type == null) {
-            return "";
-          }
-          if (typeof type === "function") {
-            {
-              return describeNativeComponentFrame(type, shouldConstruct(type));
-            }
-          }
-          if (typeof type === "string") {
-            return describeBuiltInComponentFrame(type);
-          }
-          switch (type) {
-            case REACT_SUSPENSE_TYPE:
-              return describeBuiltInComponentFrame("Suspense");
-            case REACT_SUSPENSE_LIST_TYPE:
-              return describeBuiltInComponentFrame("SuspenseList");
-          }
-          if (typeof type === "object") {
-            switch (type.$$typeof) {
-              case REACT_FORWARD_REF_TYPE:
-                return describeFunctionComponentFrame(type.render);
-              case REACT_MEMO_TYPE:
-                return describeUnknownElementTypeFrameInDEV(type.type, source, ownerFn);
-              case REACT_LAZY_TYPE: {
-                var lazyComponent = type;
-                var payload = lazyComponent._payload;
-                var init = lazyComponent._init;
-                try {
-                  return describeUnknownElementTypeFrameInDEV(init(payload), source, ownerFn);
-                } catch (x) {
-                }
-              }
-            }
-          }
-          return "";
-        }
-        var hasOwnProperty = Object.prototype.hasOwnProperty;
-        var loggedTypeFailures = {};
-        var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
-        function setCurrentlyValidatingElement(element) {
-          {
-            if (element) {
-              var owner = element._owner;
-              var stack = describeUnknownElementTypeFrameInDEV(element.type, element._source, owner ? owner.type : null);
-              ReactDebugCurrentFrame.setExtraStackFrame(stack);
-            } else {
-              ReactDebugCurrentFrame.setExtraStackFrame(null);
-            }
-          }
-        }
-        function checkPropTypes(typeSpecs, values, location, componentName, element) {
-          {
-            var has = Function.call.bind(hasOwnProperty);
-            for (var typeSpecName in typeSpecs) {
-              if (has(typeSpecs, typeSpecName)) {
-                var error$1 = void 0;
-                try {
-                  if (typeof typeSpecs[typeSpecName] !== "function") {
-                    var err = Error((componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.");
-                    err.name = "Invariant Violation";
-                    throw err;
-                  }
-                  error$1 = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED");
-                } catch (ex) {
-                  error$1 = ex;
-                }
-                if (error$1 && !(error$1 instanceof Error)) {
-                  setCurrentlyValidatingElement(element);
-                  error("%s: type specification of %s `%s` is invalid; the type checker function must return `null` or an `Error` but returned a %s. You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument).", componentName || "React class", location, typeSpecName, typeof error$1);
-                  setCurrentlyValidatingElement(null);
-                }
-                if (error$1 instanceof Error && !(error$1.message in loggedTypeFailures)) {
-                  loggedTypeFailures[error$1.message] = true;
-                  setCurrentlyValidatingElement(element);
-                  error("Failed %s type: %s", location, error$1.message);
-                  setCurrentlyValidatingElement(null);
-                }
-              }
-            }
-          }
-        }
-        var isArrayImpl = Array.isArray;
-        function isArray(a) {
-          return isArrayImpl(a);
-        }
-        function typeName(value) {
-          {
-            var hasToStringTag = typeof Symbol === "function" && Symbol.toStringTag;
-            var type = hasToStringTag && value[Symbol.toStringTag] || value.constructor.name || "Object";
-            return type;
-          }
-        }
-        function willCoercionThrow(value) {
-          {
-            try {
-              testStringCoercion(value);
-              return false;
-            } catch (e) {
-              return true;
-            }
-          }
-        }
-        function testStringCoercion(value) {
-          return "" + value;
-        }
-        function checkKeyStringCoercion(value) {
-          {
-            if (willCoercionThrow(value)) {
-              error("The provided key is an unsupported type %s. This value must be coerced to a string before before using it here.", typeName(value));
-              return testStringCoercion(value);
-            }
-          }
-        }
-        var ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
-        var RESERVED_PROPS = {
-          key: true,
-          ref: true,
-          __self: true,
-          __source: true
-        };
-        var specialPropKeyWarningShown;
-        var specialPropRefWarningShown;
-        var didWarnAboutStringRefs;
-        {
-          didWarnAboutStringRefs = {};
-        }
-        function hasValidRef(config) {
-          {
-            if (hasOwnProperty.call(config, "ref")) {
-              var getter = Object.getOwnPropertyDescriptor(config, "ref").get;
-              if (getter && getter.isReactWarning) {
-                return false;
-              }
-            }
-          }
-          return config.ref !== void 0;
-        }
-        function hasValidKey(config) {
-          {
-            if (hasOwnProperty.call(config, "key")) {
-              var getter = Object.getOwnPropertyDescriptor(config, "key").get;
-              if (getter && getter.isReactWarning) {
-                return false;
-              }
-            }
-          }
-          return config.key !== void 0;
-        }
-        function warnIfStringRefCannotBeAutoConverted(config, self) {
-          {
-            if (typeof config.ref === "string" && ReactCurrentOwner.current && self && ReactCurrentOwner.current.stateNode !== self) {
-              var componentName = getComponentNameFromType(ReactCurrentOwner.current.type);
-              if (!didWarnAboutStringRefs[componentName]) {
-                error('Component "%s" contains the string ref "%s". Support for string refs will be removed in a future major release. This case cannot be automatically converted to an arrow function. We ask you to manually fix this case by using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref', getComponentNameFromType(ReactCurrentOwner.current.type), config.ref);
-                didWarnAboutStringRefs[componentName] = true;
-              }
-            }
-          }
-        }
-        function defineKeyPropWarningGetter(props, displayName) {
-          {
-            var warnAboutAccessingKey = function() {
-              if (!specialPropKeyWarningShown) {
-                specialPropKeyWarningShown = true;
-                error("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", displayName);
-              }
-            };
-            warnAboutAccessingKey.isReactWarning = true;
-            Object.defineProperty(props, "key", {
-              get: warnAboutAccessingKey,
-              configurable: true
-            });
-          }
-        }
-        function defineRefPropWarningGetter(props, displayName) {
-          {
-            var warnAboutAccessingRef = function() {
-              if (!specialPropRefWarningShown) {
-                specialPropRefWarningShown = true;
-                error("%s: `ref` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)", displayName);
-              }
-            };
-            warnAboutAccessingRef.isReactWarning = true;
-            Object.defineProperty(props, "ref", {
-              get: warnAboutAccessingRef,
-              configurable: true
-            });
-          }
-        }
-        var ReactElement = function(type, key, ref, self, source, owner, props) {
-          var element = {
-            // This tag allows us to uniquely identify this as a React Element
-            $$typeof: REACT_ELEMENT_TYPE,
-            // Built-in properties that belong on the element
-            type,
-            key,
-            ref,
-            props,
-            // Record the component responsible for creating this element.
-            _owner: owner
-          };
-          {
-            element._store = {};
-            Object.defineProperty(element._store, "validated", {
-              configurable: false,
-              enumerable: false,
-              writable: true,
-              value: false
-            });
-            Object.defineProperty(element, "_self", {
-              configurable: false,
-              enumerable: false,
-              writable: false,
-              value: self
-            });
-            Object.defineProperty(element, "_source", {
-              configurable: false,
-              enumerable: false,
-              writable: false,
-              value: source
-            });
-            if (Object.freeze) {
-              Object.freeze(element.props);
-              Object.freeze(element);
-            }
-          }
-          return element;
-        };
-        function jsxDEV(type, config, maybeKey, source, self) {
-          {
-            var propName;
-            var props = {};
-            var key = null;
-            var ref = null;
-            if (maybeKey !== void 0) {
-              {
-                checkKeyStringCoercion(maybeKey);
-              }
-              key = "" + maybeKey;
-            }
-            if (hasValidKey(config)) {
-              {
-                checkKeyStringCoercion(config.key);
-              }
-              key = "" + config.key;
-            }
-            if (hasValidRef(config)) {
-              ref = config.ref;
-              warnIfStringRefCannotBeAutoConverted(config, self);
-            }
-            for (propName in config) {
-              if (hasOwnProperty.call(config, propName) && !RESERVED_PROPS.hasOwnProperty(propName)) {
-                props[propName] = config[propName];
-              }
-            }
-            if (type && type.defaultProps) {
-              var defaultProps = type.defaultProps;
-              for (propName in defaultProps) {
-                if (props[propName] === void 0) {
-                  props[propName] = defaultProps[propName];
-                }
-              }
-            }
-            if (key || ref) {
-              var displayName = typeof type === "function" ? type.displayName || type.name || "Unknown" : type;
-              if (key) {
-                defineKeyPropWarningGetter(props, displayName);
-              }
-              if (ref) {
-                defineRefPropWarningGetter(props, displayName);
-              }
-            }
-            return ReactElement(type, key, ref, self, source, ReactCurrentOwner.current, props);
-          }
-        }
-        var ReactCurrentOwner$1 = ReactSharedInternals.ReactCurrentOwner;
-        var ReactDebugCurrentFrame$1 = ReactSharedInternals.ReactDebugCurrentFrame;
-        function setCurrentlyValidatingElement$1(element) {
-          {
-            if (element) {
-              var owner = element._owner;
-              var stack = describeUnknownElementTypeFrameInDEV(element.type, element._source, owner ? owner.type : null);
-              ReactDebugCurrentFrame$1.setExtraStackFrame(stack);
-            } else {
-              ReactDebugCurrentFrame$1.setExtraStackFrame(null);
-            }
-          }
-        }
-        var propTypesMisspellWarningShown;
-        {
-          propTypesMisspellWarningShown = false;
-        }
-        function isValidElement(object) {
-          {
-            return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
-          }
-        }
-        function getDeclarationErrorAddendum() {
-          {
-            if (ReactCurrentOwner$1.current) {
-              var name = getComponentNameFromType(ReactCurrentOwner$1.current.type);
-              if (name) {
-                return "\n\nCheck the render method of `" + name + "`.";
-              }
-            }
-            return "";
-          }
-        }
-        function getSourceInfoErrorAddendum(source) {
-          {
-            if (source !== void 0) {
-              var fileName = source.fileName.replace(/^.*[\\\/]/, "");
-              var lineNumber = source.lineNumber;
-              return "\n\nCheck your code at " + fileName + ":" + lineNumber + ".";
-            }
-            return "";
-          }
-        }
-        var ownerHasKeyUseWarning = {};
-        function getCurrentComponentErrorInfo(parentType) {
-          {
-            var info = getDeclarationErrorAddendum();
-            if (!info) {
-              var parentName = typeof parentType === "string" ? parentType : parentType.displayName || parentType.name;
-              if (parentName) {
-                info = "\n\nCheck the top-level render call using <" + parentName + ">.";
-              }
-            }
-            return info;
-          }
-        }
-        function validateExplicitKey(element, parentType) {
-          {
-            if (!element._store || element._store.validated || element.key != null) {
-              return;
-            }
-            element._store.validated = true;
-            var currentComponentErrorInfo = getCurrentComponentErrorInfo(parentType);
-            if (ownerHasKeyUseWarning[currentComponentErrorInfo]) {
-              return;
-            }
-            ownerHasKeyUseWarning[currentComponentErrorInfo] = true;
-            var childOwner = "";
-            if (element && element._owner && element._owner !== ReactCurrentOwner$1.current) {
-              childOwner = " It was passed a child from " + getComponentNameFromType(element._owner.type) + ".";
-            }
-            setCurrentlyValidatingElement$1(element);
-            error('Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.', currentComponentErrorInfo, childOwner);
-            setCurrentlyValidatingElement$1(null);
-          }
-        }
-        function validateChildKeys(node, parentType) {
-          {
-            if (typeof node !== "object") {
-              return;
-            }
-            if (isArray(node)) {
-              for (var i = 0; i < node.length; i++) {
-                var child = node[i];
-                if (isValidElement(child)) {
-                  validateExplicitKey(child, parentType);
-                }
-              }
-            } else if (isValidElement(node)) {
-              if (node._store) {
-                node._store.validated = true;
-              }
-            } else if (node) {
-              var iteratorFn = getIteratorFn(node);
-              if (typeof iteratorFn === "function") {
-                if (iteratorFn !== node.entries) {
-                  var iterator = iteratorFn.call(node);
-                  var step;
-                  while (!(step = iterator.next()).done) {
-                    if (isValidElement(step.value)) {
-                      validateExplicitKey(step.value, parentType);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        function validatePropTypes(element) {
-          {
-            var type = element.type;
-            if (type === null || type === void 0 || typeof type === "string") {
-              return;
-            }
-            var propTypes;
-            if (typeof type === "function") {
-              propTypes = type.propTypes;
-            } else if (typeof type === "object" && (type.$$typeof === REACT_FORWARD_REF_TYPE || // Note: Memo only checks outer props here.
-            // Inner props are checked in the reconciler.
-            type.$$typeof === REACT_MEMO_TYPE)) {
-              propTypes = type.propTypes;
-            } else {
-              return;
-            }
-            if (propTypes) {
-              var name = getComponentNameFromType(type);
-              checkPropTypes(propTypes, element.props, "prop", name, element);
-            } else if (type.PropTypes !== void 0 && !propTypesMisspellWarningShown) {
-              propTypesMisspellWarningShown = true;
-              var _name = getComponentNameFromType(type);
-              error("Component %s declared `PropTypes` instead of `propTypes`. Did you misspell the property assignment?", _name || "Unknown");
-            }
-            if (typeof type.getDefaultProps === "function" && !type.getDefaultProps.isReactClassApproved) {
-              error("getDefaultProps is only used on classic React.createClass definitions. Use a static property named `defaultProps` instead.");
-            }
-          }
-        }
-        function validateFragmentProps(fragment) {
-          {
-            var keys = Object.keys(fragment.props);
-            for (var i = 0; i < keys.length; i++) {
-              var key = keys[i];
-              if (key !== "children" && key !== "key") {
-                setCurrentlyValidatingElement$1(fragment);
-                error("Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.", key);
-                setCurrentlyValidatingElement$1(null);
-                break;
-              }
-            }
-            if (fragment.ref !== null) {
-              setCurrentlyValidatingElement$1(fragment);
-              error("Invalid attribute `ref` supplied to `React.Fragment`.");
-              setCurrentlyValidatingElement$1(null);
-            }
-          }
-        }
-        var didWarnAboutKeySpread = {};
-        function jsxWithValidation(type, props, key, isStaticChildren, source, self) {
-          {
-            var validType = isValidElementType(type);
-            if (!validType) {
-              var info = "";
-              if (type === void 0 || typeof type === "object" && type !== null && Object.keys(type).length === 0) {
-                info += " You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.";
-              }
-              var sourceInfo = getSourceInfoErrorAddendum(source);
-              if (sourceInfo) {
-                info += sourceInfo;
-              } else {
-                info += getDeclarationErrorAddendum();
-              }
-              var typeString;
-              if (type === null) {
-                typeString = "null";
-              } else if (isArray(type)) {
-                typeString = "array";
-              } else if (type !== void 0 && type.$$typeof === REACT_ELEMENT_TYPE) {
-                typeString = "<" + (getComponentNameFromType(type.type) || "Unknown") + " />";
-                info = " Did you accidentally export a JSX literal instead of a component?";
-              } else {
-                typeString = typeof type;
-              }
-              error("React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", typeString, info);
-            }
-            var element = jsxDEV(type, props, key, source, self);
-            if (element == null) {
-              return element;
-            }
-            if (validType) {
-              var children = props.children;
-              if (children !== void 0) {
-                if (isStaticChildren) {
-                  if (isArray(children)) {
-                    for (var i = 0; i < children.length; i++) {
-                      validateChildKeys(children[i], type);
-                    }
-                    if (Object.freeze) {
-                      Object.freeze(children);
-                    }
-                  } else {
-                    error("React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead.");
-                  }
-                } else {
-                  validateChildKeys(children, type);
-                }
-              }
-            }
-            {
-              if (hasOwnProperty.call(props, "key")) {
-                var componentName = getComponentNameFromType(type);
-                var keys = Object.keys(props).filter(function(k) {
-                  return k !== "key";
-                });
-                var beforeExample = keys.length > 0 ? "{key: someKey, " + keys.join(": ..., ") + ": ...}" : "{key: someKey}";
-                if (!didWarnAboutKeySpread[componentName + beforeExample]) {
-                  var afterExample = keys.length > 0 ? "{" + keys.join(": ..., ") + ": ...}" : "{}";
-                  error('A props object containing a "key" prop is being spread into JSX:\n  let props = %s;\n  <%s {...props} />\nReact keys must be passed directly to JSX without using spread:\n  let props = %s;\n  <%s key={someKey} {...props} />', beforeExample, componentName, afterExample, componentName);
-                  didWarnAboutKeySpread[componentName + beforeExample] = true;
-                }
-              }
-            }
-            if (type === REACT_FRAGMENT_TYPE) {
-              validateFragmentProps(element);
-            } else {
-              validatePropTypes(element);
-            }
-            return element;
-          }
-        }
-        function jsxWithValidationStatic(type, props, key) {
-          {
-            return jsxWithValidation(type, props, key, true);
-          }
-        }
-        function jsxWithValidationDynamic(type, props, key) {
-          {
-            return jsxWithValidation(type, props, key, false);
-          }
-        }
-        var jsx3 = jsxWithValidationDynamic;
-        var jsxs3 = jsxWithValidationStatic;
-        exports2.Fragment = REACT_FRAGMENT_TYPE;
-        exports2.jsx = jsx3;
-        exports2.jsxs = jsxs3;
-      })();
-    }
-  }
-});
-
-// ../ligga-repo/node_modules/react/jsx-runtime.js
-var require_jsx_runtime = __commonJS({
-  "../ligga-repo/node_modules/react/jsx-runtime.js"(exports2, module2) {
-    "use strict";
-    if (process.env.NODE_ENV === "production") {
-      module2.exports = require_react_jsx_runtime_production_min();
-    } else {
-      module2.exports = require_react_jsx_runtime_development();
-    }
-  }
-});
-
 // scripts/ssr-legal-entry.tsx
 var ssr_legal_entry_exports = {};
 __export(ssr_legal_entry_exports, {
   paginas: () => paginas
 });
 module.exports = __toCommonJS(ssr_legal_entry_exports);
-var import_react = __toESM(require_react(), 1);
+var import_react3 = __toESM(require_react(), 1);
 var import_server = __toESM(require_server_node(), 1);
 
 // src/pages/PoliticaPrivacidade.tsx
+var import_react = __toESM(require_react(), 1);
 var import_lucide_react = __toESM(require_lucide_react(), 1);
-var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
 var PoliticaPrivacidade = () => {
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "min-h-screen bg-white", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", { className: "bg-gradient-to-br from-green-deep to-green-medium text-white py-20", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_lucide_react.Shield, { size: 64, className: "mx-auto mb-6 text-green-light" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { className: "font-poppins font-bold text-4xl md:text-5xl mb-6", children: "Pol\xEDtica de Privacidade" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-xl text-green-light", children: "\xDAltima atualiza\xE7\xE3o: 30 de outubro de 2026" })
-    ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", { className: "py-20", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "prose prose-lg max-w-none", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "1. Introdu\xE7\xE3o" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700 leading-relaxed", children: "A LiggaSST est\xE1 comprometida com a prote\xE7\xE3o da privacidade e dos dados pessoais de nossos usu\xE1rios. Esta Pol\xEDtica de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informa\xE7\xF5es pessoais em conformidade com a Lei Geral de Prote\xE7\xE3o de Dados (LGPD)." })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center mb-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_lucide_react.Database, { size: 24, className: "text-green-deep mr-3" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black", children: "2. Dados Coletados" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "2.1 Dados Fornecidos Diretamente" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Informa\xE7\xF5es de cadastro (nome, e-mail, telefone, CPF/CNPJ)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Dados profissionais (forma\xE7\xE3o, certifica\xE7\xF5es, experi\xEAncia)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Informa\xE7\xF5es empresariais (raz\xE3o social, segmento, localiza\xE7\xE3o)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Documentos e certificados enviados" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Mensagens e comunica\xE7\xF5es na plataforma" })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "2.2 Dados Coletados Automaticamente" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Informa\xE7\xF5es de navega\xE7\xE3o (IP, browser, dispositivo)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Dados de uso da plataforma (p\xE1ginas visitadas, tempo de sess\xE3o)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Cookies e tecnologias similares" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Logs de sistema e seguran\xE7a" })
-            ] })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center mb-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_lucide_react.Eye, { size: 24, className: "text-green-deep mr-3" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black", children: "3. Finalidades do Tratamento" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "3.1 Presta\xE7\xE3o de Servi\xE7os" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Criar e manter contas de usu\xE1rio" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Facilitar conex\xF5es entre empresas e profissionais" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Processar transa\xE7\xF5es e pagamentos" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Fornecer suporte ao cliente" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Viabilizar a comunica\xE7\xE3o entre empresas e profissionais pela \xE1rea de mensagens" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Analisar den\xFAncias e manter a seguran\xE7a e a integridade da plataforma" })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "3.2 Melhoria dos Servi\xE7os" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "An\xE1lise de uso e performance da plataforma" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Desenvolvimento de novos recursos" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Personaliza\xE7\xE3o da experi\xEAncia do usu\xE1rio" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Pesquisas de satisfa\xE7\xE3o" })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "3.3 Comunica\xE7\xE3o" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Envio de notifica\xE7\xF5es importantes" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Newsletter e conte\xFAdo educativo (com consentimento)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Comunica\xE7\xF5es de marketing (com consentimento)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Alertas de seguran\xE7a" })
-            ] })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12 bg-green-50 p-6 rounded-xl", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center mb-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_lucide_react.UserCheck, { size: 24, className: "text-green-600 mr-3" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-green-800", children: "4. Base Legal" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-3 font-roboto text-green-700", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Execu\xE7\xE3o de contrato:" }),
-            " Para presta\xE7\xE3o dos servi\xE7os contratados"
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Consentimento:" }),
-            " Para comunica\xE7\xF5es de marketing e cookies n\xE3o essenciais"
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Interesse leg\xEDtimo:" }),
-            " Para melhoria dos servi\xE7os e seguran\xE7a"
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Cumprimento de obriga\xE7\xE3o legal:" }),
-            " Para atender exig\xEAncias regulat\xF3rias"
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "5. Compartilhamento de Dados" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "5.1 Com Outros Usu\xE1rios" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Informa\xE7\xF5es do perfil profissional s\xE3o vis\xEDveis para empresas cadastradas e vice-versa, conforme necess\xE1rio para a presta\xE7\xE3o do servi\xE7o." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "5.2 Com Prestadores de Servi\xE7o" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Compartilhamos dados com fornecedores que nos auxiliam na opera\xE7\xE3o da plataforma (hospedagem, pagamentos, an\xE1lise), sempre sob contratos de confidencialidade." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "5.3 Por Exig\xEAncia Legal" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Podemos divulgar dados quando exigido por lei, ordem judicial ou autoridades competentes." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "5.4 Mensagens e Den\xFAncias" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "O conte\xFAdo das mensagens trocadas na plataforma \xE9 vis\xEDvel apenas para os participantes da conversa. A administra\xE7\xE3o da LiggaSST n\xE3o tem acesso geral \xE0s conversas. Quando um usu\xE1rio registra uma den\xFAncia, os dados da den\xFAncia (motivo, informa\xE7\xF5es fornecidas pelo denunciante, que podem incluir trechos ou descri\xE7\xF5es da conversa, data e usu\xE1rios envolvidos) ficam vis\xEDveis para a administra\xE7\xE3o e s\xE3o usados somente para analisar o caso e adotar as provid\xEAncias cab\xEDveis." })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center mb-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_lucide_react.Lock, { size: 24, className: "text-green-deep mr-3" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black", children: "6. Seguran\xE7a dos Dados" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Implementamos medidas t\xE9cnicas e organizacionais apropriadas para proteger seus dados pessoais contra acesso n\xE3o autorizado, altera\xE7\xE3o, divulga\xE7\xE3o ou destrui\xE7\xE3o." }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "bg-neutral-gray p-4 rounded-lg", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { className: "font-poppins font-semibold text-soft-black mb-2", children: "Medidas T\xE9cnicas" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-1 font-roboto text-sm text-gray-700", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Criptografia de dados" }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Firewalls e sistemas de detec\xE7\xE3o" }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Backups regulares" }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Monitoramento cont\xEDnuo" })
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "bg-neutral-gray p-4 rounded-lg", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { className: "font-poppins font-semibold text-soft-black mb-2", children: "Medidas Organizacionais" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-1 font-roboto text-sm text-gray-700", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Treinamento de funcion\xE1rios" }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Controle de acesso" }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Pol\xEDticas de seguran\xE7a" }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Auditorias regulares" })
-              ] })
-            ] })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "7. Reten\xE7\xE3o de Dados" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Mantemos seus dados pessoais apenas pelo tempo necess\xE1rio para cumprir as finalidades descritas nesta pol\xEDtica ou conforme exigido por lei." }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Mensagens e den\xFAncias seguem as regras gerais de reten\xE7\xE3o descritas nesta se\xE7\xE3o." }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "bg-neutral-gray p-4 rounded-lg", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { className: "font-poppins font-semibold text-soft-black mb-2", children: "Per\xEDodos de Reten\xE7\xE3o" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-1 font-roboto text-sm text-gray-700", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Dados de conta ativa: Durante a vig\xEAncia da conta" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Dados de conta inativa: At\xE9 2 anos ap\xF3s inatividade" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Dados financeiros: 5 anos (exig\xEAncia legal)" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Logs de seguran\xE7a: 6 meses" })
-            ] })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12 bg-blue-50 p-6 rounded-xl", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-blue-800 mb-4", children: "8. Seus Direitos" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-blue-700 mb-4", children: "Conforme a LGPD, voc\xEA tem os seguintes direitos sobre seus dados pessoais:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-2 font-roboto text-sm text-blue-700", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Confirma\xE7\xE3o da exist\xEAncia de tratamento" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Acesso aos dados" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Corre\xE7\xE3o de dados incompletos ou inexatos" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Anonimiza\xE7\xE3o ou elimina\xE7\xE3o" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", { className: "list-disc list-inside space-y-2 font-roboto text-sm text-blue-700", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Portabilidade dos dados" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Elimina\xE7\xE3o dos dados" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Revoga\xE7\xE3o do consentimento" }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Oposi\xE7\xE3o ao tratamento" })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "9. Como Atendemos Pedidos sobre seus Dados" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Voc\xEA pode exercer seus direitos sobre seus dados pessoais, incluindo confirma\xE7\xE3o, acesso, corre\xE7\xE3o, anonimiza\xE7\xE3o, portabilidade e exclus\xE3o, pelo e-mail contato@liggasst.com.br ou pelo telefone (11) 98886-1490, sem custo." }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Ao receber um pedido, analisamos seu alcance e verificamos se h\xE1 hip\xF3tese legal de conserva\xE7\xE3o dos dados, como o cumprimento de obriga\xE7\xE3o legal ou regulat\xF3ria (art. 16 da Lei n\xBA 13.709/2018). Atendemos o pedido na medida do cab\xEDvel e respondemos sempre com a fundamenta\xE7\xE3o da decis\xE3o. Se um impedimento t\xE9cnico exigir provid\xEAncias adicionais, informamos o tratamento e o encaminhamento que ser\xE3o dados ao seu pedido." })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "10. Cookies e Tecnologias Similares" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Utilizamos cookies e tecnologias similares para melhorar sua experi\xEAncia na plataforma. Voc\xEA pode gerenciar suas prefer\xEAncias de cookies atrav\xE9s das configura\xE7\xF5es do seu navegador." }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "bg-neutral-gray p-4 rounded-lg", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { className: "font-poppins font-semibold text-soft-black mb-2", children: "Essenciais" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-xs text-gray-700", children: "Necess\xE1rios para o funcionamento b\xE1sico da plataforma" })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "bg-neutral-gray p-4 rounded-lg", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { className: "font-poppins font-semibold text-soft-black mb-2", children: "Funcionais" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-xs text-gray-700", children: "Melhoram a funcionalidade e personaliza\xE7\xE3o" })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "bg-neutral-gray p-4 rounded-lg", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", { className: "font-poppins font-semibold text-soft-black mb-2", children: "Anal\xEDticos" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-xs text-gray-700", children: "Ajudam a entender como voc\xEA usa a plataforma" })
-            ] })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "11. Altera\xE7\xF5es nesta Pol\xEDtica" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-gray-700", children: "Podemos atualizar esta Pol\xEDtica de Privacidade periodicamente. Altera\xE7\xF5es significativas ser\xE3o comunicadas atrav\xE9s da plataforma ou por e-mail. Recomendamos que voc\xEA revise esta pol\xEDtica regularmente." })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "bg-green-50 p-6 rounded-xl", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "font-poppins font-bold text-2xl text-green-800 mb-4", children: "12. Contato sobre Dados Pessoais" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "font-roboto text-green-700 mb-4", children: "Para exercer seus direitos ou esclarecer d\xFAvidas sobre esta pol\xEDtica, fale com a gente pelo nosso canal de comunica\xE7\xE3o:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "space-y-2 font-roboto text-green-700", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "E-mail: contato@liggasst.com.br" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Telefone: (11) 98886-1490" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Endere\xE7o: S\xE3o Paulo, SP - Brasil" })
-        ] })
-      ] })
-    ] }) }) })
-  ] });
+  return /* @__PURE__ */ import_react.default.createElement("div", { className: "min-h-screen bg-white" }, /* @__PURE__ */ import_react.default.createElement("section", { className: "bg-gradient-to-br from-green-deep to-green-medium text-white py-20" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" }, /* @__PURE__ */ import_react.default.createElement(import_lucide_react.Shield, { size: 64, className: "mx-auto mb-6 text-green-light" }), /* @__PURE__ */ import_react.default.createElement("h1", { className: "font-poppins font-bold text-4xl md:text-5xl mb-6" }, "Pol\xEDtica de Privacidade"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-xl text-green-light" }, "\xDAltima atualiza\xE7\xE3o: 31 de outubro de 2026"))), /* @__PURE__ */ import_react.default.createElement("section", { className: "py-20" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "prose prose-lg max-w-none" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "1. Introdu\xE7\xE3o"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700 leading-relaxed" }, "A LiggaSST est\xE1 comprometida com a prote\xE7\xE3o da privacidade e dos dados pessoais de nossos usu\xE1rios. Esta Pol\xEDtica de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informa\xE7\xF5es pessoais em conformidade com a Lei Geral de Prote\xE7\xE3o de Dados (LGPD).")), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center mb-4" }, /* @__PURE__ */ import_react.default.createElement(import_lucide_react.Database, { size: 24, className: "text-green-deep mr-3" }), /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black" }, "2. Dados Coletados")), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "2.1 Dados Fornecidos Diretamente"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Informa\xE7\xF5es de cadastro (nome, e-mail, telefone, CPF/CNPJ)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Dados profissionais (forma\xE7\xE3o, certifica\xE7\xF5es, experi\xEAncia)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Informa\xE7\xF5es empresariais (raz\xE3o social, segmento, localiza\xE7\xE3o)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Documentos e certificados enviados"), /* @__PURE__ */ import_react.default.createElement("li", null, "Mensagens e comunica\xE7\xF5es na plataforma"))), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "2.2 Dados Coletados Automaticamente"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Informa\xE7\xF5es de navega\xE7\xE3o (IP, browser, dispositivo)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Dados de uso da plataforma (p\xE1ginas visitadas, tempo de sess\xE3o)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Cookies e tecnologias similares"), /* @__PURE__ */ import_react.default.createElement("li", null, "Logs de sistema e seguran\xE7a"))), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "2.3 Login com Google"), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-3 font-roboto text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("p", null, "Voc\xEA pode criar sua conta ou entrar na LiggaSST usando sua conta Google. O Google mostra uma tela pedindo a sua autoriza\xE7\xE3o antes de enviar qualquer informa\xE7\xE3o."), /* @__PURE__ */ import_react.default.createElement("p", null, "Dados que o Google informa: as informa\xE7\xF5es b\xE1sicas da conta, que s\xE3o nome, e-mail e, quando existir, foto de perfil. N\xE3o pedimos acesso a seus e-mails, arquivos, contatos, agenda ou outro conte\xFAdo da conta Google."), /* @__PURE__ */ import_react.default.createElement("p", null, "Dados que usamos: nome e e-mail, para criar e identificar sua conta e preencher o nome do seu perfil. N\xE3o usamos nem exibimos a foto do Google na plataforma. O provedor de autentica\xE7\xE3o que usamos pode registr\xE1-la junto com os dados de login."), /* @__PURE__ */ import_react.default.createElement("p", null, "N\xE3o guardamos sua senha do Google e n\xE3o usamos esse acesso para consultar servi\xE7os do Google em seu nome."), /* @__PURE__ */ import_react.default.createElement("p", null, "Seu e-mail e os dados de login n\xE3o aparecem para outros usu\xE1rios. O nome do perfil segue as regras de visibilidade do item 5.1."), /* @__PURE__ */ import_react.default.createElement("p", null, "N\xE3o vendemos os dados recebidos do Google e n\xE3o os usamos para publicidade. Eles ficam restritos \xE0 autentica\xE7\xE3o e ao seu perfil, e s\xF3 s\xE3o compartilhados com os fornecedores do item 5.2 ou quando a lei exigir (item 5.3). O uso das informa\xE7\xF5es recebidas das APIs do Google segue a", " ", /* @__PURE__ */ import_react.default.createElement(
+    "a",
+    {
+      href: "https://developers.google.com/terms/api-services-user-data-policy",
+      className: "text-green-deep underline",
+      target: "_blank",
+      rel: "noopener noreferrer"
+    },
+    "Pol\xEDtica de Dados de Usu\xE1rio dos Servi\xE7os de API do Google"
+  ), ", incluindo os requisitos de uso limitado."), /* @__PURE__ */ import_react.default.createElement("p", null, "Reten\xE7\xE3o e remo\xE7\xE3o: valem as regras da se\xE7\xE3o 7 e os pedidos da se\xE7\xE3o 9. Voc\xEA tamb\xE9m pode retirar a autoriza\xE7\xE3o a qualquer momento em", " ", /* @__PURE__ */ import_react.default.createElement(
+    "a",
+    {
+      href: "https://myaccount.google.com/permissions",
+      className: "text-green-deep underline",
+      target: "_blank",
+      rel: "noopener noreferrer"
+    },
+    "myaccount.google.com/permissions"
+  ), "."))))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center mb-4" }, /* @__PURE__ */ import_react.default.createElement(import_lucide_react.Eye, { size: 24, className: "text-green-deep mr-3" }), /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black" }, "3. Finalidades do Tratamento")), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "3.1 Presta\xE7\xE3o de Servi\xE7os"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Criar e manter contas de usu\xE1rio"), /* @__PURE__ */ import_react.default.createElement("li", null, "Facilitar conex\xF5es entre empresas e profissionais"), /* @__PURE__ */ import_react.default.createElement("li", null, "Processar transa\xE7\xF5es e pagamentos"), /* @__PURE__ */ import_react.default.createElement("li", null, "Fornecer suporte ao cliente"), /* @__PURE__ */ import_react.default.createElement("li", null, "Viabilizar a comunica\xE7\xE3o entre empresas e profissionais pela \xE1rea de mensagens"), /* @__PURE__ */ import_react.default.createElement("li", null, "Analisar den\xFAncias e manter a seguran\xE7a e a integridade da plataforma"))), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "3.2 Melhoria dos Servi\xE7os"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "An\xE1lise de uso e performance da plataforma"), /* @__PURE__ */ import_react.default.createElement("li", null, "Desenvolvimento de novos recursos"), /* @__PURE__ */ import_react.default.createElement("li", null, "Personaliza\xE7\xE3o da experi\xEAncia do usu\xE1rio"), /* @__PURE__ */ import_react.default.createElement("li", null, "Pesquisas de satisfa\xE7\xE3o"))), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "3.3 Comunica\xE7\xE3o"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-2 font-roboto text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Envio de notifica\xE7\xF5es importantes"), /* @__PURE__ */ import_react.default.createElement("li", null, "Newsletter e conte\xFAdo educativo (com consentimento)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Comunica\xE7\xF5es de marketing (com consentimento)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Alertas de seguran\xE7a"))))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12 bg-green-50 p-6 rounded-xl" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center mb-4" }, /* @__PURE__ */ import_react.default.createElement(import_lucide_react.UserCheck, { size: 24, className: "text-green-600 mr-3" }), /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-green-800" }, "4. Base Legal")), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-3 font-roboto text-green-700" }, /* @__PURE__ */ import_react.default.createElement("p", null, /* @__PURE__ */ import_react.default.createElement("strong", null, "Execu\xE7\xE3o de contrato:"), " Para presta\xE7\xE3o dos servi\xE7os contratados"), /* @__PURE__ */ import_react.default.createElement("p", null, /* @__PURE__ */ import_react.default.createElement("strong", null, "Consentimento:"), " Para comunica\xE7\xF5es de marketing e cookies n\xE3o essenciais"), /* @__PURE__ */ import_react.default.createElement("p", null, /* @__PURE__ */ import_react.default.createElement("strong", null, "Interesse leg\xEDtimo:"), " Para melhoria dos servi\xE7os e seguran\xE7a"), /* @__PURE__ */ import_react.default.createElement("p", null, /* @__PURE__ */ import_react.default.createElement("strong", null, "Cumprimento de obriga\xE7\xE3o legal:"), " Para atender exig\xEAncias regulat\xF3rias"))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "5. Compartilhamento de Dados"), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "5.1 Com Outros Usu\xE1rios e Visitantes"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Um resumo dos perfis fica vis\xEDvel para qualquer visitante, sem login. Dos profissionais: nome, cidade, estado, foto enviada por eles, situa\xE7\xE3o de verifica\xE7\xE3o, forma\xE7\xE3o, especializa\xE7\xE3o, experi\xEAncia, raio de atendimento e descri\xE7\xE3o. Das empresas: nome, cidade, estado, segmento, porte e descri\xE7\xE3o. Contatos (e-mail e telefone), documentos e as necessidades das empresas n\xE3o aparecem publicamente. Valor por hora, disponibilidade e LinkedIn dos profissionais s\xE3o vis\xEDveis apenas para empresas que estiverem logadas. Conversas e contratos acontecem somente dentro da plataforma, ap\xF3s o login.")), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "5.2 Com Prestadores de Servi\xE7o"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Compartilhamos dados com fornecedores que nos auxiliam na opera\xE7\xE3o da plataforma (hospedagem, pagamentos, an\xE1lise), sempre sob contratos de confidencialidade.")), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "5.3 Por Exig\xEAncia Legal"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Podemos divulgar dados quando exigido por lei, ordem judicial ou autoridades competentes.")), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "5.4 Mensagens e Den\xFAncias"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "O conte\xFAdo das mensagens trocadas na plataforma \xE9 vis\xEDvel apenas para os participantes da conversa. A administra\xE7\xE3o da LiggaSST n\xE3o tem acesso geral \xE0s conversas. Quando um usu\xE1rio registra uma den\xFAncia, os dados da den\xFAncia (motivo, informa\xE7\xF5es fornecidas pelo denunciante, que podem incluir trechos ou descri\xE7\xF5es da conversa, data e usu\xE1rios envolvidos) ficam vis\xEDveis para a administra\xE7\xE3o e s\xE3o usados somente para analisar o caso e adotar as provid\xEAncias cab\xEDveis.")))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "flex items-center mb-4" }, /* @__PURE__ */ import_react.default.createElement(import_lucide_react.Lock, { size: 24, className: "text-green-deep mr-3" }), /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black" }, "6. Seguran\xE7a dos Dados")), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Implementamos medidas t\xE9cnicas e organizacionais apropriadas para proteger seus dados pessoais contra acesso n\xE3o autorizado, altera\xE7\xE3o, divulga\xE7\xE3o ou destrui\xE7\xE3o."), /* @__PURE__ */ import_react.default.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "bg-neutral-gray p-4 rounded-lg" }, /* @__PURE__ */ import_react.default.createElement("h4", { className: "font-poppins font-semibold text-soft-black mb-2" }, "Medidas T\xE9cnicas"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-1 font-roboto text-sm text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Criptografia de dados"), /* @__PURE__ */ import_react.default.createElement("li", null, "Firewalls e sistemas de detec\xE7\xE3o"), /* @__PURE__ */ import_react.default.createElement("li", null, "Backups regulares"), /* @__PURE__ */ import_react.default.createElement("li", null, "Monitoramento cont\xEDnuo"))), /* @__PURE__ */ import_react.default.createElement("div", { className: "bg-neutral-gray p-4 rounded-lg" }, /* @__PURE__ */ import_react.default.createElement("h4", { className: "font-poppins font-semibold text-soft-black mb-2" }, "Medidas Organizacionais"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-1 font-roboto text-sm text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Treinamento de funcion\xE1rios"), /* @__PURE__ */ import_react.default.createElement("li", null, "Controle de acesso"), /* @__PURE__ */ import_react.default.createElement("li", null, "Pol\xEDticas de seguran\xE7a"), /* @__PURE__ */ import_react.default.createElement("li", null, "Auditorias regulares")))))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "7. Reten\xE7\xE3o de Dados"), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Mantemos seus dados pessoais apenas pelo tempo necess\xE1rio para cumprir as finalidades descritas nesta pol\xEDtica ou conforme exigido por lei."), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Mensagens e den\xFAncias seguem as regras gerais de reten\xE7\xE3o descritas nesta se\xE7\xE3o."), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Os dados recebidos pelo login com Google seguem os mesmos prazos e regras desta se\xE7\xE3o."), /* @__PURE__ */ import_react.default.createElement("div", { className: "bg-neutral-gray p-4 rounded-lg" }, /* @__PURE__ */ import_react.default.createElement("h4", { className: "font-poppins font-semibold text-soft-black mb-2" }, "Per\xEDodos de Reten\xE7\xE3o"), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-1 font-roboto text-sm text-gray-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Dados de conta ativa: Durante a vig\xEAncia da conta"), /* @__PURE__ */ import_react.default.createElement("li", null, "Dados de conta inativa: At\xE9 2 anos ap\xF3s inatividade"), /* @__PURE__ */ import_react.default.createElement("li", null, "Dados financeiros: 5 anos (exig\xEAncia legal)"), /* @__PURE__ */ import_react.default.createElement("li", null, "Logs de seguran\xE7a: 6 meses"))))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12 bg-blue-50 p-6 rounded-xl" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-blue-800 mb-4" }, "8. Seus Direitos"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-blue-700 mb-4" }, "Conforme a LGPD, voc\xEA tem os seguintes direitos sobre seus dados pessoais:"), /* @__PURE__ */ import_react.default.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-2 font-roboto text-sm text-blue-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Confirma\xE7\xE3o da exist\xEAncia de tratamento"), /* @__PURE__ */ import_react.default.createElement("li", null, "Acesso aos dados"), /* @__PURE__ */ import_react.default.createElement("li", null, "Corre\xE7\xE3o de dados incompletos ou inexatos"), /* @__PURE__ */ import_react.default.createElement("li", null, "Anonimiza\xE7\xE3o ou elimina\xE7\xE3o")), /* @__PURE__ */ import_react.default.createElement("ul", { className: "list-disc list-inside space-y-2 font-roboto text-sm text-blue-700" }, /* @__PURE__ */ import_react.default.createElement("li", null, "Portabilidade dos dados"), /* @__PURE__ */ import_react.default.createElement("li", null, "Elimina\xE7\xE3o dos dados"), /* @__PURE__ */ import_react.default.createElement("li", null, "Revoga\xE7\xE3o do consentimento"), /* @__PURE__ */ import_react.default.createElement("li", null, "Oposi\xE7\xE3o ao tratamento")))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "9. Como Atendemos Pedidos sobre seus Dados"), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Voc\xEA pode exercer seus direitos sobre seus dados pessoais, incluindo confirma\xE7\xE3o, acesso, corre\xE7\xE3o, anonimiza\xE7\xE3o, portabilidade e exclus\xE3o, pelo e-mail contato@liggasst.com.br ou pelo telefone (11) 98886-1490, sem custo."), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Ao receber um pedido, analisamos seu alcance e verificamos se h\xE1 hip\xF3tese legal de conserva\xE7\xE3o dos dados, como o cumprimento de obriga\xE7\xE3o legal ou regulat\xF3ria (art. 16 da Lei n\xBA 13.709/2018). Atendemos o pedido na medida do cab\xEDvel e respondemos sempre com a fundamenta\xE7\xE3o da decis\xE3o. Se um impedimento t\xE9cnico exigir provid\xEAncias adicionais, informamos o tratamento e o encaminhamento que ser\xE3o dados ao seu pedido."))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "10. Cookies e Tecnologias Similares"), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Utilizamos cookies e tecnologias similares para melhorar sua experi\xEAncia na plataforma. Voc\xEA pode gerenciar suas prefer\xEAncias de cookies atrav\xE9s das configura\xE7\xF5es do seu navegador."), /* @__PURE__ */ import_react.default.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4" }, /* @__PURE__ */ import_react.default.createElement("div", { className: "bg-neutral-gray p-4 rounded-lg" }, /* @__PURE__ */ import_react.default.createElement("h4", { className: "font-poppins font-semibold text-soft-black mb-2" }, "Essenciais"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-xs text-gray-700" }, "Necess\xE1rios para o funcionamento b\xE1sico da plataforma")), /* @__PURE__ */ import_react.default.createElement("div", { className: "bg-neutral-gray p-4 rounded-lg" }, /* @__PURE__ */ import_react.default.createElement("h4", { className: "font-poppins font-semibold text-soft-black mb-2" }, "Funcionais"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-xs text-gray-700" }, "Melhoram a funcionalidade e personaliza\xE7\xE3o")), /* @__PURE__ */ import_react.default.createElement("div", { className: "bg-neutral-gray p-4 rounded-lg" }, /* @__PURE__ */ import_react.default.createElement("h4", { className: "font-poppins font-semibold text-soft-black mb-2" }, "Anal\xEDticos"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-xs text-gray-700" }, "Ajudam a entender como voc\xEA usa a plataforma"))))), /* @__PURE__ */ import_react.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "11. Altera\xE7\xF5es nesta Pol\xEDtica"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-gray-700" }, "Podemos atualizar esta Pol\xEDtica de Privacidade periodicamente. Altera\xE7\xF5es significativas ser\xE3o comunicadas atrav\xE9s da plataforma ou por e-mail. Recomendamos que voc\xEA revise esta pol\xEDtica regularmente.")), /* @__PURE__ */ import_react.default.createElement("div", { className: "bg-green-50 p-6 rounded-xl" }, /* @__PURE__ */ import_react.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-green-800 mb-4" }, "12. Contato sobre Dados Pessoais"), /* @__PURE__ */ import_react.default.createElement("p", { className: "font-roboto text-green-700 mb-4" }, "Para exercer seus direitos ou esclarecer d\xFAvidas sobre esta pol\xEDtica, fale com a gente pelo nosso canal de comunica\xE7\xE3o:"), /* @__PURE__ */ import_react.default.createElement("div", { className: "space-y-2 font-roboto text-green-700" }, /* @__PURE__ */ import_react.default.createElement("p", null, "E-mail: contato@liggasst.com.br"), /* @__PURE__ */ import_react.default.createElement("p", null, "Telefone: (11) 98886-1490"), /* @__PURE__ */ import_react.default.createElement("p", null, "Endere\xE7o: S\xE3o Paulo, SP - Brasil")))))));
 };
 var PoliticaPrivacidade_default = PoliticaPrivacidade;
 
 // src/pages/TermosUso.tsx
+var import_react2 = __toESM(require_react(), 1);
 var import_lucide_react2 = __toESM(require_lucide_react(), 1);
-var import_jsx_runtime2 = __toESM(require_jsx_runtime(), 1);
 var TermosUso = () => {
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "min-h-screen bg-white", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("section", { className: "bg-gradient-to-br from-green-deep to-green-medium text-white py-20", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_lucide_react2.FileText, { size: 64, className: "mx-auto mb-6 text-green-light" }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h1", { className: "font-poppins font-bold text-4xl md:text-5xl mb-6", children: "Termos de Uso" }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-xl text-green-light", children: "\xDAltima atualiza\xE7\xE3o: 30 de outubro de 2026" })
-    ] }) }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("section", { className: "py-20", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "prose prose-lg max-w-none", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "1. Introdu\xE7\xE3o" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700 leading-relaxed", children: 'Bem-vindo \xE0 LiggaSST. Estes Termos de Uso ("Termos") regem o uso da nossa plataforma digital que conecta empresas com profissionais de Seguran\xE7a do Trabalho. Ao acessar ou usar nossos servi\xE7os, voc\xEA concorda em cumprir estes termos.' })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "2. Defini\xE7\xF5es" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "2.1 Plataforma" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Refere-se ao website, aplicativo m\xF3vel e todos os servi\xE7os oferecidos pela LiggaSST para conectar empresas e profissionais de SST." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "2.2 Usu\xE1rios" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Pessoas f\xEDsicas ou jur\xEDdicas que se cadastram na plataforma, incluindo profissionais de SST e empresas contratantes." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "2.3 Servi\xE7os" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Todas as funcionalidades oferecidas pela plataforma, incluindo busca, conex\xE3o, comunica\xE7\xE3o e gest\xE3o de contratos." })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "3. Obriga\xE7\xF5es dos Usu\xE1rios" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "3.1 Informa\xE7\xF5es Verdadeiras" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Os usu\xE1rios devem fornecer informa\xE7\xF5es precisas, atualizadas e completas durante o cadastro e manter essas informa\xE7\xF5es atualizadas." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "3.2 Documenta\xE7\xE3o" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Profissionais devem apresentar documentos v\xE1lidos que comprovem sua qualifica\xE7\xE3o. Empresas devem fornecer documenta\xE7\xE3o empresarial v\xE1lida." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "3.3 Conduta Adequada" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Todos os usu\xE1rios devem manter conduta profissional, respeitosa e \xE9tica em todas as intera\xE7\xF5es na plataforma." })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12 bg-red-50 p-6 rounded-xl", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center mb-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_lucide_react2.AlertTriangle, { size: 24, className: "text-red-600 mr-3" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-red-800", children: "4. Atividades Proibidas" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-red-700", children: "\u2022 Fornecer informa\xE7\xF5es falsas ou enganosas" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-red-700", children: "\u2022 Usar a plataforma para atividades ilegais ou n\xE3o autorizadas" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-red-700", children: "\u2022 Tentar contornar medidas de seguran\xE7a da plataforma" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-red-700", children: "\u2022 Assediar, amea\xE7ar ou intimidar outros usu\xE1rios" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-red-700", children: "\u2022 Violar direitos de propriedade intelectual" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-red-700", children: "\u2022 Usar a plataforma para spam ou comunica\xE7\xF5es n\xE3o solicitadas" })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "5. Responsabilidades da Plataforma" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "5.1 Intermedia\xE7\xE3o" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "A LiggaSST atua como intermediadora, facilitando a conex\xE3o entre profissionais e empresas, mas n\xE3o \xE9 respons\xE1vel pelos servi\xE7os prestados pelos profissionais." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "5.2 Verifica\xE7\xE3o" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Realizamos verifica\xE7\xF5es b\xE1sicas de documentos, mas n\xE3o garantimos a qualidade ou adequa\xE7\xE3o dos servi\xE7os prestados." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "5.3 Disponibilidade" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Nos esfor\xE7amos para manter a plataforma dispon\xEDvel, mas n\xE3o garantimos opera\xE7\xE3o ininterrupta ou livre de erros." })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "6. Mensagens entre Usu\xE1rios" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "6.1 Quem pode conversar" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Empresas e profissionais com cadastro aprovado podem iniciar conversas entre si pela plataforma. As mensagens devem ter finalidade profissional, relacionada \xE0 contrata\xE7\xE3o e \xE0 presta\xE7\xE3o de servi\xE7os de Seguran\xE7a do Trabalho." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "6.2 Conduta nas mensagens" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "As regras de conduta (item 3.3) e as atividades proibidas (item 4) valem tamb\xE9m para as mensagens trocadas na plataforma." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "6.3 Bloqueio" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Qualquer usu\xE1rio pode bloquear outro usu\xE1rio. O bloqueio impede o envio de novas mensagens entre os dois, nos dois sentidos, e n\xE3o apaga o hist\xF3rico da conversa. O usu\xE1rio bloqueado n\xE3o \xE9 informado sobre quem realizou o bloqueio." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "6.4 Den\xFAncias" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "O usu\xE1rio pode denunciar \xE0 administra\xE7\xE3o uma mensagem ou conduta inadequada. A administra\xE7\xE3o analisa cada den\xFAncia e registra seu andamento. Esse registro n\xE3o \xE9, por si s\xF3, uma medida sobre contas: suspens\xF5es ou encerramentos seguem a se\xE7\xE3o de Rescis\xE3o destes Termos." })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12 bg-green-50 p-6 rounded-xl", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center mb-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_lucide_react2.Shield, { size: 24, className: "text-green-600 mr-3" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-green-800", children: "7. Privacidade e Dados" })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-green-700", children: "O tratamento de dados pessoais \xE9 regido por nossa Pol\xEDtica de Privacidade, que faz parte integrante destes Termos. Coletamos, usamos e protegemos seus dados conforme descrito na pol\xEDtica e em conformidade com a LGPD." })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "8. Pagamentos e Taxas" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-4", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "8.1 Planos de Assinatura" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Oferecemos planos gratuitos e pagos. Os valores e condi\xE7\xF5es est\xE3o descritos na p\xE1gina de planos e podem ser alterados mediante aviso pr\xE9vio." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "8.2 Comiss\xF5es" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Podemos cobrar comiss\xF5es sobre transa\xE7\xF5es realizadas atrav\xE9s da plataforma, conforme especificado nos termos de cada plano." })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2", children: "8.3 Reembolsos" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Reembolsos s\xE3o processados conforme nossa pol\xEDtica espec\xEDfica, dispon\xEDvel na \xE1rea de suporte da plataforma." })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "9. Rescis\xE3o" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700 mb-4", children: "Qualquer parte pode encerrar o uso da plataforma a qualquer momento. Reservamo-nos o direito de suspender ou encerrar contas que violem estes termos." }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Em caso de rescis\xE3o, os dados do usu\xE1rio ser\xE3o tratados conforme nossa Pol\xEDtica de Privacidade e a legisla\xE7\xE3o aplic\xE1vel." })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "10. Limita\xE7\xE3o de Responsabilidade" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700 mb-4", children: "A LiggaSST n\xE3o se responsabiliza por danos diretos, indiretos, incidentais ou consequenciais decorrentes do uso da plataforma." }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Nossa responsabilidade m\xE1xima \xE9 limitada ao valor pago pelo usu\xE1rio nos 12 meses anteriores ao evento que deu origem \xE0 reclama\xE7\xE3o." })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "11. Altera\xE7\xF5es nos Termos" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Podemos modificar estes termos a qualquer momento. Altera\xE7\xF5es significativas ser\xE3o comunicadas com anteced\xEAncia m\xEDnima de 30 dias. O uso continuado da plataforma ap\xF3s as altera\xE7\xF5es constitui aceita\xE7\xE3o dos novos termos." })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mb-12", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "12. Lei Aplic\xE1vel e Foro" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700", children: "Estes termos s\xE3o regidos pelas leis brasileiras. Qualquer disputa ser\xE1 resolvida no foro da comarca de S\xE3o Paulo, SP, com ren\xFAncia expressa a qualquer outro foro." })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "bg-neutral-gray p-6 rounded-xl", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4", children: "13. Contato" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { className: "font-roboto text-gray-700 mb-4", children: "Para d\xFAvidas sobre estes Termos de Uso, entre em contato conosco:" }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "space-y-2 font-roboto text-gray-700", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "E-mail: contato@liggasst.com.br" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "Telefone: (11) 98886-1490" }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("p", { children: "Endere\xE7o: S\xE3o Paulo, SP - Brasil" })
-        ] })
-      ] })
-    ] }) }) })
-  ] });
+  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "min-h-screen bg-white" }, /* @__PURE__ */ import_react2.default.createElement("section", { className: "bg-gradient-to-br from-green-deep to-green-medium text-white py-20" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" }, /* @__PURE__ */ import_react2.default.createElement(import_lucide_react2.FileText, { size: 64, className: "mx-auto mb-6 text-green-light" }), /* @__PURE__ */ import_react2.default.createElement("h1", { className: "font-poppins font-bold text-4xl md:text-5xl mb-6" }, "Termos de Uso"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-xl text-green-light" }, "\xDAltima atualiza\xE7\xE3o: 30 de outubro de 2026"))), /* @__PURE__ */ import_react2.default.createElement("section", { className: "py-20" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "prose prose-lg max-w-none" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "1. Introdu\xE7\xE3o"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700 leading-relaxed" }, 'Bem-vindo \xE0 LiggaSST. Estes Termos de Uso ("Termos") regem o uso da nossa plataforma digital que conecta empresas com profissionais de Seguran\xE7a do Trabalho. Ao acessar ou usar nossos servi\xE7os, voc\xEA concorda em cumprir estes termos.')), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "2. Defini\xE7\xF5es"), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "2.1 Plataforma"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Refere-se ao website, aplicativo m\xF3vel e todos os servi\xE7os oferecidos pela LiggaSST para conectar empresas e profissionais de SST.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "2.2 Usu\xE1rios"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Pessoas f\xEDsicas ou jur\xEDdicas que se cadastram na plataforma, incluindo profissionais de SST e empresas contratantes.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "2.3 Servi\xE7os"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Todas as funcionalidades oferecidas pela plataforma, incluindo busca, conex\xE3o, comunica\xE7\xE3o e gest\xE3o de contratos.")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "3. Obriga\xE7\xF5es dos Usu\xE1rios"), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "3.1 Informa\xE7\xF5es Verdadeiras"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Os usu\xE1rios devem fornecer informa\xE7\xF5es precisas, atualizadas e completas durante o cadastro e manter essas informa\xE7\xF5es atualizadas.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "3.2 Documenta\xE7\xE3o"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Profissionais devem apresentar documentos v\xE1lidos que comprovem sua qualifica\xE7\xE3o. Empresas devem fornecer documenta\xE7\xE3o empresarial v\xE1lida.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "3.3 Conduta Adequada"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Todos os usu\xE1rios devem manter conduta profissional, respeitosa e \xE9tica em todas as intera\xE7\xF5es na plataforma.")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12 bg-red-50 p-6 rounded-xl" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center mb-4" }, /* @__PURE__ */ import_react2.default.createElement(import_lucide_react2.AlertTriangle, { size: 24, className: "text-red-600 mr-3" }), /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-red-800" }, "4. Atividades Proibidas")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-red-700" }, "\u2022 Fornecer informa\xE7\xF5es falsas ou enganosas"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-red-700" }, "\u2022 Usar a plataforma para atividades ilegais ou n\xE3o autorizadas"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-red-700" }, "\u2022 Tentar contornar medidas de seguran\xE7a da plataforma"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-red-700" }, "\u2022 Assediar, amea\xE7ar ou intimidar outros usu\xE1rios"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-red-700" }, "\u2022 Violar direitos de propriedade intelectual"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-red-700" }, "\u2022 Usar a plataforma para spam ou comunica\xE7\xF5es n\xE3o solicitadas"))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "5. Responsabilidades da Plataforma"), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "5.1 Intermedia\xE7\xE3o"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "A LiggaSST atua como intermediadora, facilitando a conex\xE3o entre profissionais e empresas, mas n\xE3o \xE9 respons\xE1vel pelos servi\xE7os prestados pelos profissionais.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "5.2 Verifica\xE7\xE3o"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Realizamos verifica\xE7\xF5es b\xE1sicas de documentos, mas n\xE3o garantimos a qualidade ou adequa\xE7\xE3o dos servi\xE7os prestados.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "5.3 Disponibilidade"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Nos esfor\xE7amos para manter a plataforma dispon\xEDvel, mas n\xE3o garantimos opera\xE7\xE3o ininterrupta ou livre de erros.")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "6. Mensagens entre Usu\xE1rios"), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "6.1 Quem pode conversar"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Empresas e profissionais com cadastro aprovado podem iniciar conversas entre si pela plataforma. As mensagens devem ter finalidade profissional, relacionada \xE0 contrata\xE7\xE3o e \xE0 presta\xE7\xE3o de servi\xE7os de Seguran\xE7a do Trabalho.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "6.2 Conduta nas mensagens"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "As regras de conduta (item 3.3) e as atividades proibidas (item 4) valem tamb\xE9m para as mensagens trocadas na plataforma.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "6.3 Bloqueio"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Qualquer usu\xE1rio pode bloquear outro usu\xE1rio. O bloqueio impede o envio de novas mensagens entre os dois, nos dois sentidos, e n\xE3o apaga o hist\xF3rico da conversa. O usu\xE1rio bloqueado n\xE3o \xE9 informado sobre quem realizou o bloqueio.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "6.4 Den\xFAncias"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "O usu\xE1rio pode denunciar \xE0 administra\xE7\xE3o uma mensagem ou conduta inadequada. A administra\xE7\xE3o analisa cada den\xFAncia e registra seu andamento. Esse registro n\xE3o \xE9, por si s\xF3, uma medida sobre contas: suspens\xF5es ou encerramentos seguem a se\xE7\xE3o de Rescis\xE3o destes Termos.")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12 bg-green-50 p-6 rounded-xl" }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center mb-4" }, /* @__PURE__ */ import_react2.default.createElement(import_lucide_react2.Shield, { size: 24, className: "text-green-600 mr-3" }), /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-green-800" }, "7. Privacidade e Dados")), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-green-700" }, "O tratamento de dados pessoais \xE9 regido por nossa Pol\xEDtica de Privacidade, que faz parte integrante destes Termos. Coletamos, usamos e protegemos seus dados conforme descrito na pol\xEDtica e em conformidade com a LGPD.")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "8. Pagamentos e Taxas"), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "8.1 Planos de Assinatura"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Oferecemos planos gratuitos e pagos. Os valores e condi\xE7\xF5es est\xE3o descritos na p\xE1gina de planos e podem ser alterados mediante aviso pr\xE9vio.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "8.2 Comiss\xF5es"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Podemos cobrar comiss\xF5es sobre transa\xE7\xF5es realizadas atrav\xE9s da plataforma, conforme especificado nos termos de cada plano.")), /* @__PURE__ */ import_react2.default.createElement("div", null, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "font-poppins font-semibold text-lg text-soft-black mb-2" }, "8.3 Reembolsos"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Reembolsos s\xE3o processados conforme nossa pol\xEDtica espec\xEDfica, dispon\xEDvel na \xE1rea de suporte da plataforma.")))), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "9. Rescis\xE3o"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700 mb-4" }, "Qualquer parte pode encerrar o uso da plataforma a qualquer momento. Reservamo-nos o direito de suspender ou encerrar contas que violem estes termos."), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Em caso de rescis\xE3o, os dados do usu\xE1rio ser\xE3o tratados conforme nossa Pol\xEDtica de Privacidade e a legisla\xE7\xE3o aplic\xE1vel.")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "10. Limita\xE7\xE3o de Responsabilidade"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700 mb-4" }, "A LiggaSST n\xE3o se responsabiliza por danos diretos, indiretos, incidentais ou consequenciais decorrentes do uso da plataforma."), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Nossa responsabilidade m\xE1xima \xE9 limitada ao valor pago pelo usu\xE1rio nos 12 meses anteriores ao evento que deu origem \xE0 reclama\xE7\xE3o.")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "11. Altera\xE7\xF5es nos Termos"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Podemos modificar estes termos a qualquer momento. Altera\xE7\xF5es significativas ser\xE3o comunicadas com anteced\xEAncia m\xEDnima de 30 dias. O uso continuado da plataforma ap\xF3s as altera\xE7\xF5es constitui aceita\xE7\xE3o dos novos termos.")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-12" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "12. Lei Aplic\xE1vel e Foro"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700" }, "Estes termos s\xE3o regidos pelas leis brasileiras. Qualquer disputa ser\xE1 resolvida no foro da comarca de S\xE3o Paulo, SP, com ren\xFAncia expressa a qualquer outro foro.")), /* @__PURE__ */ import_react2.default.createElement("div", { className: "bg-neutral-gray p-6 rounded-xl" }, /* @__PURE__ */ import_react2.default.createElement("h2", { className: "font-poppins font-bold text-2xl text-soft-black mb-4" }, "13. Contato"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "font-roboto text-gray-700 mb-4" }, "Para d\xFAvidas sobre estes Termos de Uso, entre em contato conosco:"), /* @__PURE__ */ import_react2.default.createElement("div", { className: "space-y-2 font-roboto text-gray-700" }, /* @__PURE__ */ import_react2.default.createElement("p", null, "E-mail: contato@liggasst.com.br"), /* @__PURE__ */ import_react2.default.createElement("p", null, "Telefone: (11) 98886-1490"), /* @__PURE__ */ import_react2.default.createElement("p", null, "Endere\xE7o: S\xE3o Paulo, SP - Brasil")))))));
 };
 var TermosUso_default = TermosUso;
 
@@ -34796,11 +33511,11 @@ var shell = (titulo, descricao, corpo) => `<!DOCTYPE html>
 var paginas = [
   {
     arquivo: "public/politica-de-privacidade/index.html",
-    html: shell("Pol\xEDtica de Privacidade", "Pol\xEDtica de Privacidade da LiggaSST", (0, import_server.renderToStaticMarkup)(import_react.default.createElement(PoliticaPrivacidade_default)))
+    html: shell("Pol\xEDtica de Privacidade", "Pol\xEDtica de Privacidade da LiggaSST", (0, import_server.renderToStaticMarkup)(import_react3.default.createElement(PoliticaPrivacidade_default)))
   },
   {
     arquivo: "public/termos-de-uso/index.html",
-    html: shell("Termos de Uso", "Termos de Uso da LiggaSST", (0, import_server.renderToStaticMarkup)(import_react.default.createElement(TermosUso_default)))
+    html: shell("Termos de Uso", "Termos de Uso da LiggaSST", (0, import_server.renderToStaticMarkup)(import_react3.default.createElement(TermosUso_default)))
   }
 ];
 // Annotate the CommonJS export names for ESM import in node:
@@ -34881,27 +33596,5 @@ lucide-react/dist/cjs/lucide-react.js:
    *
    * This source code is licensed under the ISC license.
    * See the LICENSE file in the root directory of this source tree.
-   *)
-
-react/cjs/react-jsx-runtime.production.min.js:
-  (**
-   * @license React
-   * react-jsx-runtime.production.min.js
-   *
-   * Copyright (c) Facebook, Inc. and its affiliates.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE file in the root directory of this source tree.
-   *)
-
-react/cjs/react-jsx-runtime.development.js:
-  (**
-   * @license React
-   * react-jsx-runtime.development.js
-   *
-   * Copyright (c) Facebook, Inc. and its affiliates.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE file in the root directory of this source tree.
    *)
 */

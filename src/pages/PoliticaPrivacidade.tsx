@@ -12,7 +12,7 @@ const PoliticaPrivacidade: React.FC = () => {
             Política de Privacidade
           </h1>
           <p className="font-roboto text-xl text-green-light">
-            Última atualização: 30 de outubro de 2026
+            Última atualização: 31 de outubro de 2026
           </p>
         </div>
       </section>
@@ -66,6 +66,65 @@ const PoliticaPrivacidade: React.FC = () => {
                     <li>Cookies e tecnologias similares</li>
                     <li>Logs de sistema e segurança</li>
                   </ul>
+                </div>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    2.3 Login com Google
+                  </h3>
+                  <div className="space-y-3 font-roboto text-gray-700">
+                    <p>
+                      Você pode criar sua conta ou entrar na LiggaSST usando sua conta Google.
+                      O Google mostra uma tela pedindo a sua autorização antes de enviar
+                      qualquer informação.
+                    </p>
+                    <p>
+                      Dados que o Google informa: as informações básicas da conta, que são
+                      nome, e-mail e, quando existir, foto de perfil. Não pedimos acesso a
+                      seus e-mails, arquivos, contatos, agenda ou outro conteúdo da conta Google.
+                    </p>
+                    <p>
+                      Dados que usamos: nome e e-mail, para criar e identificar sua conta e
+                      preencher o nome do seu perfil. Não usamos nem exibimos a foto do Google
+                      na plataforma. O provedor de autenticação que usamos pode registrá-la
+                      junto com os dados de login.
+                    </p>
+                    <p>
+                      Não guardamos sua senha do Google e não usamos esse acesso para consultar
+                      serviços do Google em seu nome.
+                    </p>
+                    <p>
+                      Seu e-mail e os dados de login não aparecem para outros usuários. O nome
+                      do perfil segue as regras de visibilidade do item 5.1.
+                    </p>
+                    <p>
+                      Não vendemos os dados recebidos do Google e não os usamos para publicidade.
+                      Eles ficam restritos à autenticação e ao seu perfil, e só são compartilhados
+                      com os fornecedores do item 5.2 ou quando a lei exigir (item 5.3). O uso das
+                      informações recebidas das APIs do Google segue a{' '}
+                      <a
+                        href="https://developers.google.com/terms/api-services-user-data-policy"
+                        className="text-green-deep underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Política de Dados de Usuário dos Serviços de API do Google
+                      </a>
+                      , incluindo os requisitos de uso limitado.
+                    </p>
+                    <p>
+                      Retenção e remoção: valem as regras da seção 7 e os pedidos da seção 9.
+                      Você também pode retirar a autorização a qualquer momento em{' '}
+                      <a
+                        href="https://myaccount.google.com/permissions"
+                        className="text-green-deep underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        myaccount.google.com/permissions
+                      </a>
+                      .
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -141,11 +200,17 @@ const PoliticaPrivacidade: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                    5.1 Com Outros Usuários
+                    5.1 Com Outros Usuários e Visitantes
                   </h3>
                   <p className="font-roboto text-gray-700">
-                    Informações do perfil profissional são visíveis para empresas cadastradas 
-                    e vice-versa, conforme necessário para a prestação do serviço.
+                    Um resumo dos perfis fica visível para qualquer visitante, sem login.
+                    Dos profissionais: nome, cidade, estado, foto enviada por eles, situação de
+                    verificação, formação, especialização, experiência, raio de atendimento e
+                    descrição. Das empresas: nome, cidade, estado, segmento, porte e descrição.
+                    Contatos (e-mail e telefone), documentos e as necessidades das empresas não
+                    aparecem publicamente. Valor por hora, disponibilidade e LinkedIn dos
+                    profissionais são visíveis apenas para empresas que estiverem logadas.
+                    Conversas e contratos acontecem somente dentro da plataforma, após o login.
                   </p>
                 </div>
                 <div>
@@ -239,6 +304,10 @@ const PoliticaPrivacidade: React.FC = () => {
                 <p className="font-roboto text-gray-700">
                   Mensagens e denúncias seguem as regras gerais de retenção descritas
                   nesta seção.
+                </p>
+                <p className="font-roboto text-gray-700">
+                  Os dados recebidos pelo login com Google seguem os mesmos prazos e regras
+                  desta seção.
                 </p>
                 <div className="bg-neutral-gray p-4 rounded-lg">
                   <h4 className="font-poppins font-semibold text-soft-black mb-2">
