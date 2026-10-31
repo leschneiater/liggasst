@@ -15,10 +15,16 @@ import {
   MessageSquare,
   Shield,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
+import { fetchReports, fetchProfileNames, fetchAdminOverview, fetchAdminMembers, fetchAdminDemands } from '../../services/database';
+import { montarCsvAdmin, periodoDesde } from './exportarAdmin';
 
 const DashboardAdmin: React.FC = () => {
+  const navigate = useNavigate();
+  const [exportando, setExportando] = useState(false);
   const [stats, setStats] = useState({
     totalProfissionais: 0,
     totalEmpresas: 0,
@@ -140,7 +146,14 @@ const DashboardAdmin: React.FC = () => {
   ]);
 
   useEffect(() => {
-    // Carregar estatísticas do Supabase
+    // Denuncias abertas: numero real vindo do banco
+    fetchReports().then(r => {
+      if (r.success) {
+        const abertas = r.data.filter(d => d.status === 'open').length;
+        setStats(prev => ({ ...prev, denunciasAbertas: abertas }));
+      }
+    });
+    // Demais estatisticas ainda sao ilustrativas (sem fonte real no produto)
     setStats({
       totalProfissionais: 5247,
       totalEmpresas: 2156,
@@ -187,8 +200,47 @@ const DashboardAdmin: React.FC = () => {
     activity.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleExportData = () => {
-    alert('Exportando dados...');
+  const handleExportData = async () => {
+    setExportando(true);
+    try {
+      const desde = periodoDesde(timeFilter);
+      const [visao, membros, demandas, denuncias] = await Promise.all([
+        fetchAdminOverview(desde.toISOString()),
+        fetchAdminMembers(),
+        fetchAdminDemands(),
+        fetchReports(),
+      ]);
+      if (!visao.success || !visao.data || !membros.success || !demandas.success || !denuncias.success) {
+        toast.error('Não foi possível gerar a exportação. Tente novamente.');
+        return;
+      }
+      const ids = [...new Set([
+        ...denuncias.data.flatMap(d => [d.reporter_id, d.reported_id]),
+        ...demandas.data.map(d => d.company_id),
+      ])];
+      const nomes = await fetchProfileNames(ids);
+      const csv = montarCsvAdmin({
+        visao: visao.data,
+        membros: membros.data,
+        demandas: demandas.data,
+        denuncias: denuncias.data,
+        nomes: nomes.success ? nomes.data : {},
+        desde,
+        timeFilter,
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `liggasst-relatorio-${timeFilter}-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Relatório completo gerado com dados reais.');
+    } finally {
+      setExportando(false);
+    }
   };
 
   const handleViewDetails = (type: string, id: number) => {
@@ -222,8 +274,8 @@ const DashboardAdmin: React.FC = () => {
                 <option value="90d">Últimos 90 dias</option>
                 <option value="1y">Último ano</option>
               </select>
-              <Button icon={Download} onClick={handleExportData}>
-                Exportar
+              <Button icon={Download} onClick={handleExportData} disabled={exportando}>
+                {exportando ? 'Exportando...' : 'Exportar'}
               </Button>
             </div>
           </div>
@@ -556,7 +608,7 @@ const DashboardAdmin: React.FC = () => {
             <Button
               variant="outline"
               className="h-20 flex-col"
-              onClick={() => alert('Denúncias')}
+              onClick={() => navigate('/admin/denuncias')}
             >
               <AlertTriangle size={24} className="mb-2 text-red-600" />
               <span className="text-xs">Denúncias</span>

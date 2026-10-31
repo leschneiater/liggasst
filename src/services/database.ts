@@ -9,6 +9,24 @@ const getAuthenticatedUser = async () => {
   return data.user;
 };
 
+// PostgREST corta em 1000 linhas por resposta; relatorios e contagens de
+// admin precisam varrer todas as paginas para nao truncar resultado.
+const PAGINA = 1000;
+const fetchTodasPaginas = async <T>(
+  buscar: (de: number, ate: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
+): Promise<{ data: T[]; error: unknown | null }> => {
+  const todas: T[] = [];
+  let de = 0;
+  for (;;) {
+    const { data, error } = await buscar(de, de + PAGINA - 1);
+    if (error) return { data: todas, error };
+    const linhas = data || [];
+    todas.push(...linhas);
+    if (linhas.length < PAGINA) return { data: todas, error: null };
+    de += PAGINA;
+  }
+};
+
 export const fetchProfessionals = async (filters: Filters = {}) => {
   try {
     const { data, error } = await supabase.rpc('search_professionals', {
@@ -316,12 +334,15 @@ export interface ReportRow {
 export const fetchReports = async () => {
   try {
     await getAuthenticatedUser();
-    const { data, error } = await supabase
-      .from('message_reports')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } = await fetchTodasPaginas<ReportRow>((de, ate) =>
+      supabase
+        .from('message_reports')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(de, ate)
+    );
     if (error) throw error;
-    return { success: true, data: (data || []) as ReportRow[] };
+    return { success: true, data };
   } catch (error) {
     console.error('Erro ao buscar denúncias:', error);
     return { success: false, data: [] as ReportRow[], error };
@@ -348,14 +369,18 @@ export const fetchProfileNames = async (ids: string[]) => {
   try {
     await getAuthenticatedUser();
     if (ids.length === 0) return { success: true, data: {} as Record<string, string> };
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, display_name')
-      .in('id', ids);
-    if (error) throw error;
     const mapa: Record<string, string> = {};
-    for (const p of (data || []) as { id: string; display_name: string }[]) {
-      mapa[p.id] = p.display_name;
+    // .in() tambem tem limite pratico; envia em lotes de 200 ids
+    for (let i = 0; i < ids.length; i += 200) {
+      const lote = ids.slice(i, i + 200);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', lote);
+      if (error) throw error;
+      for (const p of (data || []) as { id: string; display_name: string }[]) {
+        mapa[p.id] = p.display_name;
+      }
     }
     return { success: true, data: mapa };
   } catch (error) {
@@ -555,5 +580,150 @@ export const deleteCertificate = async (certificateId: string, storagePath: stri
   } catch (error) {
     console.error('Erro ao excluir certificado:', error);
     return { success: false, error };
+  }
+};
+
+// Visao administrativa real para o painel e exportacao (RLS: is_admin le tudo)
+export interface AdminOverview {
+  totalProfissionais: number;
+  totalEmpresas: number;
+  novosProfissionaisPeriodo: number;
+  novasEmpresasPeriodo: number;
+  demandasPeriodo: number;
+  denunciasAbertas: number;
+  denunciasPeriodo: number;
+}
+
+export const fetchAdminOverview = async (desdeISO: string) => {
+  try {
+    await getAuthenticatedUser();
+    const [perfis, demandas, denuncias] = await Promise.all([
+      fetchTodasPaginas<{ role: string; created_at: string; is_test: boolean }>((de, ate) =>
+        supabase.from('profiles').select('id, role, created_at, is_test').range(de, ate)),
+      fetchTodasPaginas<{ created_at: string }>((de, ate) =>
+        supabase.from('demands').select('id, created_at').range(de, ate)),
+      fetchTodasPaginas<{ status: string; created_at: string }>((de, ate) =>
+        supabase.from('message_reports').select('id, status, created_at').range(de, ate)),
+    ]);
+    if (perfis.error) throw perfis.error;
+    if (demandas.error) throw demandas.error;
+    if (denuncias.error) throw denuncias.error;
+    const desde = new Date(desdeISO).getTime();
+    const noPeriodo = (created_at: string) => new Date(created_at).getTime() >= desde;
+    // mesma elegibilidade das listas: perfis de teste ficam fora; admin nao
+    // entra porque os contadores filtram pelos papeis professional/company
+    const linhas = perfis.data.filter(p => !p.is_test);
+    const data: AdminOverview = {
+      totalProfissionais: linhas.filter(p => p.role === 'professional').length,
+      totalEmpresas: linhas.filter(p => p.role === 'company').length,
+      novosProfissionaisPeriodo: linhas.filter(p => p.role === 'professional' && noPeriodo(p.created_at)).length,
+      novasEmpresasPeriodo: linhas.filter(p => p.role === 'company' && noPeriodo(p.created_at)).length,
+      demandasPeriodo: demandas.data.filter(d => noPeriodo(d.created_at)).length,
+      denunciasAbertas: denuncias.data.filter(d => d.status === 'open').length,
+      denunciasPeriodo: denuncias.data.filter(d => noPeriodo(d.created_at)).length,
+    };
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar visão administrativa:', error);
+    return { success: false, data: null as AdminOverview | null, error };
+  }
+};
+
+// Relatorio administrativo completo (RLS: is_admin le tudo abaixo)
+export interface AdminMemberRow {
+  id: string;
+  role: string;
+  display_name: string;
+  email: string;
+  phone: string | null;
+  city: string | null;
+  state: string | null;
+  created_at: string;
+  education: string | null;
+  specialization: string | null;
+  experience: string | null;
+  hourly_rate: number | null;
+  segment: string | null;
+  employee_count: string | null;
+  responsible_name: string | null;
+  responsible_email: string | null;
+  responsible_phone: string | null;
+}
+
+export const fetchAdminMembers = async () => {
+  try {
+    await getAuthenticatedUser();
+    const [perfis, profs, emps] = await Promise.all([
+      fetchTodasPaginas<Record<string, unknown>>((de, ate) =>
+        supabase.from('profiles').select('id, role, display_name, email, phone, city, state, created_at, is_test').range(de, ate)),
+      fetchTodasPaginas<Record<string, unknown>>((de, ate) =>
+        supabase.from('professionals').select('profile_id, education, specialization, experience, hourly_rate').range(de, ate)),
+      fetchTodasPaginas<Record<string, unknown>>((de, ate) =>
+        supabase.from('companies').select('profile_id, segment, employee_count, responsible_name, responsible_email, responsible_phone').range(de, ate)),
+    ]);
+    if (perfis.error) throw perfis.error;
+    if (profs.error) throw profs.error;
+    if (emps.error) throw emps.error;
+    const mapaProf = new Map(profs.data.map(p => [p.profile_id, p]));
+    const mapaEmp = new Map(emps.data.map(e => [e.profile_id, e]));
+    // perfis de teste ficam fora do relatorio (mesma regra das buscas)
+    const data: AdminMemberRow[] = (perfis.data.filter(p => !p.is_test) as Record<string, unknown>[]).map(p => {
+      const prof = mapaProf.get(p.id) as Record<string, unknown> | undefined;
+      const emp = mapaEmp.get(p.id) as Record<string, unknown> | undefined;
+      return {
+        id: p.id as string,
+        role: p.role as string,
+        display_name: (p.display_name as string) || '',
+        email: (p.email as string) || '',
+        phone: (p.phone as string | null) ?? null,
+        city: (p.city as string | null) ?? null,
+        state: (p.state as string | null) ?? null,
+        created_at: p.created_at as string,
+        education: (prof?.education as string | null) ?? null,
+        specialization: (prof?.specialization as string | null) ?? null,
+        experience: (prof?.experience as string | null) ?? null,
+        hourly_rate: (prof?.hourly_rate as number | null) ?? null,
+        segment: (emp?.segment as string | null) ?? null,
+        employee_count: (emp?.employee_count as string | null) ?? null,
+        responsible_name: (emp?.responsible_name as string | null) ?? null,
+        responsible_email: (emp?.responsible_email as string | null) ?? null,
+        responsible_phone: (emp?.responsible_phone as string | null) ?? null,
+      };
+    });
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar membros para o relatório:', error);
+    return { success: false, data: [] as AdminMemberRow[], error };
+  }
+};
+
+export interface AdminDemandRow {
+  id: string;
+  title: string;
+  company_id: string;
+  service_type: string | null;
+  city: string | null;
+  state: string | null;
+  budget: number | null;
+  deadline: string | null;
+  status: string;
+  created_at: string;
+}
+
+export const fetchAdminDemands = async () => {
+  try {
+    await getAuthenticatedUser();
+    const { data, error } = await fetchTodasPaginas<AdminDemandRow>((de, ate) =>
+      supabase
+        .from('demands')
+        .select('id, title, company_id, service_type, city, state, budget, deadline, status, created_at')
+        .order('created_at', { ascending: false })
+        .range(de, ate)
+    );
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar demandas para o relatório:', error);
+    return { success: false, data: [] as AdminDemandRow[], error };
   }
 };
