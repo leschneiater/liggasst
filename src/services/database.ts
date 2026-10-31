@@ -420,11 +420,15 @@ export const publishDemand = async (demandData: ProfileData) => {
 
 export const fetchDemands = async (filters: Filters = {}) => {
   try {
-    let query = supabase.from('demands').select('*');
-    for (const [key, value] of Object.entries(filters)) {
-      if (value !== undefined && value !== null && value !== '') query = query.eq(key, value);
-    }
-    const { data, error } = await query.order('created_at', { ascending: false });
+    // Paginada como as leituras do admin: relatorios e paineis nao podem
+    // truncar silenciosamente no limite padrao de linhas.
+    const { data, error } = await fetchTodasPaginas((de, ate) => {
+      let query = supabase.from('demands').select('*');
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null && value !== '') query = query.eq(key, value);
+      }
+      return query.order('created_at', { ascending: false }).range(de, ate);
+    });
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
@@ -433,18 +437,48 @@ export const fetchDemands = async (filters: Filters = {}) => {
   }
 };
 
-export const updateDemand = async (id: string, campos: Record<string, unknown>) => {
+// Allowlist de campos gravaveis pelo cliente: company_id, ids, created_at e
+// qualquer coluna fora da lista nunca sao escritos a partir do app.
+const CAMPOS_EDITAVEIS_DEMANDA = new Set([
+  'title', 'description', 'service_type', 'city', 'state', 'budget',
+  'deadline', 'modalidade', 'urgencia', 'tipo_orcamento', 'status',
+]);
+
+export type UpdateDemandResult =
+  | { success: true; data: unknown }
+  | { success: false; conflict?: boolean; error: unknown };
+
+export const updateDemand = async (
+  id: string,
+  campos: Record<string, unknown>,
+): Promise<UpdateDemandResult> => {
   try {
-    // A policy demands_update garante no banco que so o dono (ou admin)
-    // altera a demanda; aqui apenas repassamos o resultado.
-    await getAuthenticatedUser();
+    const seguro: Record<string, unknown> = {};
+    for (const [campo, valor] of Object.entries(campos)) {
+      if (CAMPOS_EDITAVEIS_DEMANDA.has(campo)) seguro[campo] = valor;
+    }
+    if (Object.keys(seguro).length === 0) throw new Error('Nenhum campo editável informado');
+    const user = await getAuthenticatedUser();
+    // Dono e status 'active' entram no PROPRIO update (checagem atomica, nao
+    // so na leitura anterior da tela): um formulario aberto sobre uma demanda
+    // ja encerrada resulta em 0 linhas (conflito), nunca em sobrescrita. A
+    // policy demands_update reforca o dono no banco.
     const { data, error } = await supabase
       .from('demands')
-      .update(campos)
+      .update(seguro)
       .eq('id', id)
+      .eq('company_id', user.id)
+      .eq('status', 'active')
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw error;
+    if (!data) {
+      return {
+        success: false,
+        conflict: true,
+        error: new Error('Demanda não está ativa ou não pertence à empresa logada'),
+      };
+    }
     return { success: true, data };
   } catch (error) {
     console.error('Erro ao atualizar demanda:', error);

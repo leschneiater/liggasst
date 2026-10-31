@@ -54,6 +54,14 @@ const DashboardEmpresa: React.FC = () => {
     setAcaoLoading(true);
     try {
       const result = await updateDemand(confirmacao.id, { status: destino });
+      if (!result.success && result.conflict) {
+        // Conflito: a demanda ja nao estava ativa (ex.: outra aba encerrou).
+        // Nada foi sobrescrito; a lista recarrega com o estado real.
+        toast.error('Esta demanda não está mais ativa. A lista foi atualizada.');
+        setConfirmacao(null);
+        carregarDemandas();
+        return;
+      }
       if (!result.success) throw new Error('Falha ao atualizar status');
       toast.success(
         confirmacao.acao === 'concluir'

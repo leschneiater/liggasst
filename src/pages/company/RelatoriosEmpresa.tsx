@@ -154,7 +154,7 @@ const RelatoriosEmpresa: React.FC = () => {
                     <p className="font-roboto text-sm text-gray-500">{c.rotulo}</p>
                     <p className="font-poppins font-bold text-3xl text-soft-black">{total}</p>
                     <p className="font-roboto text-xs text-gray-400 mt-1">
-                      +{periodo} no período
+                      {periodo} publicadas no período
                     </p>
                   </div>
                 );
@@ -163,9 +163,12 @@ const RelatoriosEmpresa: React.FC = () => {
 
             {/* Lista do período */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="font-poppins font-semibold text-xl text-soft-black mb-4">
-                Demandas no período ({ROTULOS_PERIODO[timeFilter].toLowerCase()})
+              <h2 className="font-poppins font-semibold text-xl text-soft-black mb-1">
+                Demandas publicadas no período ({ROTULOS_PERIODO[timeFilter].toLowerCase()})
               </h2>
+              <p className="font-roboto text-xs text-gray-400 mb-4">
+                O período considera a data de publicação da demanda, não a data de conclusão.
+              </p>
               {noPeriodo.length === 0 ? (
                 <p className="font-roboto text-sm text-gray-500">
                   Nenhuma demanda publicada neste período.

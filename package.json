@@ -14,7 +14,8 @@
     "test:rpc": "node supabase/tests/search_companies.test.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:trainings": "node supabase/tests/trainings.test.mjs"
+    "test:trainings": "node supabase/tests/trainings.test.mjs",
+    "test:demands": "node supabase/tests/demands_policy.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",

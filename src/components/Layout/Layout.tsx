@@ -4,7 +4,7 @@ import Header from './Header';
 import Footer from './Footer';
 import ProfessionalAreaNav, { professionalAreaPaths } from './ProfessionalAreaNav';
 import CompanyAreaNav from './CompanyAreaNav';
-import { companyAreaPaths } from './companyMenu';
+import { isCompanyAreaPath } from './companyMenu';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const isProfessionalArea = professionalAreaPaths.includes(location.pathname);
-  const isCompanyArea = companyAreaPaths.includes(location.pathname);
+  const isCompanyArea = isCompanyAreaPath(location.pathname);
 
   // Scroll to top on page change
   useEffect(() => {

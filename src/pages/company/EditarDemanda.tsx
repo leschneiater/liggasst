@@ -102,6 +102,13 @@ const EditarDemanda: React.FC = () => {
         urgencia: data.urgencia || null,
         tipo_orcamento: data.tipoOrcamento || null,
       });
+      if (!result.success && result.conflict) {
+        // Conflito: a demanda foi encerrada depois que a tela abriu.
+        // Nada foi sobrescrito; volta ao painel com o estado real.
+        toast.error('Esta demanda não está mais ativa. Nenhuma alteração foi salva.');
+        navigate('/dashboard-empresa');
+        return;
+      }
       if (!result.success) throw new Error('Falha ao salvar');
       toast.success('Demanda atualizada com sucesso.');
       navigate('/dashboard-empresa');
