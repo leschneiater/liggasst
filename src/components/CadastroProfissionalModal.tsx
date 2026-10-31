@@ -41,6 +41,7 @@ interface ProfessionalFormData {
   valorHora: string;
   disponibilidade: string[];
   descricao: string;
+  termosAceitos: boolean;
 }
 
 interface CadastroProfissionalModalProps {
@@ -59,6 +60,28 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
   
   const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<ProfessionalFormData>();
   const watchPassword = watch('password');
+
+  const rotulosCampos: Record<keyof ProfessionalFormData, string> = {
+    nome: 'Nome Completo',
+    email: 'E-mail',
+    password: 'Senha',
+    confirmPassword: 'Confirmar Senha',
+    telefone: 'Telefone',
+    cpf: 'CPF',
+    cep: 'CEP',
+    cidade: 'Cidade',
+    estado: 'Estado',
+    endereco: 'Endereço',
+    formacao: 'Formação',
+    especializacao: 'Especialização',
+    experiencia: 'Experiência (anos)',
+    registro: 'Registro Profissional',
+    raioAtendimento: 'Raio de Atendimento (km)',
+    valorHora: 'Valor Hora (R$)',
+    disponibilidade: 'Disponibilidade',
+    descricao: 'Descrição Profissional',
+    termosAceitos: 'Termos de Uso e Política de Privacidade',
+  };
 
   const especialidades = [
     'Técnico em Segurança do Trabalho',
@@ -373,7 +396,7 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
                     ))}
                   </select>
                   {errors.estado && (
-                    <p className="text-red-500 text-sm font-roboto">{errors.estado.message}</p>
+                    <p className="text-red-500 text-sm font-roboto" role="alert">{errors.estado.message}</p>
                   )}
                 </div>
               </div>
@@ -407,7 +430,7 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
                     ))}
                   </select>
                   {errors.formacao && (
-                    <p className="text-red-500 text-sm font-roboto">{errors.formacao.message}</p>
+                    <p className="text-red-500 text-sm font-roboto" role="alert">{errors.formacao.message}</p>
                   )}
                 </div>
 
@@ -502,8 +525,8 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  required
                   className="rounded border-gray-300 text-green-deep focus:ring-green-deep"
+                  {...register('termosAceitos', { required: 'É necessário aceitar os Termos de Uso e a Política de Privacidade' })}
                 />
                 <span className="ml-2 font-roboto text-sm text-gray-600">
                   Aceito os{' '}
@@ -524,6 +547,26 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
                   </Link>
                 </span>
               </div>
+
+              {errors.termosAceitos && (
+                <p className="text-red-500 text-sm font-roboto" role="alert">{errors.termosAceitos.message}</p>
+              )}
+
+              {Object.keys(errors).length > 0 && (
+                <div className="bg-red-50 border border-red-300 rounded-lg p-4" role="alert">
+                  <p className="font-roboto font-medium text-red-700 text-sm mb-2">
+                    Não foi possível criar a conta. Corrija os campos abaixo:
+                  </p>
+                  <ul className="font-roboto text-sm text-red-700 space-y-1 list-disc list-inside">
+                    {Object.entries(errors).map(([campo, erro]) => (
+                      <li key={campo}>
+                        <span className="font-medium">{rotulosCampos[campo as keyof ProfessionalFormData] ?? campo}:</span>{' '}
+                        {erro?.message}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <Button type="submit" loading={loading} fullWidth size="lg">
                 Criar Conta
