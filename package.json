@@ -17,6 +17,7 @@
     "test:trainings": "node supabase/tests/trainings.test.mjs",
     "test:demands": "node supabase/tests/demands_policy.test.mjs",
     "test:contracts": "node supabase/tests/contratos_policy.test.mjs",
+    "test:demands-isolation": "node supabase/tests/demands_isolamento_teste.test.mjs",
     "test:companies-contato": "node supabase/tests/companies_contato_razao_social.test.mjs"
   },
   "dependencies": {
