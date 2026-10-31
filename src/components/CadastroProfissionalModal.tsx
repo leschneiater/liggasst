@@ -191,7 +191,7 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
           </h2>
           
           <p className="font-roboto text-gray-600 mb-6">
-            Sua conta foi criada com sucesso! Verifique seu e-mail para ativar a conta antes de fazer login.
+            Sua conta foi criada com sucesso! Faça login com seu e-mail e senha para começar.
           </p>
           
           <div className="bg-green-light bg-opacity-20 p-4 rounded-lg mb-6">
@@ -199,10 +199,10 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
               Próximos Passos:
             </h3>
             <ul className="font-roboto text-sm text-green-deep space-y-1 text-left">
-              <li>• Verifique seu e-mail e clique no link de confirmação</li>
-              <li>• Faça login na plataforma</li>
+              <li>• Faça login com seu e-mail e senha</li>
               <li>• Complete seu perfil profissional</li>
-              <li>• Faça upload dos seus certificados</li>
+              <li>• Envie seus certificados, se quiser compartilhá-los</li>
+              <li>• Seu perfil já aparece na busca de empresas</li>
             </ul>
           </div>
           
@@ -515,10 +515,10 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
                   Próximos Passos:
                 </h3>
                 <ul className="font-roboto text-sm text-green-deep space-y-1">
-                  <li>• Verificaremos seus documentos</li>
-                  <li>• Enviaremos um e-mail de confirmação</li>
-                  <li>• Ative sua conta pelo e-mail</li>
-                  <li>• Faça login e complete seu perfil</li>
+                  <li>• Sua conta fica ativa logo após o cadastro</li>
+                  <li>• Faça login com e-mail e senha</li>
+                  <li>• Complete seu perfil e envie certificados</li>
+                  <li>• Empresas podem encontrar você na busca</li>
                 </ul>
               </div>
 

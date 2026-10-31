@@ -210,7 +210,7 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
           </h2>
           
           <p className="font-roboto text-gray-600 mb-6">
-            Sua conta foi criada com sucesso! Verifique seu e-mail para ativar a conta antes de fazer login.
+            Sua conta foi criada com sucesso! Faça login com seu e-mail e senha para começar.
           </p>
           
           <div className="bg-green-light bg-opacity-20 p-4 rounded-lg mb-6">
@@ -218,10 +218,10 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
               Próximos Passos:
             </h3>
             <ul className="font-roboto text-sm text-green-deep space-y-1 text-left">
-              <li>• Verifique seu e-mail e clique no link de confirmação</li>
-              <li>• Faça login na plataforma</li>
-              <li>• Complete seu perfil empresarial</li>
-              <li>• Explore profissionais disponíveis</li>
+              <li>• Faça login com seu e-mail e senha</li>
+              <li>• Complete o perfil da empresa</li>
+              <li>• Publique demandas de SST</li>
+              <li>• Busque profissionais disponíveis</li>
             </ul>
           </div>
           
@@ -555,10 +555,10 @@ const CadastroEmpresaModal: React.FC<CadastroEmpresaModalProps> = ({ isOpen, onC
                   Próximos Passos:
                 </h3>
                 <ul className="font-roboto text-sm text-green-deep space-y-1">
-                  <li>• Verificaremos os dados da empresa</li>
-                  <li>• Enviaremos um e-mail de confirmação</li>
-                  <li>• Ative sua conta pelo e-mail</li>
-                  <li>• Faça login e complete seu perfil</li>
+                  <li>• Sua conta fica ativa logo após o cadastro</li>
+                  <li>• Faça login com e-mail e senha</li>
+                  <li>• Publique demandas de SST</li>
+                  <li>• Profissionais podem encontrar sua empresa na busca</li>
                 </ul>
               </div>
 
