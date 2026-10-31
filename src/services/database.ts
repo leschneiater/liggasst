@@ -433,6 +433,25 @@ export const fetchDemands = async (filters: Filters = {}) => {
   }
 };
 
+export const updateDemand = async (id: string, campos: Record<string, unknown>) => {
+  try {
+    // A policy demands_update garante no banco que so o dono (ou admin)
+    // altera a demanda; aqui apenas repassamos o resultado.
+    await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('demands')
+      .update(campos)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao atualizar demanda:', error);
+    return { success: false, error };
+  }
+};
+
 export interface Certificate {
   id: string;
   professional_id: string;
