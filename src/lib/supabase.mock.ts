@@ -3,6 +3,10 @@
 // Papel escolhido pela querystring: ?role=admin|company|professional.
 const params = new URLSearchParams(window.location.search);
 const role = (params.get('role') ?? 'professional') as 'admin' | 'company' | 'professional';
+// Estado da moderacao exibido nas fixtures (evidencia do fluxo de denuncia):
+// padrao = comentario visivel; 'em-revisao' = oculto apos denuncia aberta;
+// 'excluida' = admin excluiu o comentario; 'mantida' = admin manteve (reaparece).
+const cenario = params.get('cenario') ?? 'padrao';
 
 const agora = '2026-10-30T20:00:00Z';
 const user = {
@@ -98,11 +102,60 @@ const contratosEmpresaFix = [
   { id: 'c1', demand_id: 'd-prop-1', company_id: user.id, professional_id: 'p1', status: 'pending', title: null, amount: 5200, starts_at: '2026-11-10', ends_at: null, progress: 0, created_at: '2026-10-29T14:00:00Z', contraparte_nome: 'Ana Lima', demanda_titulo: 'Elaboração de PGR - unidade 2' },
   { id: 'c2', demand_id: null, company_id: user.id, professional_id: 'p2', status: 'in_progress', title: 'Consultoria mensal de SST', amount: 3200, starts_at: '2026-10-15', ends_at: '2026-12-15', progress: 40, created_at: '2026-10-12T09:00:00Z', contraparte_nome: 'Bruno Reis', demanda_titulo: null },
   { id: 'c3', demand_id: null, company_id: user.id, professional_id: 'p3', status: 'completed', title: 'PCMSO anual 2025', amount: 3800, starts_at: '2026-08-01', ends_at: '2026-09-30', progress: 100, created_at: '2026-07-28T09:00:00Z', contraparte_nome: 'Carla Nunes', demanda_titulo: null },
+  { id: 'c4', demand_id: null, company_id: user.id, professional_id: 'p4', status: 'completed', title: 'Laudo ergonômico setor produtivo', amount: 2400, starts_at: '2026-09-01', ends_at: '2026-09-20', progress: 100, created_at: '2026-08-25T09:00:00Z', contraparte_nome: 'Diego Prado', demanda_titulo: null },
+];
+
+// Fixtures de avaliações (somente build E2E): cobrem os estados
+// pode-avaliar, enviada-oculta e revelada, a vitrine e a fila da admin.
+const avaliacoesPendentesFix = [{
+  contract_id: 'c3', contraparte_nome: 'Carla Nunes', contrato_titulo: 'PCMSO anual 2025',
+  concluido_em: '2026-10-28T10:00:00Z', prazo_fim: '2026-11-11T10:00:00Z',
+}];
+
+const minhasAvaliacoesEmpresaFix = [
+  { id: 'r1', contract_id: 'c4', direcao: 'feita', score: 5, comment: 'Laudo detalhado e entregue antes do prazo.', comentario_oculto: false, created_at: '2026-10-26T10:00:00Z', contraparte_nome: 'Diego Prado', contrato_titulo: 'Laudo ergonômico setor produtivo' },
+  { id: 'r2', contract_id: 'c4', direcao: 'recebida', score: 4, comment: 'Empresa organizada, dados enviados rápido.', comentario_oculto: false, created_at: '2026-10-27T10:00:00Z', contraparte_nome: 'Diego Prado', contrato_titulo: 'Laudo ergonômico setor produtivo' },
+];
+
+const minhasAvaliacoesProfissionalFix = [
+  { id: 'r3', contract_id: 'c7', direcao: 'feita', score: 5, comment: 'Escopo claro e pagamento combinado sem atrito.', comentario_oculto: false, created_at: '2026-10-29T10:00:00Z', contraparte_nome: 'Clínica Vida', contrato_titulo: 'PCMSO anual 2025' },
+];
+
+// Perfil de profissional: quem avalia é a empresa; perfil de empresa: quem
+// avalia é o profissional. Cada direção com autores e comentários coerentes.
+// Comentário da avaliação r6 segue o cenario: oculto em revisão ou excluído
+// chega ao público como null (nota e autora preservadas), como no RPC real.
+const comentarioR6 = (cenario === 'em-revisao' || cenario === 'excluida')
+  ? null
+  : 'Profissional pontual, laudo entregue antes do prazo.';
+const avaliacoesPerfilProfissionalFix = [
+  { id: 'r6', rater_id: 'e1', score: 5, comment: comentarioR6, created_at: '2026-10-27T10:00:00Z', autor_nome: 'TechCorp Ltda', contrato_titulo: 'Laudo ergonômico setor produtivo' },
+  { id: 'r7', rater_id: 'e3', score: 4, comment: 'Domínio técnico e boa comunicação com a equipe de obra.', created_at: '2026-10-20T10:00:00Z', autor_nome: 'Construtech', contrato_titulo: 'Treinamento NR-35' },
+];
+const avaliacoesPerfilEmpresaFix = [
+  { id: 'r2', rater_id: 'p4', score: 4, comment: 'Empresa organizada, dados enviados rápido.', created_at: '2026-10-27T10:00:00Z', autor_nome: 'Diego Prado', contrato_titulo: 'Laudo ergonômico setor produtivo' },
+  { id: 'r5', rater_id: 'p5', score: 5, comment: 'Processo tranquilo do início ao fim.', created_at: '2026-10-20T10:00:00Z', autor_nome: 'Marina Duarte', contrato_titulo: 'Treinamento NR-10' },
+];
+
+// Denuncia da avaliacao r6 acompanha o cenario: aberta durante a revisao;
+// 'reviewed' apos Manter (comentario reaparece) ou Excluir (comment_removed_at
+// marcado; o texto segue retido aqui no admin para auditoria).
+const denunciaR6 = ({
+  'padrao':     { status: 'open', comment_removed_at: null },
+  'em-revisao': { status: 'open', comment_removed_at: null },
+  'excluida':   { status: 'reviewed', comment_removed_at: '2026-10-31T12:30:00Z' },
+  'mantida':    { status: 'reviewed', comment_removed_at: null },
+} as Record<string, { status: string; comment_removed_at: string | null }>)[cenario]
+  ?? { status: 'open', comment_removed_at: null };
+const denunciasAvaliacoesEstado = [
+  { report_id: 'rp1', rating_id: 'r6', reason: 'conteudo-improprio', details: 'Comentário com dados pessoais do avaliado.', status: denunciaR6.status, created_at: '2026-10-30T15:00:00Z', reporter_nome: 'Carla Nunes', autor_nome: 'TechCorp Ltda', avaliado_nome: 'Ana Lima', score: 5, comment: 'Profissional pontual, laudo entregue antes do prazo.', comment_removed_at: denunciaR6.comment_removed_at, denuncias_abertas: denunciaR6.status === 'open' ? 1 : 0 },
+  { report_id: 'rp2', rating_id: 'r8', reason: 'spam', details: null, status: 'actioned', created_at: '2026-10-29T12:00:00Z', reporter_nome: 'Bruno Reis', autor_nome: 'Ana Lima', avaliado_nome: 'Bruno Reis', score: 1, comment: 'Comentário removido da exibição pública.', comment_removed_at: '2026-10-29T18:00:00Z', denuncias_abertas: 0 },
 ];
 const contratosProfissionalFix = [
   { id: 'c4', demand_id: 'd1', company_id: 'e1', professional_id: user.id, status: 'pending', title: null, amount: 4500, starts_at: '2026-11-05', ends_at: null, progress: 0, created_at: '2026-10-29T16:30:00Z', contraparte_nome: 'TechCorp Ltda', demanda_titulo: 'Elaboração de PGR' },
   { id: 'c5', demand_id: null, company_id: 'e2', professional_id: user.id, status: 'in_progress', title: 'Treinamento NR-35 - turma novembro', amount: 8000, starts_at: '2026-10-20', ends_at: '2026-11-20', progress: 60, created_at: '2026-10-18T11:00:00Z', contraparte_nome: 'Indústria Moderna', demanda_titulo: null },
   { id: 'c6', demand_id: null, company_id: 'e3', professional_id: user.id, status: 'cancelled', title: 'Auditoria de segurança - planta Contagem', amount: 6000, starts_at: null, ends_at: null, progress: 0, created_at: '2026-09-02T10:00:00Z', contraparte_nome: 'Construtech', demanda_titulo: null },
+  { id: 'c7', demand_id: null, company_id: 'e4', professional_id: user.id, status: 'completed', title: 'PCMSO anual 2025', amount: 3800, starts_at: '2026-08-01', ends_at: '2026-09-30', progress: 100, created_at: '2026-07-28T09:00:00Z', contraparte_nome: 'Clínica Vida', demanda_titulo: null },
 ];
 const profissionalPublicoFix = [{
   professional_id: 'p1',
@@ -177,18 +230,54 @@ export const supabase = {
   functions: {
     invoke: async () => ({ data: { signedUrl: 'https://exemplo.com/assinado.pdf', expiresIn: 300 }, error: null }),
   },
-  rpc: async (fn: string) => {
-    if (fn === 'listar_contratos') {
+  rpc: (fn: string, params?: Record<string, unknown>) => {
+    const wrap = (data: unknown) => {
+      const r = { data, error: null };
+      const p = Promise.resolve(r);
+      return { then: p.then.bind(p), maybeSingle: async () => r, single: async () => r };
+    };
+    const rpcInterno = (fn2: string) => {
+    if (fn2 === 'search_companies') {
+      return wrap([
+          { id: 'e1', display_name: 'TechCorp Ltda', segment: 'Tecnologia', city: 'São Paulo', state: 'SP', employee_count: '51-100', description: 'Indústria de componentes eletrônicos com três unidades fabris.', needs: ['PGR', 'PCMSO', 'LTCAT'] },
+          { id: 'e3', display_name: 'Construtech', segment: 'Construção Civil', city: 'Contagem', state: 'MG', employee_count: '101-500', description: 'Construtora com obras industriais em Minas Gerais.', needs: ['NR-35', 'Treinamentos'] },
+      ]);
+    }
+    if (fn2 === 'listar_contratos') {
       const linhasRpc = role === 'company' ? contratosEmpresaFix
         : role === 'professional' ? contratosProfissionalFix
         : [];
-      return { data: linhasRpc, error: null };
+      return wrap(linhasRpc);
     }
-    if (fn === 'get_professional_public') return { data: profissionalPublicoFix, error: null };
-    if (fn === 'responder_contrato' || fn === 'concluir_contrato' || fn === 'cancelar_contrato') {
-      return { data: null, error: null };
+    if (fn2 === 'get_professional_public') return wrap(profissionalPublicoFix);
+    if (fn2 === 'avaliacoes_pendentes') return wrap(role === 'admin' ? [] : avaliacoesPendentesFix);
+    if (fn2 === 'minhas_avaliacoes') {
+      return wrap(role === 'company' ? minhasAvaliacoesEmpresaFix : role === 'professional' ? minhasAvaliacoesProfissionalFix : []);
     }
-    return { data: [], error: null };
+    if (fn2 === 'avaliacoes_resumo') return wrap({ media: 4.5, total: 2 });
+    if (fn2 === 'avaliacoes_do_perfil') {
+      const perfil = String(params?.p_profile ?? '');
+      return wrap(perfil.startsWith('e') ? avaliacoesPerfilEmpresaFix : avaliacoesPerfilProfissionalFix);
+    }
+    if (fn2 === 'admin_denuncias_avaliacoes') return wrap(denunciasAvaliacoesEstado);
+    if (fn2 === 'admin_revisar_denuncia_avaliacao') {
+      // Stateful: registra a decisão para a próxima leitura do painel.
+      const alvo = denunciasAvaliacoesEstado.find((d) => d.report_id === params?.p_report_id);
+      if (alvo) {
+        alvo.status = 'reviewed';
+        if (params?.p_acao === 'excluir-comentario') alvo.comment_removed_at = '2026-10-31T12:30:00Z';
+      }
+      return wrap(null);
+    }
+    if (fn2 === 'avaliar_contrato' || fn2 === 'corrigir_avaliacao') {
+      return wrap(null);
+    }
+    if (fn2 === 'responder_contrato' || fn === 'concluir_contrato' || fn === 'cancelar_contrato') {
+      return wrap(null);
+    }
+    return wrap([]);
+    };
+    return rpcInterno(fn);
   },
 };
 

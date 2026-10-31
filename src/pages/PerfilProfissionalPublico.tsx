@@ -17,6 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMessagingDisponivel } from '../hooks/useMessagingDisponivel';
 import toast from 'react-hot-toast';
 import { getProfessionalPublic, ProfessionalSearchItem, fetchSharedCertificates, getSharedCertificateUrl, SharedCertificate } from '../services/database';
+import AvaliacoesPerfil from '../components/avaliacoes/AvaliacoesPerfil';
 
 const iniciaisNome = (nome: string): string => {
   const partes = nome.trim().split(/\s+/).filter(p => /[A-Za-zÀ-ÿ]/.test(p[0] ?? ''));
@@ -237,6 +238,7 @@ const PerfilProfissionalPublico: React.FC = () => {
               {[
                 { id: 'sobre', label: 'Sobre' },
                 { id: 'especializacoes', label: 'Especializações' },
+                { id: 'avaliacoes', label: 'Avaliações' },
                 ...(userType === 'company' ? [{ id: 'certificados', label: 'Certificados' }] : [])
               ].map((tab) => (
                 <button
@@ -307,6 +309,19 @@ const PerfilProfissionalPublico: React.FC = () => {
                     Este profissional ainda não informou especializações.
                   </p>
                 )}
+              </div>
+            )}
+
+            {/* Avaliações recebidas (visíveis a cadastrados) */}
+            {activeTab === 'avaliacoes' && professional && (
+              <div>
+                <h3 className="font-poppins font-semibold text-lg text-soft-black mb-1">
+                  Avaliações
+                </h3>
+                <p className="font-roboto text-sm text-gray-500 mb-4">
+                  Notas e comentários de empresas que concluíram contratos com este profissional.
+                </p>
+                <AvaliacoesPerfil perfilId={professional.id} />
               </div>
             )}
 

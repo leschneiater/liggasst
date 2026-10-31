@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import AvaliacoesPerfil from '../../components/avaliacoes/AvaliacoesPerfil';
 import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, MapPin, Building2, MessageSquare, Users, RefreshCw } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -62,6 +63,7 @@ const BuscaEmpresas: React.FC = () => {
   const [appliedFilters, setAppliedFilters] = useState({ estado: '', cidade: '', segmento: '' });
   const [showFilters, setShowFilters] = useState(false);
   const [expandedNeeds, setExpandedNeeds] = useState<string | null>(null);
+  const [expandedAvaliacoes, setExpandedAvaliacoes] = useState<string | null>(null);
 
   // Guarda de corrida: respostas antigas nao sobrescrevem o filtro mais novo.
   const seqBusca = useRef(0);
@@ -334,6 +336,21 @@ const BuscaEmpresas: React.FC = () => {
                     </div>
                   </div>
                 )}
+
+                <div className="mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedAvaliacoes(expandedAvaliacoes === company.id ? null : company.id)}
+                    className="text-xs text-green-deep font-roboto font-semibold underline hover:text-green-800"
+                  >
+                    {expandedAvaliacoes === company.id ? 'Ocultar avaliações' : 'Ver avaliações'}
+                  </button>
+                  {expandedAvaliacoes === company.id && (
+                    <div className="mt-2">
+                      <AvaliacoesPerfil perfilId={company.id} />
+                    </div>
+                  )}
+                </div>
 
                 {msgDisponivel && (
                   <div className="mt-auto pt-4 border-t border-gray-100">

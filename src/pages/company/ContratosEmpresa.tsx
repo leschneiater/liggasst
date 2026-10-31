@@ -1,18 +1,26 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ListaContratos from '../../components/contratos/ListaContratos';
+import AvaliacoesRecebidas from '../../components/avaliacoes/AvaliacoesRecebidas';
+import { AvaliacaoPendente, AvaliacaoRow } from '../../components/contratos/avaliacaoGestao';
 import { ContratoRow } from './contratoGestao';
-import { listarContratos } from '../../services/database';
+import { avaliacoesPendentes, listarContratos, minhasAvaliacoes } from '../../services/database';
 
 const ContratosEmpresa: React.FC = () => {
   const [contratos, setContratos] = useState<ContratoRow[]>([]);
+  const [pendentes, setPendentes] = useState<AvaliacaoPendente[]>([]);
+  const [minhas, setMinhas] = useState<AvaliacaoRow[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(false);
 
   const carregar = useCallback(() => {
     setCarregando(true);
     setErro(false);
-    listarContratos()
-      .then(setContratos)
+    Promise.all([listarContratos(), avaliacoesPendentes(), minhasAvaliacoes()])
+      .then(([c, p, m]) => {
+        setContratos(c);
+        setPendentes(p);
+        setMinhas(m);
+      })
       .catch((e) => {
         console.error('Erro ao carregar contratos:', e);
         setErro(true);
@@ -41,12 +49,16 @@ const ContratosEmpresa: React.FC = () => {
             Não foi possível carregar os contratos. Tente novamente em instantes.
           </p>
         ) : (
-          <ListaContratos
-            papel="empresa"
-            contratos={contratos}
-            carregando={carregando}
-            onAtualizar={carregar}
-          />
+          <>
+            <ListaContratos
+              papel="empresa"
+              contratos={contratos}
+              carregando={carregando}
+              onAtualizar={carregar}
+              avaliacoes={{ pendentes, minhas }}
+            />
+            <AvaliacoesRecebidas recebidas={minhas.filter((a) => a.direcao === 'recebida')} />
+          </>
         )}
       </div>
     </div>

@@ -6,12 +6,16 @@ import ContratosEmpresa from '../../pages/company/ContratosEmpresa';
 import { ContratoRow } from '../../pages/company/contratoGestao';
 
 const listarContratosMock = vi.fn();
+const avaliacoesPendentesMock = vi.fn();
+const minhasAvaliacoesMock = vi.fn();
 const responderContratoMock = vi.fn();
 const concluirContratoMock = vi.fn();
 const cancelarContratoMock = vi.fn();
 
 vi.mock('../../services/database', () => ({
   listarContratos: (...args: unknown[]) => listarContratosMock(...args),
+  avaliacoesPendentes: (...args: unknown[]) => avaliacoesPendentesMock(...args),
+  minhasAvaliacoes: (...args: unknown[]) => minhasAvaliacoesMock(...args),
   responderContrato: (...args: unknown[]) => responderContratoMock(...args),
   concluirContrato: (...args: unknown[]) => concluirContratoMock(...args),
   cancelarContrato: (...args: unknown[]) => cancelarContratoMock(...args),
@@ -48,6 +52,8 @@ const renderPagina = () =>
 describe('ContratosEmpresa', () => {
   beforeEach(() => {
     listarContratosMock.mockReset();
+    avaliacoesPendentesMock.mockReset().mockResolvedValue([]);
+    minhasAvaliacoesMock.mockReset().mockResolvedValue([]);
     responderContratoMock.mockReset().mockResolvedValue(undefined);
     concluirContratoMock.mockReset().mockResolvedValue(undefined);
     cancelarContratoMock.mockReset().mockResolvedValue(undefined);

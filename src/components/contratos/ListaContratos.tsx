@@ -17,12 +17,15 @@ import {
   tituloDoContrato,
 } from '../../pages/company/contratoGestao';
 import { cancelarContrato, concluirContrato, responderContrato } from '../../services/database';
+import AvaliacaoContrato from './AvaliacaoContrato';
+import { AvaliacaoPendente, AvaliacaoRow } from './avaliacaoGestao';
 
 interface ListaContratosProps {
   papel: PapelContrato;
   contratos: ContratoRow[];
   carregando: boolean;
   onAtualizar: () => void;
+  avaliacoes?: { pendentes: AvaliacaoPendente[]; minhas: AvaliacaoRow[] };
 }
 
 const SECOES: { chave: 'pendentes' | 'emAndamento' | 'historico'; titulo: string }[] = [
@@ -31,7 +34,7 @@ const SECOES: { chave: 'pendentes' | 'emAndamento' | 'historico'; titulo: string
   { chave: 'historico', titulo: 'Histórico' },
 ];
 
-const ListaContratos: React.FC<ListaContratosProps> = ({ papel, contratos, carregando, onAtualizar }) => {
+const ListaContratos: React.FC<ListaContratosProps> = ({ papel, contratos, carregando, onAtualizar, avaliacoes }) => {
   const [confirmacao, setConfirmacao] = useState<{ id: string; acao: AcaoContrato } | null>(null);
   const [acaoLoading, setAcaoLoading] = useState(false);
 
@@ -151,6 +154,17 @@ const ListaContratos: React.FC<ListaContratosProps> = ({ papel, contratos, carre
               </Button>
             ))}
           </div>
+        )}
+        {contrato.status === 'completed' && avaliacoes && (
+          <AvaliacaoContrato
+            contractId={contrato.id}
+            statusContrato={contrato.status}
+            contraparteNome={contrato.contraparte_nome}
+            pendente={avaliacoes.pendentes.find((a) => a.contract_id === contrato.id)}
+            feita={avaliacoes.minhas.find((a) => a.contract_id === contrato.id && a.direcao === 'feita')}
+            recebida={avaliacoes.minhas.find((a) => a.contract_id === contrato.id && a.direcao === 'recebida')}
+            onAtualizar={onAtualizar}
+          />
         )}
         {confirmacao?.id === contrato.id && (
           <div className="mt-2 bg-neutral-gray rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2">
