@@ -933,3 +933,56 @@ export const deleteTraining = async (id: string, pdfPath: string | null) => {
     return { success: false, error };
   }
 };
+
+// ---------- Contratos (fluxo empresa <-> profissional) ----------
+
+export const listarContratos = async () => {
+  const { data, error } = await supabase.rpc('listar_contratos');
+  if (error) throw error;
+  return (data ?? []) as import('../pages/company/contratoGestao').ContratoRow[];
+};
+
+export interface NovoContrato {
+  professional_id: string;
+  demand_id?: string | null;
+  title?: string | null;
+  amount?: number | null;
+  starts_at?: string | null;
+  ends_at?: string | null;
+}
+
+// A policy contracts_insert valida no banco: empresa aprovada, profissional
+// aprovado, demanda da propria empresa e ativa, status inicial pending.
+export const createContract = async (contrato: NovoContrato) => {
+  const user = await getAuthenticatedUser();
+  const { data, error } = await supabase
+    .from('contracts')
+    .insert({
+      company_id: user.id,
+      professional_id: contrato.professional_id,
+      demand_id: contrato.demand_id ?? null,
+      title: contrato.title ?? null,
+      amount: contrato.amount ?? null,
+      starts_at: contrato.starts_at ?? null,
+      ends_at: contrato.ends_at ?? null,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+// Transicoes so via RPCs security definer: a tabela nao tem grant de update.
+const chamarRpcContrato = async (fn: string, params: Record<string, unknown>) => {
+  const { error } = await supabase.rpc(fn, params);
+  if (error) throw error;
+};
+
+export const responderContrato = (id: string, acao: 'aceitar' | 'recusar') =>
+  chamarRpcContrato('responder_contrato', { p_contract_id: id, p_acao: acao });
+
+export const concluirContrato = (id: string) =>
+  chamarRpcContrato('concluir_contrato', { p_contract_id: id });
+
+export const cancelarContrato = (id: string) =>
+  chamarRpcContrato('cancelar_contrato', { p_contract_id: id });

@@ -63,6 +63,7 @@ const MensagensEmpresa = lazy(() => import('./pages/company/MensagensEmpresa'));
 const AssinaturaEmpresa = lazy(() => import('./pages/company/AssinaturaEmpresa'));
 const RelatoriosEmpresa = lazy(() => import('./pages/company/RelatoriosEmpresa'));
 const EditarDemanda = lazy(() => import('./pages/company/EditarDemanda'));
+const ProporContrato = lazy(() => import('./pages/company/ProporContrato'));
 
 // Admin Pages
 const DashboardAdmin = lazy(() => import('./pages/admin/DashboardAdmin'));
@@ -216,6 +217,11 @@ function App() {
                 <Route path="/editar-demanda/:id" element={
                   <ProtectedRoute userType="company">
                     <Layout><EditarDemanda /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/propor-contrato/:profissionalId" element={
+                  <ProtectedRoute userType="company">
+                    <Layout><ProporContrato /></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/treinamentos-empresa" element={

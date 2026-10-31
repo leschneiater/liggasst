@@ -7,7 +7,8 @@ import {
   Plus,
   BarChart3,
   GraduationCap,
-  MessageSquare
+  MessageSquare,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
@@ -228,6 +229,16 @@ const DashboardEmpresa: React.FC = () => {
                 </Button>
                 <Button
                   as={Link}
+                  to="/contratos-empresa"
+                  variant="outline"
+                  size="sm"
+                  icon={FileText}
+                  className="h-20 flex-col"
+                >
+                  Contratos
+                </Button>
+                <Button
+                  as={Link}
                   to="/perfil-empresa"
                   variant="outline"
                   size="sm"
@@ -257,7 +268,7 @@ const DashboardEmpresa: React.FC = () => {
                 Em implantação
               </h2>
               <p className="font-roboto text-sm text-gray-600">
-                Contratos e gestão de projetos ainda estão sendo preparados. Quando cada área estiver ativa, ela aparecerá aqui no painel da empresa, sem dados de exemplo.
+                A gestão de projetos ainda está sendo preparada. Quando cada área estiver ativa, ela aparecerá aqui no painel da empresa, sem dados de exemplo.
               </p>
             </div>
           </div>

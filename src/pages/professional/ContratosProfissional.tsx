@@ -1,31 +1,53 @@
-import React from 'react';
-import { FileText } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import ListaContratos from '../../components/contratos/ListaContratos';
+import { ContratoRow } from '../company/contratoGestao';
+import { listarContratos } from '../../services/database';
 
 const ContratosProfissional: React.FC = () => {
+  const [contratos, setContratos] = useState<ContratoRow[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(false);
+
+  const carregar = useCallback(() => {
+    setCarregando(true);
+    setErro(false);
+    listarContratos()
+      .then(setContratos)
+      .catch((e) => {
+        console.error('Erro ao carregar contratos:', e);
+        setErro(true);
+      })
+      .finally(() => setCarregando(false));
+  }, []);
+
+  useEffect(() => {
+    carregar();
+  }, [carregar]);
+
   return (
     <div className="min-h-screen bg-neutral-gray py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="font-poppins font-bold text-3xl text-soft-black mb-2">
             Meus Contratos
           </h1>
           <p className="font-roboto text-gray-600">
-            Acompanhe seus contratos e serviços de SST
+            Responda às propostas das empresas e acompanhe seus serviços de SST. O pagamento é combinado diretamente com a empresa; a plataforma não processa pagamentos.
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-          <div className="w-16 h-16 bg-green-light rounded-full flex items-center justify-center mx-auto mb-6">
-            <FileText size={28} className="text-green-deep" />
-          </div>
-          <h2 className="font-poppins font-semibold text-xl text-soft-black mb-3">
-            A gestão de contratos ainda não está disponível
-          </h2>
-          <p className="font-roboto text-gray-600 max-w-md mx-auto">
-            Esta área está sendo preparada. Quando estiver ativa, seus contratos e serviços vão aparecer aqui, sempre com dados reais.
+        {erro ? (
+          <p className="font-roboto text-gray-600">
+            Não foi possível carregar os contratos. Tente novamente em instantes.
           </p>
-        </div>
+        ) : (
+          <ListaContratos
+            papel="profissional"
+            contratos={contratos}
+            carregando={carregando}
+            onAtualizar={carregar}
+          />
+        )}
       </div>
     </div>
   );

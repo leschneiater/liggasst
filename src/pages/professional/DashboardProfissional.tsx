@@ -81,7 +81,7 @@ const DashboardProfissional: React.FC = () => {
               className="h-24 flex-col bg-white hover:bg-green-light hover:border-green-medium"
             >
               <FileText size={24} className="mb-2 text-green-deep" />
-              <span className="text-xs font-medium">Histórico Contratos</span>
+              <span className="text-xs font-medium">Meus Contratos</span>
             </Button>
             {msgDisponivel && (
             <Button
@@ -142,7 +142,7 @@ const DashboardProfissional: React.FC = () => {
                 Em implantação
               </h2>
               <p className="font-roboto text-sm text-gray-600">
-                Contratos e avaliações ainda estão sendo preparados. Quando cada área estiver ativa, ela aparecerá aqui no seu painel, sem dados de exemplo.
+                As avaliações ainda estão sendo preparadas. Quando a área estiver ativa, ela aparecerá aqui no seu painel, sem dados de exemplo.
               </p>
             </div>
           </div>
