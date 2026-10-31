@@ -48,6 +48,43 @@ const trainings = [
   }),
 ];
 
+
+// Fixtures ricas para o painel admin (somente build E2E local; nunca entram
+// no bundle de producao, que nao importa este arquivo).
+const membro = (id: string, role: string, display_name: string, state: string, city: string, created_at: string, extra: Record<string, unknown> = {}) => ({
+  id, role, display_name, email: `${id}@fixture.local`, phone: null, city, state,
+  verification_status: 'approved', avatar_path: null, is_test: false, created_at, ...extra,
+});
+const profilesFix = [
+  profile as unknown as Record<string, unknown>,
+  membro('p1', 'professional', 'Ana Lima', 'SP', 'Campinas', '2026-10-02T10:00:00Z'),
+  membro('p2', 'professional', 'Bruno Reis', 'SP', 'São Paulo', '2026-09-14T10:00:00Z'),
+  membro('p3', 'professional', 'Carla Nunes', 'RJ', 'Rio de Janeiro', '2026-08-20T10:00:00Z'),
+  membro('p4', 'professional', 'Diego Prado', 'MG', 'Belo Horizonte', '2026-10-18T10:00:00Z'),
+  membro('e1', 'company', 'TechCorp Ltda', 'SP', 'São Paulo', '2026-10-15T10:00:00Z'),
+  membro('e2', 'company', 'Indústria Moderna', 'RJ', 'Duque de Caxias', '2026-07-30T10:00:00Z'),
+  membro('e3', 'company', 'Construtech', 'MG', 'Contagem', '2026-10-25T10:00:00Z'),
+];
+const professionalsFix = [
+  { profile_id: 'p1', education: 'Técnico em Segurança', specialization: 'PGR', experience: '5 anos', hourly_rate: 90 },
+  { profile_id: 'p2', education: 'Engenharia', specialization: 'NR-35', experience: '8 anos', hourly_rate: 120 },
+  { profile_id: 'p3', education: 'Enfermagem', specialization: 'PCMSO', experience: '6 anos', hourly_rate: 100 },
+  { profile_id: 'p4', education: 'Técnico em Segurança', specialization: 'CIPA', experience: '3 anos', hourly_rate: 70 },
+];
+const companiesFix = [
+  { profile_id: 'e1', segment: 'Tecnologia', employee_count: '51-100', responsible_name: 'Carlos Dias', responsible_email: 'carlos@techcorp.com', responsible_phone: null },
+  { profile_id: 'e2', segment: 'Metalúrgica', employee_count: '501-1000', responsible_name: 'Marina Souza', responsible_email: 'marina@imod.com', responsible_phone: null },
+  { profile_id: 'e3', segment: 'Construção Civil', employee_count: '101-500', responsible_name: 'Paulo Mendes', responsible_email: 'paulo@construtech.com', responsible_phone: null },
+];
+const demandsFix = [
+  { id: 'd1', title: 'Elaboração de PGR', company_id: 'e1', service_type: 'PGR', city: 'São Paulo', state: 'SP', budget: 4500, deadline: '2026-11-30', status: 'active', created_at: '2026-10-25T10:00:00Z' },
+  { id: 'd2', title: 'Treinamento NR-35 para equipe', company_id: 'e2', service_type: 'NR-35', city: 'Duque de Caxias', state: 'RJ', budget: 8000, deadline: '2026-12-15', status: 'active', created_at: '2026-10-20T10:00:00Z' },
+  { id: 'd3', title: 'PCMSO anual', company_id: 'e3', service_type: 'PCMSO', city: 'Contagem', state: 'MG', budget: 6000, deadline: '2026-11-20', status: 'completed', created_at: '2026-09-10T10:00:00Z' },
+];
+const reportsFix = [
+  { id: 'r1', reporter_id: 'p1', reported_id: 'e1', message_id: null, reason: 'spam', details: 'Mensagem suspeita', status: 'open', created_at: '2026-10-29T10:00:00Z' },
+  { id: 'r2', reporter_id: 'e2', reported_id: 'p3', message_id: null, reason: 'conduta', details: null, status: 'reviewed', created_at: '2026-09-15T10:00:00Z' },
+];
 interface Filtro { col: string; val: unknown }
 
 const builder = (tabela: string) => {
@@ -55,8 +92,11 @@ const builder = (tabela: string) => {
   let singleMode: 'single' | 'maybeSingle' | null = null;
   const resolver = () => {
     let linhas: Record<string, unknown>[] = [];
-    if (tabela === 'profiles') linhas = [profile as unknown as Record<string, unknown>];
-    if (tabela === 'companies' || tabela === 'professionals') linhas = [{}];
+    if (tabela === 'profiles') linhas = profilesFix;
+    if (tabela === 'professionals') linhas = professionalsFix as unknown as Record<string, unknown>[];
+    if (tabela === 'companies') linhas = companiesFix as unknown as Record<string, unknown>[];
+    if (tabela === 'demands') linhas = demandsFix as unknown as Record<string, unknown>[];
+    if (tabela === 'message_reports') linhas = reportsFix as unknown as Record<string, unknown>[];
     if (tabela === 'trainings') linhas = trainings as unknown as Record<string, unknown>[];
     for (const f of filtros) linhas = linhas.filter((l) => l[f.col] === f.val);
     if (singleMode) return { data: linhas[0] ?? null, error: null };

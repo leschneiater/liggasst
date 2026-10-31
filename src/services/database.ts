@@ -739,12 +739,17 @@ export type { TrainingAudience, TrainingStatus };
 
 export const fetchTrainingsAdmin = async () => {
   try {
-    const { data, error } = await supabase
-      .from('trainings')
-      .select('*')
-      .order('created_at', { ascending: false });
+    await getAuthenticatedUser();
+    // leitura paginada como as demais consultas admin (completa, sem teto de 1000)
+    const { data, error } = await fetchTodasPaginas<TrainingRow>((de, ate) =>
+      supabase
+        .from('trainings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(de, ate)
+    );
     if (error) throw error;
-    return { success: true, data: (data ?? []) as TrainingRow[] };
+    return { success: true, data };
   } catch (error) {
     console.error('Erro ao buscar treinamentos (admin):', error);
     return { success: false, data: [] as TrainingRow[], error };

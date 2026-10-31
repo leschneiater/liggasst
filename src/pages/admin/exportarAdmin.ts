@@ -85,7 +85,7 @@ export const montarCsvAdmin = ({ visao, membros, demandas, denuncias, nomes, des
     linha(['Empresas cadastradas (total)', visao.totalEmpresas]),
     linha(['Novos profissionais no período', visao.novosProfissionaisPeriodo]),
     linha(['Novas empresas no período', visao.novasEmpresasPeriodo]),
-    linha(['Demandas publicadas no período', visao.demandasPeriodo]),
+    linha(['Demandas publicadas no período', demandas.filter(d => new Date(d.created_at).getTime() >= desde.getTime()).length]),
     linha(['Denúncias abertas (total)', visao.denunciasAbertas]),
     linha(['Denúncias no período', visao.denunciasPeriodo]),
     '',

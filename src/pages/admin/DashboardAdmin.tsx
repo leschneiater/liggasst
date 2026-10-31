@@ -1,204 +1,114 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  Building2, 
-  FileText, 
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Users,
+  Building2,
   AlertTriangle,
-  DollarSign,
   MapPin,
-  Star,
   Activity,
   BarChart3,
   Download,
   Search,
   Eye,
-  MessageSquare,
-  Shield,
+  GraduationCap,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
-import { fetchReports, fetchProfileNames, fetchAdminOverview, fetchAdminMembers, fetchAdminDemands } from '../../services/database';
+import {
+  fetchReports,
+  fetchProfileNames,
+  fetchAdminOverview,
+  fetchAdminMembers,
+  fetchAdminDemands,
+  fetchTrainingsAdmin,
+  AdminOverview,
+  AdminMemberRow,
+  AdminDemandRow,
+  ReportRow,
+} from '../../services/database';
 import { montarCsvAdmin, periodoDesde } from './exportarAdmin';
+import {
+  montarFeedAtividade,
+  principaisRegioes,
+  filtrarDemandasVisiveis,
+  demandasNoPeriodo,
+  TipoAtividade,
+} from './adminDados';
+
+// Painel administrativo: TODOS os numeros e listas vem do banco. O que nao
+// tem fonte real no produto (receita, transacoes, avaliacoes, usuarios
+// ativos em 24h, contratos) foi removido em vez de exibir valor ilustrativo
+// ou destacar area que ainda nao tem fluxo operacional.
+
+interface DadosAdmin {
+  visao: AdminOverview;
+  membros: AdminMemberRow[];
+  demandas: AdminDemandRow[];
+  denuncias: ReportRow[];
+  treinamentosPublicados: number;
+}
 
 const DashboardAdmin: React.FC = () => {
   const navigate = useNavigate();
   const [exportando, setExportando] = useState(false);
-  const [stats, setStats] = useState({
-    totalProfissionais: 0,
-    totalEmpresas: 0,
-    contratosAtivos: 0,
-    receitaMensal: 0,
-    crescimentoMensal: 0,
-    denunciasAbertas: 0,
-    usuariosAtivos: 0,
-    transacoes: 0
-  });
-
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(false);
+  const [dados, setDados] = useState<DadosAdmin | null>(null);
   const [timeFilter, setTimeFilter] = useState('30d');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [recentActivity] = useState([
-    {
-      id: 1,
-      type: 'new_professional',
-      description: 'Novo profissional cadastrado: João Silva',
-      timestamp: '2024-01-15T10:30:00Z',
-      status: 'success'
-    },
-    {
-      id: 2,
-      type: 'new_company',
-      description: 'Nova empresa cadastrada: TechCorp Ltda',
-      timestamp: '2024-01-15T09:15:00Z',
-      status: 'success'
-    },
-    {
-      id: 3,
-      type: 'contract_signed',
-      description: 'Contrato assinado entre Maria Santos e Indústria XYZ',
-      timestamp: '2024-01-15T08:45:00Z',
-      status: 'success'
-    },
-    {
-      id: 4,
-      type: 'payment_received',
-      description: 'Pagamento recebido: R$ 149,00 - Plano Business',
-      timestamp: '2024-01-15T08:00:00Z',
-      status: 'success'
-    },
-    {
-      id: 5,
-      type: 'report_issue',
-      description: 'Denúncia reportada: Comportamento inadequado',
-      timestamp: '2024-01-15T07:30:00Z',
-      status: 'warning'
+  const carregar = useCallback(async () => {
+    setCarregando(true);
+    const desde = periodoDesde(timeFilter);
+    const [visao, membros, demandas, denuncias, treinamentos] = await Promise.all([
+      fetchAdminOverview(desde.toISOString()),
+      fetchAdminMembers(),
+      fetchAdminDemands(),
+      fetchReports(),
+      fetchTrainingsAdmin(),
+    ]);
+    // qualquer leitura que falha derruba o painel inteiro para erro: numero
+    // parcial nunca aparece como se fosse zero real
+    if (!visao.success || !visao.data || !membros.success || !demandas.success || !denuncias.success || !treinamentos.success) {
+      toast.error('Não foi possível carregar o painel. Tente novamente.');
+      setErro(true);
+      setCarregando(false);
+      return;
     }
-  ]);
-
-  const [topRegions] = useState([
-    { state: 'SP', professionals: 1250, companies: 450, growth: 12.5 },
-    { state: 'RJ', professionals: 890, companies: 320, growth: 8.3 },
-    { state: 'MG', professionals: 650, companies: 280, growth: 15.2 },
-    { state: 'RS', professionals: 420, companies: 180, growth: 6.7 },
-    { state: 'PR', professionals: 380, companies: 160, growth: 9.1 }
-  ]);
-
-  const [topProfessionals] = useState([
-    {
-      id: 1,
-      name: 'Maria Santos',
-      specialty: 'Engenheira de Segurança',
-      contracts: 15,
-      rating: 4.9,
-      revenue: 18500,
-      location: 'São Paulo, SP'
-    },
-    {
-      id: 2,
-      name: 'João Silva',
-      specialty: 'Técnico em Segurança',
-      contracts: 12,
-      rating: 4.8,
-      revenue: 14200,
-      location: 'Rio de Janeiro, RJ'
-    },
-    {
-      id: 3,
-      name: 'Ana Costa',
-      specialty: 'Médica do Trabalho',
-      contracts: 8,
-      rating: 5.0,
-      revenue: 22000,
-      location: 'Belo Horizonte, MG'
-    }
-  ]);
-
-  const [topCompanies] = useState([
-    {
-      id: 1,
-      name: 'TechCorp Ltda',
-      segment: 'Tecnologia',
-      contracts: 25,
-      spent: 45000,
-      employees: '101-500',
-      location: 'São Paulo, SP'
-    },
-    {
-      id: 2,
-      name: 'Indústria Moderna',
-      segment: 'Metalúrgica',
-      contracts: 18,
-      spent: 38500,
-      employees: '501-1000',
-      location: 'São Bernardo, SP'
-    },
-    {
-      id: 3,
-      name: 'Construtech',
-      segment: 'Construção Civil',
-      contracts: 22,
-      spent: 52000,
-      employees: '51-100',
-      location: 'Rio de Janeiro, RJ'
-    }
-  ]);
+    setErro(false);
+    setDados({
+      visao: visao.data,
+      membros: membros.data,
+      demandas: demandas.data,
+      denuncias: denuncias.data,
+      // conteudo de teste nunca entra nos numeros do painel
+      treinamentosPublicados: treinamentos.data.filter(t => t.status === 'published' && !t.is_test).length,
+    });
+    setCarregando(false);
+  }, [timeFilter]);
 
   useEffect(() => {
-    // Denuncias abertas: numero real vindo do banco
-    fetchReports().then(r => {
-      if (r.success) {
-        const abertas = r.data.filter(d => d.status === 'open').length;
-        setStats(prev => ({ ...prev, denunciasAbertas: abertas }));
-      }
-    });
-    // Demais estatisticas ainda sao ilustrativas (sem fonte real no produto)
-    setStats({
-      totalProfissionais: 5247,
-      totalEmpresas: 2156,
-      contratosAtivos: 1834,
-      receitaMensal: 125000,
-      crescimentoMensal: 12.5,
-      denunciasAbertas: 3,
-      usuariosAtivos: 4892,
-      transacoes: 2847
-    });
-  }, []);
+    carregar();
+  }, [carregar]);
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'new_professional':
+  const getActivityIcon = (tipo: TipoAtividade) => {
+    switch (tipo) {
+      case 'cadastro_profissional':
         return <Users size={16} className="text-blue-600" />;
-      case 'new_company':
+      case 'cadastro_empresa':
         return <Building2 size={16} className="text-green-600" />;
-      case 'contract_signed':
-        return <FileText size={16} className="text-purple-600" />;
-      case 'payment_received':
-        return <DollarSign size={16} className="text-yellow-600" />;
-      case 'report_issue':
+      case 'demanda':
+        return <BarChart3 size={16} className="text-yellow-600" />;
+      case 'denuncia':
         return <AlertTriangle size={16} className="text-red-600" />;
       default:
         return <Activity size={16} className="text-gray-600" />;
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'success':
-        return 'bg-green-50 border-green-200';
-      case 'warning':
-        return 'bg-yellow-50 border-yellow-200';
-      case 'error':
-        return 'bg-red-50 border-red-200';
-      default:
-        return 'bg-gray-50 border-gray-200';
-    }
-  };
-
-  const filteredActivity = recentActivity.filter(activity =>
-    activity.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getActivityColor = (tipo: TipoAtividade) =>
+    tipo === 'denuncia' ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200';
 
   const handleExportData = async () => {
     setExportando(true);
@@ -222,7 +132,9 @@ const DashboardAdmin: React.FC = () => {
       const csv = montarCsvAdmin({
         visao: visao.data,
         membros: membros.data,
-        demandas: demandas.data,
+        // mesma elegibilidade da tela: demanda de empresa de teste/removida
+        // nao entra no relatorio
+        demandas: filtrarDemandasVisiveis(demandas.data, membros.data),
         denuncias: denuncias.data,
         nomes: nomes.success ? nomes.data : {},
         desde,
@@ -243,9 +155,32 @@ const DashboardAdmin: React.FC = () => {
     }
   };
 
-  const handleViewDetails = (type: string, id: number) => {
-    alert(`Visualizando detalhes: ${type} - ${id}`);
-  };
+  if (carregando || !dados) {
+    return (
+      <div className="min-h-screen bg-neutral-gray">
+        <AdminAreaNav />
+        <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {erro ? (
+            <div>
+              <p className="font-roboto text-gray-600 mb-4">
+                Não foi possível carregar os dados do painel.
+              </p>
+              <Button onClick={carregar}>Tentar novamente</Button>
+            </div>
+          ) : (
+            <p className="font-roboto text-gray-600">Carregando dados do painel…</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const desde = periodoDesde(timeFilter);
+  const demandasVisiveis = filtrarDemandasVisiveis(dados.demandas, dados.membros);
+  const feed = montarFeedAtividade(dados.membros, dados.demandas, dados.denuncias);
+  const feedFiltrado = feed.filter(a => a.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
+  const regioes = principaisRegioes(dados.membros);
+  const novosCadastros = dados.visao.novosProfissionaisPeriodo + dados.visao.novasEmpresasPeriodo;
 
   return (
     <div className="min-h-screen bg-neutral-gray">
@@ -281,16 +216,18 @@ const DashboardAdmin: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Stats */}
+        {/* Main Stats — todos reais */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-roboto text-sm text-gray-600">Profissionais</p>
                 <p className="font-poppins font-bold text-2xl text-soft-black">
-                  {stats.totalProfissionais.toLocaleString()}
+                  {dados.visao.totalProfissionais.toLocaleString()}
                 </p>
-                <p className="font-roboto text-xs text-green-600">+{stats.crescimentoMensal}% este mês</p>
+                <p className="font-roboto text-xs text-green-600">
+                  +{dados.visao.novosProfissionaisPeriodo} no período
+                </p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Users size={24} className="text-blue-600" />
@@ -303,9 +240,11 @@ const DashboardAdmin: React.FC = () => {
               <div>
                 <p className="font-roboto text-sm text-gray-600">Empresas</p>
                 <p className="font-poppins font-bold text-2xl text-soft-black">
-                  {stats.totalEmpresas.toLocaleString()}
+                  {dados.visao.totalEmpresas.toLocaleString()}
                 </p>
-                <p className="font-roboto text-xs text-green-600">+8.2% este mês</p>
+                <p className="font-roboto text-xs text-green-600">
+                  +{dados.visao.novasEmpresasPeriodo} no período
+                </p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <Building2 size={24} className="text-green-600" />
@@ -316,14 +255,16 @@ const DashboardAdmin: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-roboto text-sm text-gray-600">Contratos Ativos</p>
+                <p className="font-roboto text-sm text-gray-600">Demandas</p>
                 <p className="font-poppins font-bold text-2xl text-soft-black">
-                  {stats.contratosAtivos.toLocaleString()}
+                  {demandasVisiveis.length.toLocaleString()}
                 </p>
-                <p className="font-roboto text-xs text-green-600">+15.3% este mês</p>
+                <p className="font-roboto text-xs text-green-600">
+                  +{demandasNoPeriodo(demandasVisiveis, desde)} no período
+                </p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <FileText size={24} className="text-purple-600" />
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <BarChart3 size={24} className="text-yellow-600" />
               </div>
             </div>
           </div>
@@ -331,51 +272,36 @@ const DashboardAdmin: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-roboto text-sm text-gray-600">Receita Mensal</p>
+                <p className="font-roboto text-sm text-gray-600">Denúncias Pendentes</p>
                 <p className="font-poppins font-bold text-2xl text-soft-black">
-                  R$ {stats.receitaMensal.toLocaleString()}
+                  {dados.visao.denunciasAbertas}
                 </p>
-                <p className="font-roboto text-xs text-green-600">+22.1% este mês</p>
+                <p className="font-roboto text-xs text-green-600">
+                  {dados.visao.denunciasPeriodo} no período
+                </p>
               </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <DollarSign size={24} className="text-yellow-600" />
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <AlertTriangle size={24} className="text-red-600" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Secondary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Secondary Stats — todos reais */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-poppins font-semibold text-lg text-soft-black">
-                Usuários Ativos
+                Novos Cadastros
               </h3>
-              <Activity size={20} className="text-blue-600" />
-            </div>
-            <div className="text-center">
-              <p className="font-poppins font-bold text-3xl text-blue-600">
-                {stats.usuariosAtivos.toLocaleString()}
-              </p>
-              <p className="font-roboto text-sm text-gray-600">
-                Últimas 24h
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-poppins font-semibold text-lg text-soft-black">
-                Transações
-              </h3>
-              <BarChart3 size={20} className="text-green-600" />
+              <Activity size={20} className="text-green-600" />
             </div>
             <div className="text-center">
               <p className="font-poppins font-bold text-3xl text-green-600">
-                {stats.transacoes.toLocaleString()}
+                {novosCadastros.toLocaleString()}
               </p>
               <p className="font-roboto text-sm text-gray-600">
-                Este mês
+                profissionais e empresas no período selecionado
               </p>
             </div>
           </div>
@@ -383,40 +309,23 @@ const DashboardAdmin: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-poppins font-semibold text-lg text-soft-black">
-                Denúncias
+                Treinamentos
               </h3>
-              <AlertTriangle size={20} className="text-red-600" />
+              <GraduationCap size={20} className="text-purple-600" />
             </div>
             <div className="text-center">
-              <p className="font-poppins font-bold text-3xl text-red-600">
-                {stats.denunciasAbertas}
+              <p className="font-poppins font-bold text-3xl text-purple-600">
+                {dados.treinamentosPublicados.toLocaleString()}
               </p>
               <p className="font-roboto text-sm text-gray-600">
-                Pendentes
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-poppins font-semibold text-lg text-soft-black">
-                Satisfação
-              </h3>
-              <Star size={20} className="text-yellow-600" />
-            </div>
-            <div className="text-center">
-              <p className="font-poppins font-bold text-3xl text-yellow-600">
-                4.8
-              </p>
-              <p className="font-roboto text-sm text-gray-600">
-                Avaliação média
+                publicados
               </p>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Recent Activity */}
+          {/* Atividade Recente — eventos reais */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-poppins font-semibold text-xl text-soft-black">
@@ -436,31 +345,39 @@ const DashboardAdmin: React.FC = () => {
               </div>
             </div>
             <div className="space-y-3 max-h-80 overflow-y-auto">
-              {filteredActivity.map((activity) => (
-                <div key={activity.id} className={`flex items-start space-x-3 p-3 rounded-lg border ${getStatusColor(activity.status)}`}>
+              {feedFiltrado.length === 0 && (
+                <p className="font-roboto text-sm text-gray-500">
+                  Nenhuma atividade registrada ainda.
+                </p>
+              )}
+              {feedFiltrado.map((activity) => (
+                <div key={activity.id} className={`flex items-start space-x-3 p-3 rounded-lg border ${getActivityColor(activity.tipo)}`}>
                   <div className="flex-shrink-0 mt-1">
-                    {getActivityIcon(activity.type)}
+                    {getActivityIcon(activity.tipo)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-roboto text-sm text-gray-700">
-                      {activity.description}
+                      {activity.descricao}
                     </p>
                     <p className="font-roboto text-xs text-gray-500 mt-1">
                       {new Date(activity.timestamp).toLocaleString('pt-BR')}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleViewDetails(activity.type, activity.id)}
-                    className="flex-shrink-0 p-1 text-gray-400 hover:text-green-deep"
-                  >
-                    <Eye size={14} />
-                  </button>
+                  {activity.tipo === 'denuncia' && (
+                    <button
+                      onClick={() => navigate('/admin/denuncias')}
+                      className="flex-shrink-0 p-1 text-gray-400 hover:text-green-deep"
+                      aria-label="Ver denúncias"
+                    >
+                      <Eye size={14} />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Top Regions */}
+          {/* Principais Regiões — contagem real de membros por UF */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-poppins font-semibold text-xl text-soft-black">
@@ -469,27 +386,27 @@ const DashboardAdmin: React.FC = () => {
               <MapPin size={20} className="text-gray-400" />
             </div>
             <div className="space-y-4">
-              {topRegions.map((region, index) => (
+              {regioes.length === 0 && (
+                <p className="font-roboto text-sm text-gray-500">
+                  Nenhum membro com estado informado ainda.
+                </p>
+              )}
+              {regioes.map((region, index) => (
                 <div key={region.state} className="flex items-center justify-between p-3 bg-neutral-gray rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-green-deep text-white rounded-full flex items-center justify-center font-poppins font-bold text-sm">
                       {index + 1}
                     </div>
-                    <div>
-                      <span className="font-poppins font-semibold text-soft-black">
-                        {region.state}
-                      </span>
-                      <p className="font-roboto text-xs text-gray-500">
-                        +{region.growth}% crescimento
-                      </p>
-                    </div>
+                    <span className="font-poppins font-semibold text-soft-black">
+                      {region.state}
+                    </span>
                   </div>
                   <div className="text-right">
                     <p className="font-roboto text-sm text-gray-700">
-                      {region.professionals} profissionais
+                      {region.profissionais} profissionais
                     </p>
                     <p className="font-roboto text-xs text-gray-500">
-                      {region.companies} empresas
+                      {region.empresas} empresas
                     </p>
                   </div>
                 </div>
@@ -498,113 +415,12 @@ const DashboardAdmin: React.FC = () => {
           </div>
         </div>
 
-        {/* Top Performers */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Top Professionals */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="font-poppins font-semibold text-xl text-soft-black mb-6">
-              Top Profissionais
-            </h3>
-            <div className="space-y-4">
-              {topProfessionals.map((professional) => (
-                <div key={professional.id} className="flex items-center justify-between p-4 bg-neutral-gray rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-light rounded-full flex items-center justify-center">
-                      <span className="font-poppins font-bold text-green-deep text-sm">
-                        {professional.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div>
-                      <h4 className="font-poppins font-semibold text-soft-black">
-                        {professional.name}
-                      </h4>
-                      <p className="font-roboto text-sm text-gray-600">
-                        {professional.specialty}
-                      </p>
-                      <p className="font-roboto text-xs text-gray-500">
-                        {professional.location}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-roboto text-sm font-semibold text-green-deep">
-                      R$ {professional.revenue.toLocaleString()}
-                    </p>
-                    <p className="font-roboto text-xs text-gray-500">
-                      {professional.contracts} contratos
-                    </p>
-                    <div className="flex items-center justify-end mt-1">
-                      <Star size={12} className="text-yellow-400 fill-current mr-1" />
-                      <span className="font-roboto text-xs text-gray-600">
-                        {professional.rating}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Top Companies */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="font-poppins font-semibold text-xl text-soft-black mb-6">
-              Top Empresas
-            </h3>
-            <div className="space-y-4">
-              {topCompanies.map((company) => (
-                <div key={company.id} className="flex items-center justify-between p-4 bg-neutral-gray rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Building2 size={20} className="text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-poppins font-semibold text-soft-black">
-                        {company.name}
-                      </h4>
-                      <p className="font-roboto text-sm text-gray-600">
-                        {company.segment}
-                      </p>
-                      <p className="font-roboto text-xs text-gray-500">
-                        {company.location} • {company.employees} funcionários
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-roboto text-sm font-semibold text-blue-600">
-                      R$ {company.spent.toLocaleString()}
-                    </p>
-                    <p className="font-roboto text-xs text-gray-500">
-                      {company.contracts} contratos
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
+        {/* Ações Rápidas — somente destinos que existem */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h3 className="font-poppins font-semibold text-xl text-soft-black mb-6">
             Ações Rápidas
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <Button
-              variant="outline"
-              className="h-20 flex-col"
-              onClick={() => alert('Gerenciar usuários')}
-            >
-              <Users size={24} className="mb-2 text-blue-600" />
-              <span className="text-xs">Usuários</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-20 flex-col"
-              onClick={() => alert('Ver contratos')}
-            >
-              <FileText size={24} className="mb-2 text-green-600" />
-              <span className="text-xs">Contratos</span>
-            </Button>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <Button
               variant="outline"
               className="h-20 flex-col"
@@ -616,26 +432,19 @@ const DashboardAdmin: React.FC = () => {
             <Button
               variant="outline"
               className="h-20 flex-col"
-              onClick={() => alert('Relatórios')}
+              onClick={() => navigate('/admin/treinamentos')}
             >
-              <BarChart3 size={24} className="mb-2 text-purple-600" />
-              <span className="text-xs">Relatórios</span>
+              <GraduationCap size={24} className="mb-2 text-purple-600" />
+              <span className="text-xs">Treinamentos</span>
             </Button>
             <Button
               variant="outline"
               className="h-20 flex-col"
-              onClick={() => alert('Mensagens')}
+              onClick={handleExportData}
+              disabled={exportando}
             >
-              <MessageSquare size={24} className="mb-2 text-yellow-600" />
-              <span className="text-xs">Mensagens</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-20 flex-col"
-              onClick={() => alert('Configurações')}
-            >
-              <Shield size={24} className="mb-2 text-gray-600" />
-              <span className="text-xs">Config</span>
+              <Download size={24} className="mb-2 text-green-600" />
+              <span className="text-xs">Exportar CSV</span>
             </Button>
           </div>
         </div>

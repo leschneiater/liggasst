@@ -10,6 +10,7 @@ const fetchProfileNamesMock = vi.fn();
 const fetchAdminOverviewMock = vi.fn();
 const fetchAdminMembersMock = vi.fn();
 const fetchAdminDemandsMock = vi.fn();
+const fetchTrainingsAdminMock = vi.fn();
 
 vi.mock('../../services/database', () => ({
   fetchReports: (...args: unknown[]) => fetchReportsMock(...args),
@@ -17,6 +18,7 @@ vi.mock('../../services/database', () => ({
   fetchAdminOverview: (...args: unknown[]) => fetchAdminOverviewMock(...args),
   fetchAdminMembers: (...args: unknown[]) => fetchAdminMembersMock(...args),
   fetchAdminDemands: (...args: unknown[]) => fetchAdminDemandsMock(...args),
+  fetchTrainingsAdmin: (...args: unknown[]) => fetchTrainingsAdminMock(...args),
 }));
 
 const denuncia = (id: string, status: string, created_at: string) => ({
@@ -80,15 +82,62 @@ describe('DashboardAdmin', () => {
     fetchAdminOverviewMock.mockResolvedValue({ success: true, data: visaoReal });
     fetchAdminMembersMock.mockResolvedValue({ success: true, data: [] });
     fetchAdminDemandsMock.mockResolvedValue({ success: true, data: [] });
+    fetchTrainingsAdminMock.mockResolvedValue({ success: true, data: [] });
   });
 
   it('mostra o numero real de denuncias abertas no cartao', async () => {
-    fetchReportsMock.mockResolvedValue({
-      success: true,
-      data: [denuncia('1', 'open', '2026-10-29T10:00:00Z'), denuncia('2', 'open', '2026-10-28T10:00:00Z'), denuncia('3', 'actioned', '2026-10-27T10:00:00Z')],
-    });
     render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
-    await waitFor(() => expect(screen.getByText('Pendentes').previousSibling?.textContent).toBe('2'));
+    await waitFor(() => {
+      const titulo = screen.getByText('Denúncias Pendentes');
+      const cartao = titulo.closest('div.bg-white')!;
+      expect(cartao.textContent).toContain(String(visaoReal.denunciasAbertas));
+      expect(cartao.textContent).toContain(`${visaoReal.denunciasPeriodo} no período`);
+    });
+  });
+
+  it('nao exibe nenhum numero inventado nem area sem fluxo operacional', async () => {
+    render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Denúncias Pendentes')).toBeInTheDocument());
+    expect(screen.queryByText(/Receita/i)).toBeNull();
+    expect(screen.queryByText(/Transa/i)).toBeNull();
+    expect(screen.queryByText(/Satisfa/i)).toBeNull();
+    expect(screen.queryByText(/Usuários Ativos/i)).toBeNull();
+    // contratos ainda nao tem fluxo de criacao: nenhum card/ranking destaca a area
+    expect(screen.queryByText(/Contrato/i)).toBeNull();
+  });
+
+  it('alimenta cartoes, atividade e regioes com dados reais', async () => {
+    fetchAdminMembersMock.mockResolvedValue({ success: true, data: [membroProfissional, membroEmpresa] });
+    fetchAdminDemandsMock.mockResolvedValue({
+      success: true,
+      data: [
+        demandaReal,
+        // demanda de empresa fora da lista de membros (teste/removida): nao conta
+        { ...demandaReal, id: 'dTeste', title: 'Demanda de teste', company_id: 'empresa-teste', created_at: '2026-10-28T10:00:00Z' },
+      ],
+    });
+    fetchTrainingsAdminMock.mockResolvedValue({ success: true, data: [{ id: 't1', status: 'published', is_test: false }] });
+    render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Novo profissional cadastrado: Ana Lima')).toBeInTheDocument());
+    expect(screen.getByText('Nova empresa cadastrada: TechCorp')).toBeInTheDocument();
+    expect(screen.getByText('Nova demanda publicada: Elaboração de PGR')).toBeInTheDocument();
+    // demanda de empresa invisivel fica fora do feed
+    expect(screen.queryByText(/Demanda de teste/)).toBeNull();
+    // cartao Demandas conta so a visivel
+    const cartao = screen.getByText('Demandas', { selector: 'p' }).closest('div.bg-white')!;
+    expect(cartao.textContent).toContain('1');
+    expect(cartao.textContent).toContain('+1 no período');
+    // regiao real: SP com 1 profissional e 1 empresa
+    expect(screen.getByText('SP')).toBeInTheDocument();
+    // treinamento publicado real no cartao
+    expect(screen.getAllByText('Treinamentos').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('falha de qualquer leitura mostra erro, nunca zeros', async () => {
+    fetchAdminDemandsMock.mockResolvedValue({ success: false, data: [], error: new Error('rls') });
+    render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Não foi possível carregar os dados do painel.')).toBeInTheDocument());
+    expect(screen.queryByText('Painel Administrativo')).toBeNull();
   });
 
   it('acao rapida Denuncias navega para /admin/denuncias', async () => {
@@ -100,6 +149,7 @@ describe('DashboardAdmin', () => {
         </Routes>
       </MemoryRouter>
     );
+    await waitFor(() => expect(screen.getByText('Exportar')).toBeInTheDocument());
     const botoes = screen.getAllByText('Denúncias');
     const acaoRapida = botoes[botoes.length - 1].closest('button')!;
     fireEvent.click(acaoRapida);
@@ -119,6 +169,7 @@ describe('DashboardAdmin', () => {
     HTMLAnchorElement.prototype.click = function () { clicks.push((this as HTMLAnchorElement).download); };
 
     render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Exportar')).toBeInTheDocument());
     fireEvent.click(screen.getByText('Exportar'));
 
     await waitFor(() => expect(clicks.length).toBe(1));
@@ -145,10 +196,13 @@ describe('DashboardAdmin', () => {
   });
 
   it('Exportar mostra erro quando alguma leitura falha', async () => {
+    // o painel carrega com sucesso; so a releitura da exportacao falha
+    fetchAdminMembersMock.mockResolvedValueOnce({ success: true, data: [] });
     fetchAdminMembersMock.mockResolvedValue({ success: false, data: [], error: new Error('rls') });
     const createObjectURL = vi.fn(() => 'blob:fake');
     Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, writable: true });
     render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Exportar')).toBeInTheDocument());
     fireEvent.click(screen.getByText('Exportar'));
     await waitFor(() => expect(screen.getByText('Exportar')).toBeInTheDocument());
     await new Promise(r => setTimeout(r, 100));
@@ -176,6 +230,8 @@ describe('montarCsvAdmin', () => {
     expect(csv).toContain('01/01/2026');
     expect(csv).toContain('"4500"');
     expect(csv).toContain('30/11/2026');
+    // demandas no periodo contam a partir da lista filtrada, nao do agregado
+    expect(csv).toContain('"Demandas publicadas no período";"1"');
     // conta admin nao entra nas listas de membros
     const csvComAdmin = montarCsvAdmin({
       ...entradaCsv,
