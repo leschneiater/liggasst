@@ -89,6 +89,36 @@ const reportsFix = [
   { id: 'r1', reporter_id: 'p1', reported_id: 'e1', message_id: null, reason: 'spam', details: 'Mensagem suspeita', status: 'open', created_at: '2026-10-29T10:00:00Z' },
   { id: 'r2', reporter_id: 'e2', reported_id: 'p3', message_id: null, reason: 'conduta', details: null, status: 'reviewed', created_at: '2026-09-15T10:00:00Z' },
 ];
+
+// Fixtures de contratos para o build E2E local: a area Contratos dos dois
+// paineis e o formulario de proposta. listar_contratos devolve as linhas ja
+// com o nome da contraparte, como a RPC real. Nunca entram no bundle de
+// producao, que nao importa este arquivo.
+const contratosEmpresaFix = [
+  { id: 'c1', demand_id: 'd-prop-1', company_id: user.id, professional_id: 'p1', status: 'pending', title: null, amount: 5200, starts_at: '2026-11-10', ends_at: null, progress: 0, created_at: '2026-10-29T14:00:00Z', contraparte_nome: 'Ana Lima', demanda_titulo: 'Elaboração de PGR - unidade 2' },
+  { id: 'c2', demand_id: null, company_id: user.id, professional_id: 'p2', status: 'in_progress', title: 'Consultoria mensal de SST', amount: 3200, starts_at: '2026-10-15', ends_at: '2026-12-15', progress: 40, created_at: '2026-10-12T09:00:00Z', contraparte_nome: 'Bruno Reis', demanda_titulo: null },
+  { id: 'c3', demand_id: null, company_id: user.id, professional_id: 'p3', status: 'completed', title: 'PCMSO anual 2025', amount: 3800, starts_at: '2026-08-01', ends_at: '2026-09-30', progress: 100, created_at: '2026-07-28T09:00:00Z', contraparte_nome: 'Carla Nunes', demanda_titulo: null },
+];
+const contratosProfissionalFix = [
+  { id: 'c4', demand_id: 'd1', company_id: 'e1', professional_id: user.id, status: 'pending', title: null, amount: 4500, starts_at: '2026-11-05', ends_at: null, progress: 0, created_at: '2026-10-29T16:30:00Z', contraparte_nome: 'TechCorp Ltda', demanda_titulo: 'Elaboração de PGR' },
+  { id: 'c5', demand_id: null, company_id: 'e2', professional_id: user.id, status: 'in_progress', title: 'Treinamento NR-35 - turma novembro', amount: 8000, starts_at: '2026-10-20', ends_at: '2026-11-20', progress: 60, created_at: '2026-10-18T11:00:00Z', contraparte_nome: 'Indústria Moderna', demanda_titulo: null },
+  { id: 'c6', demand_id: null, company_id: 'e3', professional_id: user.id, status: 'cancelled', title: 'Auditoria de segurança - planta Contagem', amount: 6000, starts_at: null, ends_at: null, progress: 0, created_at: '2026-09-02T10:00:00Z', contraparte_nome: 'Construtech', demanda_titulo: null },
+];
+const profissionalPublicoFix = [{
+  professional_id: 'p1',
+  display_name: 'Ana Lima',
+  education: 'Técnica em Segurança do Trabalho',
+  specialization: 'PGR, NR-35',
+  experience: '5 anos',
+  city: 'Campinas',
+  state: 'SP',
+  hourly_rate: 90,
+  service_radius: '50km',
+  description: 'Técnica em segurança do trabalho com experiência em indústrias.',
+  availability: ['Manhãs', 'Tardes'],
+  avatar_path: null,
+}];
+
 interface Filtro { col: string; val: unknown }
 
 const builder = (tabela: string) => {
@@ -147,7 +177,19 @@ export const supabase = {
   functions: {
     invoke: async () => ({ data: { signedUrl: 'https://exemplo.com/assinado.pdf', expiresIn: 300 }, error: null }),
   },
-  rpc: async () => ({ data: [], error: null }),
+  rpc: async (fn: string) => {
+    if (fn === 'listar_contratos') {
+      const linhasRpc = role === 'company' ? contratosEmpresaFix
+        : role === 'professional' ? contratosProfissionalFix
+        : [];
+      return { data: linhasRpc, error: null };
+    }
+    if (fn === 'get_professional_public') return { data: profissionalPublicoFix, error: null };
+    if (fn === 'responder_contrato' || fn === 'concluir_contrato' || fn === 'cancelar_contrato') {
+      return { data: null, error: null };
+    }
+    return { data: [], error: null };
+  },
 };
 
 export const testConnection = async () => true;

@@ -9,7 +9,8 @@ import {
   MessageSquare,
   Award,
   Building2,
-  Eye
+  Eye,
+  FileText
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
@@ -155,11 +156,21 @@ const PerfilProfissionalPublico: React.FC = () => {
           >
             Voltar à Busca
           </Button>
+          {userType === 'company' && professional && (
+            <Button
+              onClick={() => navigate(`/propor-contrato/${professional.id}`)}
+              icon={FileText}
+              size="sm"
+            >
+              Propor Contrato
+            </Button>
+          )}
           {userType === 'company' && professional && msgDisponivel && (
             <Button
               onClick={() => navigate(`/mensagens-empresa?para=${professional.id}`)}
               icon={MessageSquare}
               size="sm"
+              variant="outline"
             >
               Enviar Mensagem
             </Button>

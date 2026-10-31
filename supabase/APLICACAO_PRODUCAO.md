@@ -80,3 +80,31 @@ Aplicada via SQL editor:
 Verificacao pos-aplicacao (catalogo read-only): trigger
 demanda_guarda_transicao | fn=private.demanda_guarda_transicao | enabled=O
 em public.demands. Nenhum registro alterado (migracao so cria funcao+trigger).
+
+## 2026-10-31 (madrugada) — Fluxo de contratos empresa <-> profissional
+
+Autorizacao da usuaria (WhatsApp): "Pode" 00:00:03
+(wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYIEE1MUE0MzdCQjM2ODkzNDM3NkE4NjY5OTdFMjM2RTlCAA==),
+em resposta a proposta de publicacao com as regras completas do fluxo
+(wamid.HBgNNTUxMTkxNDMyMzI2NBUCABEYEjRDRDI0MDJDNDdEMjREREVBNwA=): empresa
+propoe, profissional aceita/recusa; aceite tira a demanda da vitrine e
+cancela propostas concorrentes; cancelar contrato em andamento devolve a
+demanda a vitrine; concluir contrato conclui a demanda junto (ajuste
+aprovado em "Pode seguir" 23:57:31); encerrados imutaveis inclusive admin;
+valor sem pagamento na plataforma; sem e-mails.
+
+Aplicada via SQL editor:
+- 20261031010000_contratos_fluxo (coluna contracts.title; policy
+  contracts_insert com validacoes; RPCs security definer
+  responder_contrato/concluir_contrato/cancelar_contrato/listar_contratos;
+  trigger contrato_guarda_transicao; guarda de demandas estendida com flag
+  de transacao app.fluxo_contrato). Registrada em
+  supabase_migrations.schema_migrations. Nenhum dado alterado.
+
+Verificacao pos-aplicacao (catalogo read-only): 9 funcoes criadas
+(private.contrato_*, private.demanda_guarda_transicao atualizada,
+public.responder/concluir/cancelar/listar_contratos), policies
+contracts_insert + contracts_select em contracts, triggers
+contrato_guarda_transicao e demanda_guarda_transicao enabled=O, grants de
+authenticated em contracts = SELECT+INSERT (sem UPDATE), coluna title text
+presente.
