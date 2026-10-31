@@ -15,8 +15,11 @@
 //   - guarda atomica usada pelo app (UPDATE ... AND status='active') faz um
 //     formulario aberto sobre demanda ja encerrada afetar 0 linhas, sem
 //     sobrescrever o encerramento;
-//   - DOCUMENTADO: a policy deixa a dona reabrir demanda encerrada (o app
-//     nao oferece esse caminho); endurecer isso no banco exige migracao.
+//   - trigger 20261031000000_demandas_maquina_estado.sql: demanda encerrada
+//     e imutavel (sem reabrir nem editar), company_id nunca muda, transicoes
+//     invalidas (active -> draft, etc.) sao rejeitadas, fluxo legitimo
+//     (editar ativa, concluir/cancelar, rascunho -> publicada, admin
+//     cancelando ativa) segue funcionando.
 //
 // Como rodar:  npm run test:demands
 //
@@ -94,6 +97,9 @@ const dona = await criarUsuario('dona@teste.local', { role: 'company', display_n
 const outra = await criarUsuario('outra@teste.local', { role: 'company', display_name: 'Empresa Outra' });
 const prof = await criarUsuario('prof@teste.local', { role: 'professional', display_name: 'Profissional' });
 const admin = await criarUsuario('admin@teste.local', { role: 'admin', display_name: 'Admin' });
+// O trigger de cadastro nao promove role admin a partir do metadata (vira
+// professional); promoção direta de fixture, mesmo estado de producao.
+await db.query(`update public.profiles set role = 'admin' where id = $1`, [admin]);
 
 // Executa como role/claims especificos (mesma avaliacao do PostgREST).
 // COMMIT (nao rollback): o cenario e sequencial — insert, edicoes, cancelamento
@@ -187,11 +193,43 @@ ok(linhasAfetadas(updTardio) === 0, 'guarda atomica: edicao tardia sobre demanda
 const tituloFinal = await db.query(`select title from public.demands where id = $1`, [demandaId]);
 ok(tituloFinal.rows[0].title === 'PGR sede v2', 'encerramento preservado, sem sobrescrita');
 
-// ---------- documentacao de comportamento da policy ----------
-const updReabre = await comoUsuario(dona,
-  `update public.demands set status = 'active' where id = $1`, [demandaId]);
-ok(linhasAfetadas(updReabre) === 1,
-  'DOCUMENTADO: policy permite a dona reabrir; app nao oferece, endurecer no banco exige migracao');
+// ---------- maquina de estados no banco (trigger) ----------
+const esperaErro = async (uid, sql, params = []) => {
+  try { await comoUsuario(uid, sql, params); return false; } catch { return true; }
+};
+ok(await esperaErro(dona,
+  `update public.demands set status = 'active' where id = $1`, [demandaId]),
+  'encerrada NAO pode ser reaberta, nem pela dona (trigger)');
+ok(await esperaErro(dona,
+  `update public.demands set title = 'editar historico' where id = $1`, [demandaId]),
+  'encerrada NAO pode ser editada (historico imutavel)');
+ok(await esperaErro(admin,
+  `update public.demands set status = 'active' where id = $1`, [demandaId]),
+  'encerrada NAO pode ser reaberta nem por admin');
+
+// demanda ainda ativa: fluxos legitimos preservados
+const ins2 = await comoUsuario(dona,
+  `insert into public.demands (company_id, title, description, status) values ($1, 'Rascunho NR-10', 'desc', 'draft') returning id`,
+  [dona]);
+const rascunhoId = ins2.rows[0].id;
+ok(await esperaErro(dona,
+  `update public.demands set company_id = $1 where id = $2`, [outra, rascunhoId]),
+  'company_id NUNCA muda (troca de proprietario bloqueada)');
+const publicaRascunho = await comoUsuario(dona,
+  `update public.demands set status = 'active' where id = $1`, [rascunhoId]);
+ok(linhasAfetadas(publicaRascunho) === 1, 'rascunho -> ativa segue permitido (publicacao)');
+ok(await esperaErro(dona,
+  `update public.demands set status = 'draft' where id = $1`, [rascunhoId]),
+  'ativa -> rascunho rejeitada (transicao invalida)');
+const editaAtiva = await comoUsuario(dona,
+  `update public.demands set title = 'NR-10 turma 2' where id = $1`, [rascunhoId]);
+ok(linhasAfetadas(editaAtiva) === 1, 'edicao de conteudo em demanda ativa segue permitida');
+const cancelaAdmin = await comoUsuario(admin,
+  `update public.demands set status = 'cancelled' where id = $1`, [rascunhoId]);
+ok(linhasAfetadas(cancelaAdmin) === 1, 'admin cancela demanda ativa (moderacao preservada)');
+const updAtualizado = await db.query(
+  `select updated_at > created_at as tocado from public.demands where id = $1`, [rascunhoId]);
+ok(updAtualizado.rows[0].tocado === true, 'updated_at passa a ser mantido no update');
 
 console.log(`\n${pass} passaram, ${fail} falharam`);
 process.exit(fail === 0 ? 0 : 1);
