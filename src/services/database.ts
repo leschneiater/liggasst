@@ -986,3 +986,98 @@ export const concluirContrato = (id: string) =>
 
 export const cancelarContrato = (id: string) =>
   chamarRpcContrato('cancelar_contrato', { p_contract_id: id });
+
+// ---------- Avaliações mútuas após contrato concluído ----------
+// Escrita só via RPCs (a tabela não tem grant de insert/update/delete);
+// tipos e rótulos em components/contratos/avaliacaoGestao.
+
+export const avaliarContrato = (contractId: string, score: number, comment: string | null) =>
+  chamarRpcContrato('avaliar_contrato', { p_contract_id: contractId, p_score: score, p_comment: comment });
+
+export const corrigirAvaliacao = (contractId: string, score: number, comment: string | null) =>
+  chamarRpcContrato('corrigir_avaliacao', { p_contract_id: contractId, p_score: score, p_comment: comment });
+
+export const minhasAvaliacoes = async () => {
+  const { data, error } = await supabase.rpc('minhas_avaliacoes');
+  if (error) throw error;
+  return (data ?? []) as import('../components/contratos/avaliacaoGestao').AvaliacaoRow[];
+};
+
+export const avaliacoesPendentes = async () => {
+  const { data, error } = await supabase.rpc('avaliacoes_pendentes');
+  if (error) throw error;
+  return (data ?? []) as import('../components/contratos/avaliacaoGestao').AvaliacaoPendente[];
+};
+
+export const avaliacoesResumo = async (profileId: string) => {
+  const { data, error } = await supabase.rpc('avaliacoes_resumo', { p_profile: profileId }).maybeSingle();
+  if (error) throw error;
+  return (data ?? { media: null, total: 0 }) as import('../components/contratos/avaliacaoGestao').ResumoAvaliacoes;
+};
+
+export const avaliacoesDoPerfil = async (profileId: string) => {
+  const { data, error } = await supabase.rpc('avaliacoes_do_perfil', { p_profile: profileId });
+  if (error) throw error;
+  return (data ?? []) as import('../components/contratos/avaliacaoGestao').AvaliacaoPerfil[];
+};
+
+// Denúncia de avaliação (rating_reports) para revisão da administração.
+export const reportAvaliacao = async (ratingId: string, reason: string, details: string) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { error } = await supabase
+      .from('rating_reports')
+      .insert({
+        rating_id: ratingId,
+        reporter_id: user.id,
+        reason,
+        details: details || null
+      });
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao denunciar avaliação:', error);
+    return { success: false, error };
+  }
+};
+
+// Admin: fila de denúncias de avaliações e decisão (manter/excluir comentário).
+export interface RatingReportAdminRow {
+  report_id: string;
+  rating_id: string;
+  reason: string;
+  details: string | null;
+  status: string;
+  created_at: string;
+  reporter_nome: string | null;
+  autor_nome: string | null;
+  avaliado_nome: string | null;
+  score: number;
+  comment: string | null;
+  comment_removed_at: string | null;
+  denuncias_abertas: number;
+}
+
+export const fetchRatingReportsAdmin = async () => {
+  try {
+    await getAuthenticatedUser();
+    const { data, error } = await supabase.rpc('admin_denuncias_avaliacoes');
+    if (error) throw error;
+    return { success: true, data: (data ?? []) as RatingReportAdminRow[] };
+  } catch (error) {
+    console.error('Erro ao carregar denúncias de avaliações:', error);
+    return { success: false, error };
+  }
+};
+
+export const revisarDenunciaAvaliacao = async (reportId: string, acao: 'manter' | 'excluir-comentario') => {
+  try {
+    await getAuthenticatedUser();
+    const { error } = await supabase.rpc('admin_revisar_denuncia_avaliacao', { p_report_id: reportId, p_acao: acao });
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao revisar denúncia de avaliação:', error);
+    return { success: false, error };
+  }
+};

@@ -25,3 +25,8 @@ supabase/migrations/ com aprovação explícita de publicação será aplicado.
 
 Combinação: D e E são independentes entre si; C altera a mesma policy
 messages_insert — se aprovadas juntas, consolidar em uma única migração.
+- draft_avaliacoes.sql — avaliações mútuas após contrato concluído.
+  Regras APROVADAS pela usuária em 31/10/2026 (09:05-09:49, citadas no
+  cabeçalho); promovida à migração preparada
+  20261031040000_avaliacoes_mutuas.sql (mesmo conteúdo). Validada
+  localmente (56 verificações PGlite). Mantido como registro.
