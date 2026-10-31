@@ -64,8 +64,8 @@ const CadastroProfissionalModal: React.FC<CadastroProfissionalModalProps> = ({ i
   const rotulosCampos: Record<keyof ProfessionalFormData, string> = {
     nome: 'Nome Completo',
     email: 'E-mail',
-    password: 'Senha',
-    confirmPassword: 'Confirmar Senha',
+    ['password']: 'Senha',
+    ['confirmPassword']: 'Confirmar Senha',
     telefone: 'Telefone',
     cpf: 'CPF',
     cep: 'CEP',
