@@ -28,6 +28,7 @@ const DenunciasAdmin: React.FC = () => {
   const [erro, setErro] = useState(false);
   const [filtro, setFiltro] = useState<'open' | 'todas'>('open');
   const [atualizando, setAtualizando] = useState<string | null>(null);
+  const [confirmandoExclusaoId, setConfirmandoExclusaoId] = useState<string | null>(null);
 
   const carregar = async () => {
     setLoading(true);
@@ -69,6 +70,7 @@ const DenunciasAdmin: React.FC = () => {
     const r = await revisarDenunciaAvaliacao(reportId, acao);
     setAtualizando(null);
     if (r.success) {
+      setConfirmandoExclusaoId(null);
       toast.success(acao === 'manter'
         ? 'Denúncia arquivada. O comentário volta a aparecer se não houver outra denúncia aberta.'
         : 'Comentário excluído da exibição pública. A nota e o registro da avaliação foram mantidos.');
@@ -269,7 +271,7 @@ const DenunciasAdmin: React.FC = () => {
                           Manter comentário
                         </Button>
                         <Button
-                          onClick={() => revisarAvaliacao(d.report_id, 'excluir-comentario')}
+                          onClick={() => setConfirmandoExclusaoId(d.report_id)}
                           icon={CheckCircle}
                           size="sm"
                           disabled={atualizando === d.report_id}
@@ -279,6 +281,30 @@ const DenunciasAdmin: React.FC = () => {
                       </div>
                     )}
                   </div>
+                  {confirmandoExclusaoId === d.report_id && (
+                    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <p className="font-roboto text-sm text-red-800">
+                        Excluir este comentário da exibição pública? A nota e a média continuam visíveis; o texto fica retido aqui para auditoria.
+                      </p>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <Button
+                          size="sm"
+                          loading={atualizando === d.report_id}
+                          onClick={() => revisarAvaliacao(d.report_id, 'excluir-comentario')}
+                          className="!bg-red-600 !border-red-600 hover:!bg-red-700"
+                        >
+                          Confirmar exclusão
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setConfirmandoExclusaoId(null)}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

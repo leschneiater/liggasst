@@ -62,6 +62,24 @@ export const useAuth = () => {
   return context;
 };
 
+// Erros do PostgREST/Auth chegam como objetos simples; no console viram
+// "[object Object]". Serializa os campos úteis para permitir diagnóstico.
+const descreverErro = (erro: unknown): string => {
+  if (erro instanceof Error) return erro.message;
+  if (erro && typeof erro === 'object') {
+    const { message, code, details, hint } = erro as {
+      message?: string;
+      code?: string;
+      details?: string;
+      hint?: string;
+    };
+    return JSON.stringify({ message, code, details, hint });
+  }
+  return String(erro);
+};
+
+const esperar = (ms: number) => new Promise<void>((resolve) => { setTimeout(resolve, ms); });
+
 const redirectForRole = (role: UserRole) => {
   if (role === 'company') return '/dashboard-empresa';
   if (role === 'admin') return '/admin';
@@ -217,6 +235,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return authProfile;
   }, [clearUser]);
 
+  // Uma nova tentativa única absorve falhas transitórias (rede/PostgREST) sem
+  // esconder erro real: se a segunda tentativa falhar, o erro propaga igual.
+  const loadUserComRetry = useCallback(async (authUser: SupabaseUser) => {
+    try {
+      return await loadUser(authUser);
+    } catch (primeiroErro) {
+      console.warn('Falha ao carregar perfil; tentando novamente:', descreverErro(primeiroErro));
+      await esperar(800);
+      return await loadUser(authUser);
+    }
+  }, [loadUser]);
+
   useEffect(() => {
     let active = true;
 
@@ -234,7 +264,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           await loadUser(data.session.user);
         } catch (loadError) {
-          console.error('Erro ao carregar perfil:', loadError);
+          console.error('Erro ao carregar perfil:', descreverErro(loadError));
         }
       } else {
         clearUser();
@@ -255,8 +285,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setLoading(true);
       setTimeout(() => {
-        void loadUser(nextSession.user)
-          .catch((loadError) => console.error('Erro ao atualizar sessão:', loadError))
+        void loadUserComRetry(nextSession.user)
+          .catch((loadError) => console.error('Erro ao atualizar sessão:', descreverErro(loadError)))
           .finally(() => active && setLoading(false));
       }, 0);
     });
@@ -265,7 +295,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       active = false;
       subscription.unsubscribe();
     };
-  }, [clearUser, loadUser]);
+  }, [clearUser, loadUser, loadUserComRetry]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
@@ -274,7 +304,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
 
       setSession(data.session);
-      const profile = await loadUser(data.user);
+      const profile = await loadUserComRetry(data.user);
       toast.success('Login realizado com sucesso!');
       navigate(redirectForRole(profile.type), { replace: true });
     } catch (error) {
