@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   Building2,
-  FileText,
   AlertTriangle,
   MapPin,
   Activity,
@@ -22,34 +21,31 @@ import {
   fetchAdminOverview,
   fetchAdminMembers,
   fetchAdminDemands,
-  fetchAdminContracts,
   fetchTrainingsAdmin,
   AdminOverview,
   AdminMemberRow,
   AdminDemandRow,
-  AdminContractRow,
   ReportRow,
 } from '../../services/database';
 import { montarCsvAdmin, periodoDesde } from './exportarAdmin';
 import {
   montarFeedAtividade,
   principaisRegioes,
-  comMaisContratos,
-  contarContratosAtivos,
-  contratosNoPeriodo,
+  filtrarDemandasVisiveis,
+  demandasNoPeriodo,
   TipoAtividade,
 } from './adminDados';
 
 // Painel administrativo: TODOS os numeros e listas vem do banco. O que nao
 // tem fonte real no produto (receita, transacoes, avaliacoes, usuarios
-// ativos em 24h) foi removido em vez de exibir valor ilustrativo.
+// ativos em 24h, contratos) foi removido em vez de exibir valor ilustrativo
+// ou destacar area que ainda nao tem fluxo operacional.
 
 interface DadosAdmin {
   visao: AdminOverview;
   membros: AdminMemberRow[];
   demandas: AdminDemandRow[];
   denuncias: ReportRow[];
-  contratos: AdminContractRow[];
   treinamentosPublicados: number;
 }
 
@@ -65,15 +61,16 @@ const DashboardAdmin: React.FC = () => {
   const carregar = useCallback(async () => {
     setCarregando(true);
     const desde = periodoDesde(timeFilter);
-    const [visao, membros, demandas, denuncias, contratos, treinamentos] = await Promise.all([
+    const [visao, membros, demandas, denuncias, treinamentos] = await Promise.all([
       fetchAdminOverview(desde.toISOString()),
       fetchAdminMembers(),
       fetchAdminDemands(),
       fetchReports(),
-      fetchAdminContracts(),
       fetchTrainingsAdmin(),
     ]);
-    if (!visao.success || !visao.data || !membros.success || !demandas.success || !denuncias.success || !contratos.success || !treinamentos.success) {
+    // qualquer leitura que falha derruba o painel inteiro para erro: numero
+    // parcial nunca aparece como se fosse zero real
+    if (!visao.success || !visao.data || !membros.success || !demandas.success || !denuncias.success || !treinamentos.success) {
       toast.error('Não foi possível carregar o painel. Tente novamente.');
       setErro(true);
       setCarregando(false);
@@ -85,7 +82,6 @@ const DashboardAdmin: React.FC = () => {
       membros: membros.data,
       demandas: demandas.data,
       denuncias: denuncias.data,
-      contratos: contratos.data,
       // conteudo de teste nunca entra nos numeros do painel
       treinamentosPublicados: treinamentos.data.filter(t => t.status === 'published' && !t.is_test).length,
     });
@@ -102,8 +98,6 @@ const DashboardAdmin: React.FC = () => {
         return <Users size={16} className="text-blue-600" />;
       case 'cadastro_empresa':
         return <Building2 size={16} className="text-green-600" />;
-      case 'contrato':
-        return <FileText size={16} className="text-purple-600" />;
       case 'demanda':
         return <BarChart3 size={16} className="text-yellow-600" />;
       case 'denuncia':
@@ -138,7 +132,9 @@ const DashboardAdmin: React.FC = () => {
       const csv = montarCsvAdmin({
         visao: visao.data,
         membros: membros.data,
-        demandas: demandas.data,
+        // mesma elegibilidade da tela: demanda de empresa de teste/removida
+        // nao entra no relatorio
+        demandas: filtrarDemandasVisiveis(demandas.data, membros.data),
         denuncias: denuncias.data,
         nomes: nomes.success ? nomes.data : {},
         desde,
@@ -180,13 +176,10 @@ const DashboardAdmin: React.FC = () => {
   }
 
   const desde = periodoDesde(timeFilter);
-  const feed = montarFeedAtividade(dados.membros, dados.demandas, dados.denuncias, dados.contratos);
+  const demandasVisiveis = filtrarDemandasVisiveis(dados.demandas, dados.membros);
+  const feed = montarFeedAtividade(dados.membros, dados.demandas, dados.denuncias);
   const feedFiltrado = feed.filter(a => a.descricao.toLowerCase().includes(searchTerm.toLowerCase()));
   const regioes = principaisRegioes(dados.membros);
-  const topProfissionais = comMaisContratos(dados.membros, dados.contratos, 'professional');
-  const topEmpresas = comMaisContratos(dados.membros, dados.contratos, 'company');
-  const contratosAtivos = contarContratosAtivos(dados.contratos);
-  const novosContratos = contratosNoPeriodo(dados.contratos, desde);
   const novosCadastros = dados.visao.novosProfissionaisPeriodo + dados.visao.novasEmpresasPeriodo;
 
   return (
@@ -262,16 +255,16 @@ const DashboardAdmin: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-roboto text-sm text-gray-600">Contratos Ativos</p>
+                <p className="font-roboto text-sm text-gray-600">Demandas</p>
                 <p className="font-poppins font-bold text-2xl text-soft-black">
-                  {contratosAtivos.toLocaleString()}
+                  {demandasVisiveis.length.toLocaleString()}
                 </p>
                 <p className="font-roboto text-xs text-green-600">
-                  +{novosContratos} novos no período
+                  +{demandasNoPeriodo(demandasVisiveis, desde)} no período
                 </p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <FileText size={24} className="text-purple-600" />
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <BarChart3 size={24} className="text-yellow-600" />
               </div>
             </div>
           </div>
@@ -295,24 +288,7 @@ const DashboardAdmin: React.FC = () => {
         </div>
 
         {/* Secondary Stats — todos reais */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-poppins font-semibold text-lg text-soft-black">
-                Demandas
-              </h3>
-              <BarChart3 size={20} className="text-blue-600" />
-            </div>
-            <div className="text-center">
-              <p className="font-poppins font-bold text-3xl text-blue-600">
-                {dados.demandas.length.toLocaleString()}
-              </p>
-              <p className="font-roboto text-sm text-gray-600">
-                {dados.visao.demandasPeriodo} no período
-              </p>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-poppins font-semibold text-lg text-soft-black">
@@ -325,7 +301,7 @@ const DashboardAdmin: React.FC = () => {
                 {novosCadastros.toLocaleString()}
               </p>
               <p className="font-roboto text-sm text-gray-600">
-                no período selecionado
+                profissionais e empresas no período selecionado
               </p>
             </div>
           </div>
@@ -433,83 +409,6 @@ const DashboardAdmin: React.FC = () => {
                       {region.empresas} empresas
                     </p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Membros com mais contratos — contagem real */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="font-poppins font-semibold text-xl text-soft-black mb-6">
-              Profissionais com Mais Contratos
-            </h3>
-            <div className="space-y-4">
-              {topProfissionais.length === 0 && (
-                <p className="font-roboto text-sm text-gray-500">
-                  Ainda não há contratos registrados.
-                </p>
-              )}
-              {topProfissionais.map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-4 bg-neutral-gray rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-light rounded-full flex items-center justify-center">
-                      <span className="font-poppins font-bold text-green-deep text-sm">
-                        {p.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </span>
-                    </div>
-                    <div>
-                      <h4 className="font-poppins font-semibold text-soft-black">
-                        {p.nome}
-                      </h4>
-                      {p.detalhe && (
-                        <p className="font-roboto text-sm text-gray-600">{p.detalhe}</p>
-                      )}
-                      {p.local && (
-                        <p className="font-roboto text-xs text-gray-500">{p.local}</p>
-                      )}
-                    </div>
-                  </div>
-                  <p className="font-roboto text-sm font-semibold text-green-deep">
-                    {p.contratos} {p.contratos === 1 ? 'contrato' : 'contratos'}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h3 className="font-poppins font-semibold text-xl text-soft-black mb-6">
-              Empresas com Mais Contratos
-            </h3>
-            <div className="space-y-4">
-              {topEmpresas.length === 0 && (
-                <p className="font-roboto text-sm text-gray-500">
-                  Ainda não há contratos registrados.
-                </p>
-              )}
-              {topEmpresas.map((e) => (
-                <div key={e.id} className="flex items-center justify-between p-4 bg-neutral-gray rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Building2 size={20} className="text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-poppins font-semibold text-soft-black">
-                        {e.nome}
-                      </h4>
-                      {e.detalhe && (
-                        <p className="font-roboto text-sm text-gray-600">{e.detalhe}</p>
-                      )}
-                      <p className="font-roboto text-xs text-gray-500">
-                        {[e.local, e.extra ? `${e.extra} funcionários` : null].filter(Boolean).join(' • ')}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="font-roboto text-sm font-semibold text-blue-600">
-                    {e.contratos} {e.contratos === 1 ? 'contrato' : 'contratos'}
-                  </p>
                 </div>
               ))}
             </div>

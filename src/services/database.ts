@@ -711,14 +711,6 @@ export interface AdminDemandRow {
   created_at: string;
 }
 
-export interface AdminContractRow {
-  id: string;
-  company_id: string;
-  professional_id: string;
-  status: string;
-  created_at: string;
-}
-
 export const fetchAdminDemands = async () => {
   try {
     await getAuthenticatedUser();
@@ -736,24 +728,6 @@ export const fetchAdminDemands = async () => {
     return { success: false, data: [] as AdminDemandRow[], error };
   }
 };
-export const fetchAdminContracts = async () => {
-  try {
-    await getAuthenticatedUser();
-    const { data, error } = await fetchTodasPaginas<AdminContractRow>((de, ate) =>
-      supabase
-        .from('contracts')
-        .select('id, company_id, professional_id, status, created_at')
-        .order('created_at', { ascending: false })
-        .range(de, ate)
-    );
-    if (error) throw error;
-    return { success: true, data };
-  } catch (error) {
-    console.error('Erro ao buscar contratos para o painel:', error);
-    return { success: false, data: [] as AdminContractRow[], error };
-  }
-};
-
 
 // =====================
 // Treinamentos (módulo admin) — depende do rascunho supabase/drafts/draft_trainings.sql
@@ -765,12 +739,17 @@ export type { TrainingAudience, TrainingStatus };
 
 export const fetchTrainingsAdmin = async () => {
   try {
-    const { data, error } = await supabase
-      .from('trainings')
-      .select('*')
-      .order('created_at', { ascending: false });
+    await getAuthenticatedUser();
+    // leitura paginada como as demais consultas admin (completa, sem teto de 1000)
+    const { data, error } = await fetchTodasPaginas<TrainingRow>((de, ate) =>
+      supabase
+        .from('trainings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(de, ate)
+    );
     if (error) throw error;
-    return { success: true, data: (data ?? []) as TrainingRow[] };
+    return { success: true, data };
   } catch (error) {
     console.error('Erro ao buscar treinamentos (admin):', error);
     return { success: false, data: [] as TrainingRow[], error };

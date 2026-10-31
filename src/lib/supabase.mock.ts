@@ -85,13 +85,6 @@ const reportsFix = [
   { id: 'r1', reporter_id: 'p1', reported_id: 'e1', message_id: null, reason: 'spam', details: 'Mensagem suspeita', status: 'open', created_at: '2026-10-29T10:00:00Z' },
   { id: 'r2', reporter_id: 'e2', reported_id: 'p3', message_id: null, reason: 'conduta', details: null, status: 'reviewed', created_at: '2026-09-15T10:00:00Z' },
 ];
-const contractsFix = [
-  { id: 'c1', company_id: 'e1', professional_id: 'p1', status: 'accepted', created_at: '2026-10-26T10:00:00Z' },
-  { id: 'c2', company_id: 'e1', professional_id: 'p2', status: 'in_progress', created_at: '2026-10-10T10:00:00Z' },
-  { id: 'c3', company_id: 'e3', professional_id: 'p1', status: 'completed', created_at: '2026-08-05T10:00:00Z' },
-  { id: 'c4', company_id: 'e2', professional_id: 'p3', status: 'in_progress', created_at: '2026-09-22T10:00:00Z' },
-];
-
 interface Filtro { col: string; val: unknown }
 
 const builder = (tabela: string) => {
@@ -104,7 +97,6 @@ const builder = (tabela: string) => {
     if (tabela === 'companies') linhas = companiesFix as unknown as Record<string, unknown>[];
     if (tabela === 'demands') linhas = demandsFix as unknown as Record<string, unknown>[];
     if (tabela === 'message_reports') linhas = reportsFix as unknown as Record<string, unknown>[];
-    if (tabela === 'contracts') linhas = contractsFix as unknown as Record<string, unknown>[];
     if (tabela === 'trainings') linhas = trainings as unknown as Record<string, unknown>[];
     for (const f of filtros) linhas = linhas.filter((l) => l[f.col] === f.val);
     if (singleMode) return { data: linhas[0] ?? null, error: null };

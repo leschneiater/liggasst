@@ -10,7 +10,6 @@ const fetchProfileNamesMock = vi.fn();
 const fetchAdminOverviewMock = vi.fn();
 const fetchAdminMembersMock = vi.fn();
 const fetchAdminDemandsMock = vi.fn();
-const fetchAdminContractsMock = vi.fn();
 const fetchTrainingsAdminMock = vi.fn();
 
 vi.mock('../../services/database', () => ({
@@ -19,7 +18,6 @@ vi.mock('../../services/database', () => ({
   fetchAdminOverview: (...args: unknown[]) => fetchAdminOverviewMock(...args),
   fetchAdminMembers: (...args: unknown[]) => fetchAdminMembersMock(...args),
   fetchAdminDemands: (...args: unknown[]) => fetchAdminDemandsMock(...args),
-  fetchAdminContracts: (...args: unknown[]) => fetchAdminContractsMock(...args),
   fetchTrainingsAdmin: (...args: unknown[]) => fetchTrainingsAdminMock(...args),
 }));
 
@@ -84,7 +82,6 @@ describe('DashboardAdmin', () => {
     fetchAdminOverviewMock.mockResolvedValue({ success: true, data: visaoReal });
     fetchAdminMembersMock.mockResolvedValue({ success: true, data: [] });
     fetchAdminDemandsMock.mockResolvedValue({ success: true, data: [] });
-    fetchAdminContractsMock.mockResolvedValue({ success: true, data: [] });
     fetchTrainingsAdminMock.mockResolvedValue({ success: true, data: [] });
   });
 
@@ -98,34 +95,49 @@ describe('DashboardAdmin', () => {
     });
   });
 
-  it('nao exibe nenhum numero inventado (receita, transacoes, satisfacao)', async () => {
+  it('nao exibe nenhum numero inventado nem area sem fluxo operacional', async () => {
     render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
     await waitFor(() => expect(screen.getByText('Denúncias Pendentes')).toBeInTheDocument());
     expect(screen.queryByText(/Receita/i)).toBeNull();
     expect(screen.queryByText(/Transa/i)).toBeNull();
     expect(screen.queryByText(/Satisfa/i)).toBeNull();
     expect(screen.queryByText(/Usuários Ativos/i)).toBeNull();
-    expect(screen.queryByText('5247'.replace(/\d/,''))).toBeNull();
+    // contratos ainda nao tem fluxo de criacao: nenhum card/ranking destaca a area
+    expect(screen.queryByText(/Contrato/i)).toBeNull();
   });
 
-  it('alimenta atividade e rankings com dados reais', async () => {
+  it('alimenta cartoes, atividade e regioes com dados reais', async () => {
     fetchAdminMembersMock.mockResolvedValue({ success: true, data: [membroProfissional, membroEmpresa] });
-    fetchAdminDemandsMock.mockResolvedValue({ success: true, data: [demandaReal] });
-    fetchAdminContractsMock.mockResolvedValue({
+    fetchAdminDemandsMock.mockResolvedValue({
       success: true,
-      data: [{ id: 'c1', company_id: 'e1', professional_id: 'p1', status: 'accepted', created_at: '2026-10-26T10:00:00Z' }],
+      data: [
+        demandaReal,
+        // demanda de empresa fora da lista de membros (teste/removida): nao conta
+        { ...demandaReal, id: 'dTeste', title: 'Demanda de teste', company_id: 'empresa-teste', created_at: '2026-10-28T10:00:00Z' },
+      ],
     });
     fetchTrainingsAdminMock.mockResolvedValue({ success: true, data: [{ id: 't1', status: 'published', is_test: false }] });
     render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
     await waitFor(() => expect(screen.getByText('Novo profissional cadastrado: Ana Lima')).toBeInTheDocument());
+    expect(screen.getByText('Nova empresa cadastrada: TechCorp')).toBeInTheDocument();
     expect(screen.getByText('Nova demanda publicada: Elaboração de PGR')).toBeInTheDocument();
-    expect(screen.getByText('Profissionais com Mais Contratos')).toBeInTheDocument();
-    expect(screen.getByText('Empresas com Mais Contratos')).toBeInTheDocument();
-    expect(screen.getAllByText('1 contrato').length).toBe(2);
+    // demanda de empresa invisivel fica fora do feed
+    expect(screen.queryByText(/Demanda de teste/)).toBeNull();
+    // cartao Demandas conta so a visivel
+    const cartao = screen.getByText('Demandas', { selector: 'p' }).closest('div.bg-white')!;
+    expect(cartao.textContent).toContain('1');
+    expect(cartao.textContent).toContain('+1 no período');
     // regiao real: SP com 1 profissional e 1 empresa
     expect(screen.getByText('SP')).toBeInTheDocument();
     // treinamento publicado real no cartao
     expect(screen.getAllByText('Treinamentos').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('falha de qualquer leitura mostra erro, nunca zeros', async () => {
+    fetchAdminDemandsMock.mockResolvedValue({ success: false, data: [], error: new Error('rls') });
+    render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Não foi possível carregar os dados do painel.')).toBeInTheDocument());
+    expect(screen.queryByText('Painel Administrativo')).toBeNull();
   });
 
   it('acao rapida Denuncias navega para /admin/denuncias', async () => {
@@ -218,6 +230,8 @@ describe('montarCsvAdmin', () => {
     expect(csv).toContain('01/01/2026');
     expect(csv).toContain('"4500"');
     expect(csv).toContain('30/11/2026');
+    // demandas no periodo contam a partir da lista filtrada, nao do agregado
+    expect(csv).toContain('"Demandas publicadas no período";"1"');
     // conta admin nao entra nas listas de membros
     const csvComAdmin = montarCsvAdmin({
       ...entradaCsv,
