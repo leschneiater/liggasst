@@ -140,3 +140,18 @@ Bug: coluna razao_social (20261029230000) fora do GRANT por coluna do unify — 
 Aplicacao: SQL editor do Supabase (projeto ilvrcozeqbdgeuzjgpvf) em 2026-10-31 ~04:07 UTC.
 Verificacao: update como role authenticated com JWT da empresa retornou 1 row (antes: 42501 permission denied); versao registrada em supabase_migrations.schema_migrations; publicacao de demanda pela UI validada de ponta a ponta com conta de teste.
 Teste PGlite: npm run test:companies-contato — 8/8 (dona positivo; outra empresa/profissional/anon negativo; grant segue por coluna). Red->green confirmado.
+
+## 2026-10-31 (tarde) - Login Google + vitrines publicas
+
+Autorizacao da usuaria (WhatsApp, 31/10/2026 14:39:27): "Pode aplicar!", em resposta a pergunta de 14:37:55 sobre aplicar mudancas no banco, ativar o Google e publicar o site com a politica revisada (wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYIEE1MkI4N0I3RjY1QThGNDIwMDVEMUFENTYyRkU1MzhEAA==).
+
+Aplicadas via SQL editor em UMA transacao, com guarda de frescor (md5 das 4 funcoes auditadas) e registradas em supabase_migrations.schema_migrations:
+- 20261031120000 oauth_cadastro_incompleto
+- 20261031120100 completar_cadastro
+- 20261031120200 linkedin_url
+- 20261031130000 vitrines_publicas
+- 20261031140000 reconciliacao_busca_linkedin
+
+Verificacao pos-aplicacao (catalogo): md5 de prosrc das 7 funcoes iguais ao PGlite local; check de verification_status inclui awaiting_completion; trigger profiles_conclusao_cadastro presente; 2 perfis seguem approved; EXECUTE anon+authenticated em search_professionals, get_professional_public e search_companies_public; completar_cadastro so authenticated.
+Rollback preparado e NAO executado: ver supabase/drafts/ROLLBACK_migracoes_login_google_NAO_EXECUTADO.sql (nao coberto: constraint, coluna linkedin_url, revoke em ratings).
+Provider Google habilitado no Supabase Auth (client ID do projeto GCP liggasst; secret somente no cofre).

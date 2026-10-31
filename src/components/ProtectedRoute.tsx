@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -9,6 +9,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, userType }) => {
   const { currentUser, userType: currentUserType, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -27,6 +28,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, userType }) =
 
   if (!currentUser.verified) {
     return <Navigate to="/auth/login" replace />;
+  }
+
+  // Conta OAuth sem papel definido: completa o cadastro antes de usar a
+  // plataforma. A propria rota /auth/completar-cadastro e a excecao (senao
+  // o redirecionamento apontaria para si mesma em loop).
+  if (
+    currentUser.statusVerificacao === 'awaiting_completion' &&
+    !location.pathname.endsWith('/auth/completar-cadastro')
+  ) {
+    return <Navigate to="/auth/completar-cadastro" replace />;
   }
 
   if (userType && currentUserType !== userType) {

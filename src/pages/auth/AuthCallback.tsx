@@ -13,6 +13,11 @@ const AuthCallback = () => {
       return;
     }
 
+    if (currentUser.statusVerificacao === 'awaiting_completion') {
+      navigate('/auth/completar-cadastro', { replace: true });
+      return;
+    }
+
     const destination = currentUser.type === 'company'
       ? '/dashboard-empresa'
       : currentUser.type === 'admin'

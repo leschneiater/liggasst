@@ -11,6 +11,7 @@ interface AuthUser {
   email: string;
   type: UserRole;
   verified: boolean;
+  statusVerificacao: 'pending' | 'approved' | 'rejected' | 'awaiting_completion';
   email_confirmed_at?: string;
   created_at?: string;
   updated_at?: string;
@@ -28,7 +29,7 @@ interface ProfileRow {
   state: string | null;
   address: string | null;
   avatar_path: string | null;
-  verification_status: 'pending' | 'approved' | 'rejected';
+  verification_status: 'pending' | 'approved' | 'rejected' | 'awaiting_completion';
   created_at: string;
   updated_at: string;
 }
@@ -40,6 +41,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithOAuth: (provider: 'google' | 'azure') => Promise<void>;
+  completarCadastro: (role: 'professional' | 'company', displayName: string) => Promise<void>;
   signup: (
     email: string,
     password: string,
@@ -176,6 +179,7 @@ const toUserData = (
     valorHora: details?.hourly_rate,
     disponibilidade: details?.availability,
     descricao: details?.description,
+    linkedinUrl: details?.linkedin_url,
   };
 };
 
@@ -224,6 +228,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email: authUser.email ?? profile.email,
       type: profile.role,
       verified: Boolean(authUser.email_confirmed_at),
+      statusVerificacao: profile.verification_status,
       email_confirmed_at: authUser.email_confirmed_at,
       created_at: authUser.created_at,
       updated_at: authUser.updated_at,
@@ -320,6 +325,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
+  };
+
+  // Login social (Google ou Microsoft/Azure). O Supabase redireciona ao
+  // provedor e devolve a sessao em /auth/callback. Contas OAuth nascem sem
+  // papel: handle_new_user marca 'awaiting_completion' e o usuario escolhe
+  // empresa/profissional na tela de conclusao antes de usar a plataforma.
+  const loginWithOAuth = async (provider: 'google' | 'azure') => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}auth/callback`,
+        // Azure so devolve e-mail quando o escopo 'email' e pedido (exigencia do Supabase Auth).
+        ...(provider === 'azure' ? { scopes: 'email' } : {}),
+      },
+    });
+    if (error) {
+      toast.error('Não foi possível iniciar o login social. Tente novamente.');
+      throw error;
+    }
+  };
+
+  // Conclusao de cadastro para contas OAuth: a RPC completar_cadastro e o
+  // unico caminho que aprova (grants de coluna + guard no banco impedem
+  // atualizacao direta de role/verification_status).
+  const completarCadastro = async (role: 'professional' | 'company', displayName: string) => {
+    if (!currentUser) throw new Error('Usuário não autenticado.');
+    const { error } = await supabase.rpc('completar_cadastro', {
+      p_role: role,
+      p_display_name: displayName,
+    });
+    if (error) {
+      toast.error(error.message || 'Não foi possível concluir o cadastro.');
+      throw error;
+    }
+    const { data } = await supabase.auth.getUser();
+    if (data.user) await loadUserComRetry(data.user);
+    toast.success('Cadastro concluído!');
+    navigate(redirectForRole(role), { replace: true });
   };
 
   const signup = async (
@@ -460,6 +503,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hourly_rate: data.valorHora,
         availability: data.disponibilidade,
         description: data.descricao,
+        linkedin_url: data.linkedinUrl || null,
       }).eq('profile_id', currentUser.id);
       if (error) throw error;
     } else if (currentUser.type === 'company') {
@@ -495,6 +539,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     loading,
     login,
+    loginWithOAuth,
+    completarCadastro,
     signup,
     logout,
     resetPassword,

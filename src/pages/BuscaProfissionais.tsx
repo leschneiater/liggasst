@@ -8,14 +8,12 @@ import {
   Calendar,
   DollarSign,
   Plus,
-  SlidersHorizontal,
-  Shield
+  SlidersHorizontal
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { searchProfessionals } from '../services/database';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
-import toast from 'react-hot-toast';
 
 interface Professional {
   id: string;
@@ -58,16 +56,11 @@ const BuscaProfissionais: React.FC = () => {
   const [sortBy, setSortBy] = useState<'experiencia' | 'valor' | ''>('');
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   
-  const { currentUser } = useAuth();
+  const { currentUser, userType } = useAuth();
   const navigate = useNavigate();
   
-  // Verificar se o usuário está logado
-  useEffect(() => {
-    if (!currentUser) {
-      toast.error('Você precisa estar logado para buscar profissionais');
-      navigate('/');
-    }
-  }, [currentUser, navigate]);
+  // Vitrine publica (decisao de produto de 31/10): visitante sem
+  // login navega livremente; conversar/contratar exige conta.
 
   const loadProfessionals = async () => {
     setLoading(true);
@@ -87,10 +80,10 @@ const BuscaProfissionais: React.FC = () => {
 
   const currentUserId = currentUser?.id;
 
+  // A vitrine e publica: carrega mesmo sem sessao (visitante anonimo).
   useEffect(() => {
-    if (!currentUserId) return;
     loadProfessionals();
-  }, [currentUserId, filters.estado, filters.especializacao]);
+  }, [currentUserId, filters.estado, filters.especializacao]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const estados = [
     { sigla: 'AC', nome: 'Acre' },
@@ -231,43 +224,6 @@ const BuscaProfissionais: React.FC = () => {
     navigate(`/perfil-profissional-publico/${professionalId}`);
   };
 
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-neutral-gray py-8">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Shield size={32} className="text-yellow-600" />
-            </div>
-            
-            <h2 className="font-poppins font-bold text-2xl text-soft-black mb-4">
-              Acesso Restrito
-            </h2>
-            
-            <p className="font-roboto text-gray-600 mb-6">
-              Você precisa estar logado para buscar profissionais.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => navigate('/')}
-                variant="outline"
-                className="flex-1"
-              >
-                Voltar ao Início
-              </Button>
-              <Button 
-                onClick={() => navigate('/auth/login')}
-                className="flex-1"
-              >
-                Fazer Login
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -381,6 +337,8 @@ const BuscaProfissionais: React.FC = () => {
                     </select>
                   </div>
 
+                  {userType === 'company' && (
+                  <>
                   <div>
                     <label className="block font-roboto font-medium text-sm text-gray-700 mb-1">
                       Disponibilidade
@@ -422,6 +380,8 @@ const BuscaProfissionais: React.FC = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-deep focus:border-green-deep"
                     />
                   </div>
+                  </>
+                  )}
 
                 </div>
 
@@ -448,7 +408,7 @@ const BuscaProfissionais: React.FC = () => {
               >
                 <option value="">Padrão</option>
                 <option value="experiencia">Experiência</option>
-                <option value="valor">Valor</option>
+                {userType === 'company' && <option value="valor">Valor</option>}
               </select>
             </div>
           </div>
@@ -554,7 +514,7 @@ const BuscaProfissionais: React.FC = () => {
                 )}
 
                 <p className="font-roboto text-xs text-gray-500 mb-3">
-                  Para conversar, abra o perfil e envie uma mensagem pela plataforma.
+                  Abra o perfil para conversar pela plataforma.
                 </p>
                 <div className="flex space-x-2">
                   <Button 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Linkedin } from 'lucide-react';
 import { 
   User, 
   Mail, 
@@ -34,6 +35,7 @@ interface ProfileFormData {
   valorHora: string;
   disponibilidade: string[];
   descricao: string;
+  linkedinUrl: string;
 }
 
 const PerfilProfissional: React.FC = () => {
@@ -244,6 +246,20 @@ const PerfilProfissional: React.FC = () => {
                         {...register('registro', { required: 'Registro é obrigatório' })}
                       />
                     </div>
+
+                    <Input
+                      label="LinkedIn (URL do perfil)"
+                      type="url"
+                      icon={Linkedin}
+                      placeholder="https://www.linkedin.com/in/seu-perfil"
+                      error={errors.linkedinUrl?.message}
+                      {...register('linkedinUrl', {
+                        pattern: {
+                          value: /^$|^https:\/\/([a-z0-9-]+\.)*linkedin\.com(\/|$)/,
+                          message: 'Informe uma URL https do linkedin.com'
+                        }
+                      })}
+                    />
 
                     <Input
                       label="Especialização"

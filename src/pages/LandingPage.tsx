@@ -32,12 +32,8 @@ const LandingPage: React.FC = () => {
   const isLoggedIn = Boolean(currentUser);
 
   const handleBuscarProfissional = () => {
-    if (isLoggedIn) {
-      navigate('/busca-profissionais');
-    } else {
-      toast.error('Você precisa estar logado para buscar profissionais');
-      setIsLoginModalOpen(true);
-    }
+    // Vitrine publica: a busca de profissionais nao exige mais login.
+    navigate('/busca-profissionais');
   };
 
   const handleProtectedAction = (action: () => void, actionName: string) => {
@@ -100,14 +96,14 @@ const LandingPage: React.FC = () => {
               <div className="animate-slide-up">
                 <div className="inline-flex items-center bg-white bg-opacity-20 rounded-full px-4 py-2 mb-6">
                   <Shield size={16} className="mr-2" />
-                  <span className="text-sm font-roboto">Busca de profissionais restrita a usuários cadastrados</span>
+                  <span className="text-sm font-roboto">Vitrine aberta: conheça profissionais e empresas da rede</span>
                 </div>
                 <h1 className="font-poppins font-bold text-3xl md:text-4xl lg:text-6xl mb-6">
                   Profissionais de <span className="text-green-light">SST</span> onde você precisar
                 </h1>
                 <p className="font-roboto text-lg md:text-xl text-green-light mb-8 leading-relaxed">
-                  Encontre especialistas de Segurança do Trabalho em qualquer lugar do Brasil 
-                  e visualize perfis completos. Cadastro gratuito.
+                  Conheça profissionais e empresas de Segurança do Trabalho na vitrine
+                  pública. Para conversar e contratar, o cadastro é gratuito.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                   <Button 
@@ -128,6 +124,13 @@ const LandingPage: React.FC = () => {
                     <span style={{ color: '#1B4332' }}>Sou Profissional</span>
                   </Button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/vitrine-empresas')}
+                  className="font-roboto text-sm text-green-light underline underline-offset-4 hover:text-white transition-colors mb-8"
+                >
+                  Ver empresas que já fazem parte da rede
+                </button>
               </div>
               
               <div className="animate-fade-in">

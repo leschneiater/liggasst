@@ -57,6 +57,7 @@ export interface ProfessionalSearchRow {
   description: string | null;
   availability: string[] | null;
   avatar_path: string | null;
+  linkedin_url: string | null;
 }
 
 export interface ProfessionalSearchItem {
@@ -71,6 +72,7 @@ export interface ProfessionalSearchItem {
   especializacoes: string[];
   disponibilidade: string[];
   descricao: string;
+  linkedinUrl: string | null;
 }
 
 const parseLeadingInt = (value: string | null): number | null => {
@@ -93,7 +95,8 @@ export const mapProfessionalSearchRow = (row: ProfessionalSearchRow): Profession
     .map(item => item.trim())
     .filter(item => item.length > 0),
   disponibilidade: row.availability ?? [],
-  descricao: row.description || ''
+  descricao: row.description || '',
+  linkedinUrl: row.linkedin_url ?? null
 });
 
 export const searchProfessionals = async (params: {
@@ -128,6 +131,21 @@ export const fetchCompanies = async (filters: Filters = {}) => {
     return { success: true, data };
   } catch (error) {
     console.error('Erro ao buscar empresas:', error);
+    return { success: false, error };
+  }
+};
+
+export const fetchCompaniesPublic = async (filters: Filters = {}) => {
+  try {
+    const { data, error } = await supabase.rpc('search_companies_public', {
+      p_state: filters.estado ?? filters.state ?? null,
+      p_city: filters.cidade ?? filters.city ?? null,
+      p_segment: filters.segmento ?? filters.segment ?? null,
+    });
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Erro ao buscar empresas (vitrine publica):', error);
     return { success: false, error };
   }
 };
@@ -790,6 +808,22 @@ export const fetchAdminDemands = async () => {
 export { treinamentoVisivelPara };
 export type { TrainingAudience, TrainingStatus };
 
+// Espelha public.trainings (migracao 20261030230000_trainings.sql).
+export interface TrainingRow {
+  id: string;
+  title: string;
+  description: string;
+  audience: TrainingAudience;
+  youtube_url: string | null;
+  pdf_path: string | null;
+  link_url: string | null;
+  is_test: boolean;
+  status: TrainingStatus;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const fetchTrainingsAdmin = async () => {
   try {
     await getAuthenticatedUser();
@@ -829,9 +863,10 @@ export const createTraining = async (treinamento: {
   title: string;
   description?: string;
   audience: TrainingAudience;
-  youtube_url?: string | null;
+  youtube_url: string | null;
   pdf_path?: string | null;
-  link_url?: string | null;
+  link_url: string | null;
+  is_test?: boolean;
   status?: TrainingStatus;
 }) => {
   try {

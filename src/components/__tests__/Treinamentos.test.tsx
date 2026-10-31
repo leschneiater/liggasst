@@ -26,6 +26,8 @@ const treinamento = (id: string, audience: TrainingRow['audience'], extra: Parti
   audience,
   youtube_url: null,
   pdf_path: null,
+  link_url: null,
+  is_test: false,
   status: 'published',
   created_by: 'admin-1',
   created_at: '2026-10-30T00:00:00Z',

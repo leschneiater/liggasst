@@ -28,6 +28,7 @@ const SobreCache = lazy(() => import('./pages/SobreCache'));
 const TermosUso = lazy(() => import('./pages/TermosUso'));
 const PoliticaPrivacidade = lazy(() => import('./pages/PoliticaPrivacidade'));
 const BuscaProfissionais = lazy(() => import('./pages/BuscaProfissionais'));
+const VitrineEmpresas = lazy(() => import('./pages/VitrineEmpresas'));
 const PubliqueDemanda = lazy(() => import('./pages/PubliqueDemanda'));
 const PerfilProfissionalPublico = lazy(() => import('./pages/PerfilProfissionalPublico'));
 const Error404 = lazy(() => import('./pages/Error404'));
@@ -39,6 +40,7 @@ const Dashboard = lazy(() => import('./pages/auth/Dashboard'));
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
 const AuthCallback = lazy(() => import('./pages/auth/AuthCallback'));
+const CompletarCadastro = lazy(() => import('./pages/auth/CompletarCadastro'));
 
 // Professional Pages
 const DashboardProfissional = lazy(() => import('./pages/professional/DashboardProfissional'));
@@ -111,6 +113,7 @@ function App() {
                 <Route path="/termos-de-uso" element={<Layout><TermosUso /></Layout>} />
                 <Route path="/politica-de-privacidade" element={<Layout><PoliticaPrivacidade /></Layout>} />
                 <Route path="/busca-profissionais" element={<Layout><BuscaProfissionais /></Layout>} />
+                <Route path="/vitrine-empresas" element={<Layout><VitrineEmpresas /></Layout>} />
                 <Route path="/publique-demanda" element={
                   <ProtectedRoute userType="company">
                     <Layout><PubliqueDemanda /></Layout>
@@ -125,6 +128,14 @@ function App() {
                 <Route path="/auth/forgot-password" element={<ForgotPassword />} />
                 <Route path="/auth/reset-password" element={<ResetPassword />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route
+                  path="/auth/completar-cadastro"
+                  element={
+                    <ProtectedRoute>
+                      <CompletarCadastro />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <Layout><Dashboard /></Layout>

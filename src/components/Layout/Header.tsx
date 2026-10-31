@@ -6,7 +6,6 @@ import LoginModal from '../LoginModal';
 import CadastroEmpresaModal from '../CadastroEmpresaModal';
 import CadastroProfissionalModal from '../CadastroProfissionalModal';
 import Button from '../ui/Button';
-import toast from 'react-hot-toast';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,26 +38,13 @@ const Header: React.FC = () => {
     }
   };
 
-  const handleProtectedNavigation = (path: string, actionName: string) => {
-    if (!currentUser) {
-      toast.error(`Você precisa estar logado para ${actionName}`);
-      setIsLoginModalOpen(true);
-      return;
-    }
-    navigate(path);
-  };
 
   const isActive = (path: string) => location.pathname === path;
 
   const publicNavItems = [
     { path: '/', label: 'Início' },
     { path: '/como-funciona', label: 'Como Funciona' },
-    { 
-      path: '/busca-profissionais', 
-      label: 'Buscar Profissionais',
-      protected: true,
-      actionName: 'buscar profissionais'
-    },
+    { path: '/busca-profissionais', label: 'Buscar Profissionais' },
     { path: '/planos', label: 'Planos' },
     { path: '/contato', label: 'Contato' },
   ];
@@ -96,23 +82,6 @@ const Header: React.FC = () => {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-6 lg:space-x-8" aria-label="Navegação principal">
               {publicNavItems.map((item) => (
-                item.protected ? (
-                  <button
-                    key={item.path}
-                    onClick={() => handleProtectedNavigation(item.path, item.actionName!)}
-                    className={`font-roboto transition-all duration-300 relative ${
-                      isActive(item.path)
-                        ? 'text-green-deep font-semibold'
-                        : 'text-gray-700 hover:text-green-deep'
-                    }`}
-                    aria-current={isActive(item.path) ? 'page' : undefined}
-                  >
-                    {item.label}
-                    {isActive(item.path) && (
-                      <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-green-deep rounded-full"></div>
-                    )}
-                  </button>
-                ) : (
                   <Link
                     key={item.path}
                     to={item.path}
@@ -128,7 +97,6 @@ const Header: React.FC = () => {
                       <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-green-deep rounded-full"></div>
                     )}
                   </Link>
-                )
               ))}
             </nav>
 
@@ -214,23 +182,6 @@ const Header: React.FC = () => {
             <div className="md:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
                 {publicNavItems.map((item) => (
-                  item.protected ? (
-                    <button
-                      key={item.path}
-                      onClick={() => {
-                        handleProtectedNavigation(item.path, item.actionName!);
-                        setIsMenuOpen(false);
-                      }}
-                      className={`block px-3 py-2 rounded-md text-base font-roboto transition-colors duration-300 w-full text-left ${
-                        isActive(item.path)
-                          ? 'text-green-deep bg-green-light font-semibold'
-                          : 'text-gray-700 hover:text-green-deep hover:bg-neutral-gray'
-                      }`}
-                      aria-current={isActive(item.path) ? 'page' : undefined}
-                    >
-                      {item.label}
-                    </button>
-                  ) : (
                     <Link
                       key={item.path}
                       to={item.path}
@@ -244,7 +195,6 @@ const Header: React.FC = () => {
                     >
                       {item.label}
                     </Link>
-                  )
                 ))}
                 
                 {isLoggedIn ? (

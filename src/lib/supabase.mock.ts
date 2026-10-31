@@ -170,7 +170,14 @@ const profissionalPublicoFix = [{
   description: 'Técnica em segurança do trabalho com experiência em indústrias.',
   availability: ['Manhãs', 'Tardes'],
   avatar_path: null,
+  linkedin_url: 'https://www.linkedin.com/in/ana-lima',
 }];
+
+// Audiencias decididas pela usuaria (31/10): LinkedIn, valor/hora e
+// disponibilidade so para empresa logada; anon e profissional veem null.
+const soEmpresa = <T>(v: T): T | null =>
+  (role === 'company' && params.get('deslogado') !== '1') ? v : null;
+const linkedinPara = (url: string | null) => soEmpresa(url);
 
 interface Filtro { col: string; val: unknown }
 
@@ -210,8 +217,13 @@ const builder = (tabela: string) => {
 
 export const supabase = {
   auth: {
-    getSession: async () => ({ data: { session: { user, access_token: 'e2e' } }, error: null }),
-    getUser: async () => ({ data: { user }, error: null }),
+    // ?deslogado=1 simula visitante anonimo (vitrine publica sem sessao).
+    getSession: async () => params.get('deslogado') === '1'
+      ? { data: { session: null }, error: null }
+      : { data: { session: { user, access_token: 'e2e' } }, error: null },
+    getUser: async () => params.get('deslogado') === '1'
+      ? { data: { user: null }, error: null }
+      : { data: { user }, error: null },
     onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
     signInWithPassword: async () => ({ data: { user }, error: null }),
     signOut: async () => ({ error: null }),
@@ -237,6 +249,24 @@ export const supabase = {
       return { then: p.then.bind(p), maybeSingle: async () => r, single: async () => r };
     };
     const rpcInterno = (fn2: string) => {
+    if (fn2 === 'search_companies_public') {
+      // Vitrine publica (31/10): mesmo recorte da RPC real — sem needs,
+      // sem contato, sem avatar/verification_status.
+      return wrap([
+          { id: 'e1', display_name: 'TechCorp Ltda', segment: 'Tecnologia', city: 'São Paulo', state: 'SP', employee_count: '51-100', description: 'Indústria de componentes eletrônicos com três unidades fabris.' },
+          { id: 'e3', display_name: 'Construtech', segment: 'Construção Civil', city: 'Contagem', state: 'MG', employee_count: '101-500', description: 'Construtora com obras industriais em Minas Gerais.' },
+          { id: 'e4', display_name: 'AgroVale S/A', segment: 'Agronegócio', city: 'Ribeirão Preto', state: 'SP', employee_count: '501-1000', description: 'Produtora de grãos com operações em três estados.' },
+      ]);
+    }
+    if (fn2 === 'search_professionals') {
+      return wrap(profissionalPublicoFix.map((p) => ({
+        id: p.professional_id, display_name: p.display_name, city: p.city, state: p.state,
+        avatar_path: p.avatar_path, verification_status: 'approved', education: p.education,
+        specialization: p.specialization, experience: p.experience, service_radius: p.service_radius,
+        hourly_rate: soEmpresa(p.hourly_rate), availability: soEmpresa(p.availability), description: p.description,
+        linkedin_url: linkedinPara(p.linkedin_url),
+      })));
+    }
     if (fn2 === 'search_companies') {
       return wrap([
           { id: 'e1', display_name: 'TechCorp Ltda', segment: 'Tecnologia', city: 'São Paulo', state: 'SP', employee_count: '51-100', description: 'Indústria de componentes eletrônicos com três unidades fabris.', needs: ['PGR', 'PCMSO', 'LTCAT'] },
@@ -249,7 +279,7 @@ export const supabase = {
         : [];
       return wrap(linhasRpc);
     }
-    if (fn2 === 'get_professional_public') return wrap(profissionalPublicoFix);
+    if (fn2 === 'get_professional_public') return wrap(profissionalPublicoFix.map((p) => ({ ...p, hourly_rate: soEmpresa(p.hourly_rate), availability: soEmpresa(p.availability), linkedin_url: linkedinPara(p.linkedin_url) })));
     if (fn2 === 'avaliacoes_pendentes') return wrap(role === 'admin' ? [] : avaliacoesPendentesFix);
     if (fn2 === 'minhas_avaliacoes') {
       return wrap(role === 'company' ? minhasAvaliacoesEmpresaFix : role === 'professional' ? minhasAvaliacoesProfissionalFix : []);

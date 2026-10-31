@@ -7,10 +7,13 @@ import {
   CheckCircle,
   ArrowLeft,
   MessageSquare,
+  LogIn,
   Award,
   Building2,
   Eye,
   FileText
+,
+  Linkedin
 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,7 +37,7 @@ const PerfilProfissionalPublico: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [activeTab, setActiveTab] = useState('sobre');
-  const { userType } = useAuth();
+  const { currentUser, userType } = useAuth();
   const [certificados, setCertificados] = useState<SharedCertificate[] | null>(null);
   const [certificadosErro, setCertificadosErro] = useState(false);
   const [abrindoCertId, setAbrindoCertId] = useState<string | null>(null);
@@ -148,7 +151,7 @@ const PerfilProfissionalPublico: React.FC = () => {
     <div className="min-h-screen bg-neutral-gray py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <Button
             onClick={handleGoBack}
             variant="outline"
@@ -174,6 +177,16 @@ const PerfilProfissionalPublico: React.FC = () => {
               variant="outline"
             >
               Enviar Mensagem
+            </Button>
+          )}
+          {!currentUser && professional && (
+            <Button
+              onClick={() => navigate('/auth/login')}
+              icon={LogIn}
+              size="sm"
+              className="w-full sm:w-auto"
+            >
+              Entre para conversar e contratar
             </Button>
           )}
         </div>
@@ -227,6 +240,18 @@ const PerfilProfissionalPublico: React.FC = () => {
                   </span>
                 </div>
               )}
+
+              {professional.linkedinUrl && (
+                <a
+                  href={professional.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center mt-3 text-blue-700 hover:text-blue-900 font-roboto text-sm"
+                >
+                  <Linkedin size={16} className="mr-1" />
+                  Perfil no LinkedIn
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -234,7 +259,7 @@ const PerfilProfissionalPublico: React.FC = () => {
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-8">
+            <nav className="flex space-x-6 sm:space-x-8 px-4 sm:px-8 overflow-x-auto">
               {[
                 { id: 'sobre', label: 'Sobre' },
                 { id: 'especializacoes', label: 'Especializações' },
@@ -244,7 +269,7 @@ const PerfilProfissionalPublico: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-roboto font-medium text-sm ${
+                  className={`py-4 px-1 border-b-2 font-roboto font-medium text-sm whitespace-nowrap flex-shrink-0 ${
                     activeTab === tab.id
                       ? 'border-green-deep text-green-deep'
                       : 'border-transparent text-gray-500 hover:text-gray-700'

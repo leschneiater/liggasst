@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Restaura o caminho original salvo pelo public/404.html (fallback SPA do GitHub Pages).
+      (function () {
+        var r = sessionStorage.getItem('spa-redirect');
+        if (r) { sessionStorage.removeItem('spa-redirect'); history.replaceState(null, '', r); }
+      })();
+    </script>
     <title>LiggaSST - Conectando Profissionais de SST com Empresas</title>
     <meta name="description" content="Plataforma que conecta empresas com profissionais qualificados de Segurança do Trabalho em todo o Brasil." />
     
