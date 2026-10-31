@@ -77,6 +77,10 @@ const companiesFix = [
   { profile_id: 'e3', segment: 'Construção Civil', employee_count: '101-500', responsible_name: 'Paulo Mendes', responsible_email: 'paulo@construtech.com', responsible_phone: null },
 ];
 const demandsFix = [
+  // Demandas da propria empresa e2e (role=company): alimentam o painel, a
+  // edicao e os relatorios no build local. Nunca entram no bundle de producao.
+  { id: 'd-prop-1', title: 'Elaboração de PGR - unidade 2', company_id: user.id, description: 'PGR para a segunda unidade fabril, com equipe de 80 colaboradores.', service_type: 'PGR - Programa de Gerenciamento de Riscos', city: 'São Paulo', state: 'SP', budget: 5200, deadline: '2026-12-10', status: 'active', modalidade: 'presencial', urgencia: 'media', tipo_orcamento: 'fixo', created_at: '2026-10-28T10:00:00Z' },
+  { id: 'd-prop-2', title: 'PCMSO anual 2025', company_id: user.id, description: 'Renovação do PCMSO.', service_type: 'PCMSO - Programa de Controle Médico de Saúde Ocupacional', city: 'São Paulo', state: 'SP', budget: 3800, deadline: null, status: 'completed', modalidade: null, urgencia: null, tipo_orcamento: null, created_at: '2026-09-05T10:00:00Z' },
   { id: 'd1', title: 'Elaboração de PGR', company_id: 'e1', service_type: 'PGR', city: 'São Paulo', state: 'SP', budget: 4500, deadline: '2026-11-30', status: 'active', created_at: '2026-10-25T10:00:00Z' },
   { id: 'd2', title: 'Treinamento NR-35 para equipe', company_id: 'e2', service_type: 'NR-35', city: 'Duque de Caxias', state: 'RJ', budget: 8000, deadline: '2026-12-15', status: 'active', created_at: '2026-10-20T10:00:00Z' },
   { id: 'd3', title: 'PCMSO anual', company_id: 'e3', service_type: 'PCMSO', city: 'Contagem', state: 'MG', budget: 6000, deadline: '2026-11-20', status: 'completed', created_at: '2026-09-10T10:00:00Z' },
@@ -90,6 +94,7 @@ interface Filtro { col: string; val: unknown }
 const builder = (tabela: string) => {
   const filtros: Filtro[] = [];
   let singleMode: 'single' | 'maybeSingle' | null = null;
+  let updatePayload: Record<string, unknown> | null = null;
   const resolver = () => {
     let linhas: Record<string, unknown>[] = [];
     if (tabela === 'profiles') linhas = profilesFix;
@@ -99,12 +104,17 @@ const builder = (tabela: string) => {
     if (tabela === 'message_reports') linhas = reportsFix as unknown as Record<string, unknown>[];
     if (tabela === 'trainings') linhas = trainings as unknown as Record<string, unknown>[];
     for (const f of filtros) linhas = linhas.filter((l) => l[f.col] === f.val);
+    if (updatePayload) {
+      // Simula update ... .eq(...): aplica o payload nas linhas filtradas.
+      for (const l of linhas) Object.assign(l, updatePayload);
+    }
     if (singleMode) return { data: linhas[0] ?? null, error: null };
     return { data: linhas, error: null, count: linhas.length };
   };
   const q: Record<string, unknown> & { then?: unknown } = {};
   const chain = (nome: string) => (...args: unknown[]) => {
     if (nome === 'eq') filtros.push({ col: args[0] as string, val: args[1] });
+    if (nome === 'update') updatePayload = args[0] as Record<string, unknown>;
     if (nome === 'single' || nome === 'maybeSingle') singleMode = nome;
     return q;
   };

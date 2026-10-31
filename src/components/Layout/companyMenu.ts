@@ -28,3 +28,8 @@ export const companyMenuItems: CompanyMenuItem[] = [
 ];
 
 export const companyAreaPaths: string[] = companyMenuItems.map((item) => item.path);
+
+// Rotas da area empresa fora do menu (ex.: edicao de demanda) tambem levam
+// o menu fixo, para a empresa nao perder a navegacao ao editar.
+export const isCompanyAreaPath = (pathname: string): boolean =>
+  companyAreaPaths.includes(pathname) || pathname.startsWith('/editar-demanda/');

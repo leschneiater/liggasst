@@ -61,3 +61,22 @@ Verificacao pos-aplicacao (catalogo): 6 funcoes private, 2 tabelas, 3 policies e
 Gate FECHADO em producao: envio/bloqueio/denuncia bloqueados para contas fora da allowlist; perfis is_test invisiveis na busca e no perfil publico para usuarios gerais.
 
 Pos-validacao (mesma sessao): E2E real aprovado (envio/resposta/bloqueio/desbloqueio/denuncia/painel admin), conta de teste e todos os registros removidos (cascata verificada: 0 ocorrencias; 2 contas reais intactas), gate ABERTO (private.messaging_flags.aberta=true) apos Deploy B (475d34b). PAT temporario do GitHub revogado.
+
+## 2026-10-30 (noite) — Maquina de estado de demandas
+
+Autorizacao da usuaria (WhatsApp): "Perfeito vamos seguir" 23:19:23
+(wamid.HBgNNTUxMTkxNDMyMzI2NBUCABIYIEE1NTk5NjE0MTJFN0U3QTM3MTQ2QUMwQzExQzc3RkRBAA==),
+em resposta a proposta de gestao de demandas + relatorios reais + protecao no
+banco (demandas encerradas imutaveis, inclusive para admin).
+
+Aplicada via SQL editor:
+- 20261031000000_demandas_maquina_estado (trigger BEFORE UPDATE em
+  public.demands: demanda completed/cancelled e historico nao aceitam NENHUM
+  update; company_id imutavel; transicoes validas draft->active,
+  active/in_progress->completed/cancelled; mantem updated_at).
+  Funcao private.demanda_guarda_transicao. Reversivel via drop trigger +
+  drop function.
+
+Verificacao pos-aplicacao (catalogo read-only): trigger
+demanda_guarda_transicao | fn=private.demanda_guarda_transicao | enabled=O
+em public.demands. Nenhum registro alterado (migracao so cria funcao+trigger).

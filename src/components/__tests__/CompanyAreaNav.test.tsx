@@ -34,6 +34,16 @@ describe('Menu fixo da area empresa', () => {
     expect(screen.getByText('Painel').closest('a')).toHaveAttribute('aria-current', 'page');
   });
 
+  it('aparece na edicao de demanda (rota da empresa fora do menu)', () => {
+    render(
+      <MemoryRouter initialEntries={['/editar-demanda/d1']}>
+        <Layout><div>conteúdo</div></Layout>
+      </MemoryRouter>
+    );
+    expect(screen.getByLabelText('Menu da empresa')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Menu do profissional')).not.toBeInTheDocument();
+  });
+
   it('esconde Mensagens quando o canal nao esta disponivel', () => {
     mensagensDisponivel = false;
     render(
