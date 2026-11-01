@@ -8,7 +8,7 @@ import { textoMensagensNovas, textoPropostasPendentes } from '../../utils/avisos
 const CartaoAvisos: React.FC<{ rotaMensagens: string; rotaContratos: string; mensagensDisponivel: boolean }> = ({
   rotaMensagens, rotaContratos, mensagensDisponivel,
 }) => {
-  const { mensagensNovas, propostasPendentes } = useAvisos();
+  const { mensagensNovas, propostasPendentes, indisponivel } = useAvisos();
   const mostraMsg = mensagensDisponivel && mensagensNovas > 0;
   if (!mostraMsg && propostasPendentes <= 0) return null;
   return (
@@ -32,6 +32,9 @@ const CartaoAvisos: React.FC<{ rotaMensagens: string; rotaContratos: string; men
           </li>
         )}
       </ul>
+      {indisponivel && (
+        <p className="mt-3 text-sm text-gray-500 font-roboto">Não foi possível verificar todos os avisos agora.</p>
+      )}
     </section>
   );
 };

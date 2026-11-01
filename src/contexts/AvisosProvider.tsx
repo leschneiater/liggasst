@@ -16,7 +16,8 @@ const MIN_MS_ENTRE_LEITURAS_AO_VOLTAR = 60_000;
 // as mesmas regras de acesso do banco). Regras de seguranca da exibicao:
 // - ao sair ou trocar de conta/papel, zera na hora e descarta respostas que
 //   chegam atrasadas da conta anterior;
-// - falha de leitura nao mostra numero antigo: aquela fonte volta a zero.
+// - falha de leitura nao mostra numero antigo nem diz "sem novidades": o
+//   contador some e o sino avisa que nao foi possivel verificar.
 export const AvisosProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser, userType } = useAuth();
   const { disponivel: mensagensDisponivel } = useMessagingDisponivel();
@@ -42,21 +43,26 @@ export const AvisosProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (chaveAtual.current !== minhaChave) return;
 
     let mensagensNovas = 0;
+    let indisponivel = false;
     if (mensagensDisponivel) {
       const msgsOk = msgs.status === 'fulfilled' && msgs.value && msgs.value.success && Array.isArray(msgs.value.data);
       const blqOk = bloqueios.status === 'fulfilled' && bloqueios.value && bloqueios.value.success;
       if (msgsOk && blqOk) {
         const ids = new Set((bloqueios.value as { data: { blocked_id: string }[] }).data.map((b) => b.blocked_id));
         mensagensNovas = contarMensagensNaoLidas((msgs.value as unknown as { data: MensagemAviso[] }).data, meuId, ids);
+      } else {
+        indisponivel = true;
       }
     }
+    if (papel === 'profissional' && contratos.status !== 'fulfilled') indisponivel = true;
     const propostasPendentes = papel === 'profissional' && contratos.status === 'fulfilled'
       ? contarPropostasParaResponder(contratos.value, papel)
       : 0;
     setAvisos((anterior) =>
       anterior.mensagensNovas === mensagensNovas && anterior.propostasPendentes === propostasPendentes
+        && anterior.indisponivel === indisponivel
         ? anterior
-        : { mensagensNovas, propostasPendentes });
+        : { mensagensNovas, propostasPendentes, indisponivel });
   }, [meuId, papel, mensagensDisponivel]);
 
   // Zera na hora quando a identidade muda (logout, outra conta, outro papel).

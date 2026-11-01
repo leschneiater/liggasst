@@ -9,6 +9,8 @@ import Button from '../ui/Button';
 import { useAvisos } from '../../contexts/AvisosContext';
 import { textoMensagensNovas, textoPropostasPendentes } from '../../utils/avisos';
 
+const textoSemVerificar = 'Não foi possível verificar os avisos agora';
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -17,7 +19,7 @@ const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   
   const { currentUser, userType, logout } = useAuth();
-  const { mensagensNovas, propostasPendentes } = useAvisos();
+  const { mensagensNovas, propostasPendentes, indisponivel: avisosIndisponiveis } = useAvisos();
   const totalAvisos = mensagensNovas + propostasPendentes;
   const destinoAvisos = mensagensNovas > 0
     ? (userType === 'company' ? '/mensagens-empresa' : '/mensagens-profissional')
@@ -127,7 +129,7 @@ const Header: React.FC = () => {
                       <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full" aria-hidden="true"></span>
                     </Link>
                   ) : (
-                    <span className="p-2 text-gray-400 relative" role="img" aria-label="Sem avisos novos" title="Sem avisos novos">
+                    <span className="p-2 text-gray-400 relative" role="img" aria-label={avisosIndisponiveis ? textoSemVerificar : "Sem avisos novos"} title={avisosIndisponiveis ? textoSemVerificar : "Sem avisos novos"}>
                       <Bell size={20} />
                     </span>
                   )}

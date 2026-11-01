@@ -210,6 +210,7 @@ const builder = (tabela: string) => {
       // Simula update ... .eq(...): aplica o payload nas linhas filtradas.
       for (const l of linhas) Object.assign(l, updatePayload);
     }
+    if (tabela === 'messages' && params.get('avisos') === 'erro') return { data: null, error: { message: 'falha simulada' } };
     if (singleMode) return { data: linhas[0] ?? null, error: null };
     return { data: linhas, error: null, count: linhas.length };
   };

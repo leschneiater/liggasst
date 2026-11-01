@@ -25,7 +25,7 @@ import { useAvisos } from '../AvisosContext';
 
 const Mostra: React.FC = () => {
   const a = useAvisos();
-  return <div data-testid="n">{a.mensagensNovas}/{a.propostasPendentes}</div>;
+  return <div data-testid="n">{a.mensagensNovas}/{a.propostasPendentes}{a.indisponivel ? '/falha' : ''}</div>;
 };
 const montar = () => render(
   <MemoryRouter><AvisosProvider><Mostra /></AvisosProvider></MemoryRouter>,
@@ -60,14 +60,14 @@ describe('AvisosProvider', () => {
     listarContratos.mockRejectedValue(new Error('falhou'));
     montar();
     await act(async () => { await Promise.resolve(); });
-    expect(screen.getByTestId('n').textContent).toBe('0/0');
+    expect(screen.getByTestId('n').textContent).toBe('0/0/falha');
   });
 
   it('falha ao ler bloqueios nao mostra mensagens (nao arrisca exibir bloqueado)', async () => {
     fetchMessages.mockResolvedValue(msgs(2));
     fetchMyBlocks.mockResolvedValue({ success: false, data: [] });
     montar();
-    expect(await screen.findByText('0/1')).toBeTruthy();
+    expect(await screen.findByText('0/1/falha')).toBeTruthy();
   });
 
   it('empresa nao recebe aviso de proposta e admin nao recebe nada', async () => {
