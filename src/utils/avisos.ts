@@ -2,6 +2,7 @@
 // Sem estado novo no banco: cada aviso nasce de um dado que ja existe.
 
 export interface MensagemAviso {
+  sender_id?: string;
   receiver_id: string;
   read?: boolean | null;
 }
@@ -13,10 +14,17 @@ export interface ContratoAviso {
 // Mensagem nova = enviada para mim e ainda nao marcada como lida. A leitura
 // continua sendo marcada ao abrir a conversa (ChatArea), entao o aviso some
 // sozinho depois disso.
+// Remetentes que eu bloqueei nao geram aviso (o bloqueio e meu: nao quero ser
+// chamado por quem bloqueei). A lista da conversa continua mostrando a
+// conversa e o contador dela, como hoje.
 export const contarMensagensNaoLidas = (
   mensagens: MensagemAviso[],
   meuId: string,
-): number => (meuId ? mensagens.filter((m) => m.receiver_id === meuId && !m.read).length : 0);
+  bloqueados: ReadonlySet<string> = new Set(),
+): number =>
+  meuId
+    ? mensagens.filter((m) => m.receiver_id === meuId && !m.read && !bloqueados.has(m.sender_id ?? '')).length
+    : 0;
 
 // Proposta de contrato aguardando resposta: so o profissional responde um
 // contrato pendente (aceitar/recusar). Para a empresa, pendente significa que

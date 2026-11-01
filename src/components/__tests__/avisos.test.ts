@@ -19,6 +19,15 @@ describe('avisos', () => {
     expect(contarMensagensNaoLidas(msgs, '')).toBe(0);
   });
 
+  it('nao avisa mensagens de quem eu bloqueei', () => {
+    const msgs = [
+      { sender_id: 'a', receiver_id: 'eu', read: false },
+      { sender_id: 'b', receiver_id: 'eu', read: false },
+    ];
+    expect(contarMensagensNaoLidas(msgs, 'eu', new Set(['b']))).toBe(1);
+    expect(contarMensagensNaoLidas(msgs, 'eu', new Set(['a', 'b']))).toBe(0);
+  });
+
   it('proposta pendente so avisa o profissional', () => {
     const contratos = [{ status: 'pending' }, { status: 'pending' }, { status: 'in_progress' }, { status: 'cancelled' }];
     expect(contarPropostasParaResponder(contratos, 'profissional')).toBe(2);

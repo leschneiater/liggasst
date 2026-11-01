@@ -203,6 +203,7 @@ const builder = (tabela: string) => {
     if (tabela === 'demands') linhas = demandsFix as unknown as Record<string, unknown>[];
     if (tabela === 'message_reports') linhas = reportsFix as unknown as Record<string, unknown>[];
     if (tabela === 'messages') linhas = mensagensFix as unknown as Record<string, unknown>[];
+    if (tabela === 'conversation_blocks') linhas = (params.get('bloqueado') ? [{ blocker_id: user.id, blocked_id: params.get('bloqueado') }] : []) as unknown as Record<string, unknown>[];
     if (tabela === 'trainings') linhas = trainings as unknown as Record<string, unknown>[];
     for (const f of filtros) linhas = linhas.filter((l) => l[f.col] === f.val);
     if (updatePayload) {
