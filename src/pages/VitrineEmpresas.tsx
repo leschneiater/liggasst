@@ -13,6 +13,7 @@ import { Helmet } from 'react-helmet';
 import { Search, SlidersHorizontal, MapPin, Building2, Users, RefreshCw, LogIn } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { fetchCompaniesPublic } from '../services/database';
+import { useAuth } from '../contexts/AuthContext';
 
 interface PublicCompany {
   id: string;
@@ -61,6 +62,7 @@ const segmentos = [
 
 const VitrineEmpresas: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser, userType } = useAuth();
   const [companies, setCompanies] = useState<PublicCompany[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -321,16 +323,22 @@ const VitrineEmpresas: React.FC = () => {
                   </p>
                 )}
 
-                <div className="mt-auto pt-4 border-t border-gray-100">
-                  <Button
-                    size="sm"
-                    icon={LogIn}
-                    onClick={() => navigate('/auth/login')}
-                    className="w-full"
-                  >
-                    Entre para ver detalhes e conversar
-                  </Button>
-                </div>
+                {/* CTA por papel: anonimo vai ao login; profissional logado
+                    vai a /busca-empresas (area com detalhes e mensagem).
+                    Empresa/admin nao tem fluxo de contato com empresas, entao
+                    o card nao promete conversa para esses papeis. */}
+                {(!currentUser || userType === 'professional') && (
+                  <div className="mt-auto pt-4 border-t border-gray-100">
+                    <Button
+                      size="sm"
+                      icon={LogIn}
+                      onClick={() => navigate(currentUser ? '/busca-empresas' : '/auth/login')}
+                      className="w-full"
+                    >
+                      {currentUser ? 'Ver detalhes e conversar' : 'Entre para ver detalhes e conversar'}
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
