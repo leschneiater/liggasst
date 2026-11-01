@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Users, 
   Target, 
@@ -229,18 +230,18 @@ const SobreNos: React.FC = () => {
             Cadastre-se gratuitamente e comece a usar a LiggaSST
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/cadastro-empresa"
+            <Link
+              to="/auth/register"
               className="px-8 py-3 bg-green-light text-green-deep rounded-lg hover:bg-green-deep hover:text-white transition-colors duration-200 font-roboto font-medium"
             >
               Cadastrar Empresa
-            </a>
-            <a
-              href="/cadastro-profissional"
+            </Link>
+            <Link
+              to="/auth/register"
               className="px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-green-deep hover:text-white transition-colors duration-200 font-roboto font-medium"
             >
               Cadastrar Profissional
-            </a>
+            </Link>
           </div>
         </div>
       </section>

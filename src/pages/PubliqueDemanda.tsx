@@ -238,7 +238,7 @@ const PubliqueDemanda: React.FC = () => {
                 Publicar Nova Demanda
               </Button>
               <Button 
-                onClick={() => window.location.href = '/dashboard-empresa'}
+                onClick={() => navigate('/dashboard-empresa')}
                 className="flex-1"
               >
                 Ir para Dashboard

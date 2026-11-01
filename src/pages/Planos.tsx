@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Check, X, Star, Crown, Zap } from 'lucide-react';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
@@ -7,6 +7,7 @@ import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
 
 const Planos: React.FC = () => {
   const [userType, setUserType] = useState<'professional' | 'company'>('professional');
+  const navigate = useNavigate();
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
 
@@ -127,7 +128,7 @@ const Planos: React.FC = () => {
       }
     } else if (price === 'Personalizado') {
       // Plano enterprise - redirecionar para contato
-      window.location.href = '/contato';
+      navigate('/contato');
     } else {
       // Planos pagos - abrir modal de cadastro
       if (userType === 'professional') {
