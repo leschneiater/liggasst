@@ -210,8 +210,8 @@ const PubliqueDemanda: React.FC = () => {
             </h2>
             
             <p className="font-roboto text-gray-600 mb-6">
-              Sua demanda foi publicada e os profissionais qualificados já podem visualizá-la. 
-              Você receberá propostas em breve.
+              Sua demanda foi publicada. Profissionais cadastrados podem vê-la na lista de demandas
+              e enviar uma mensagem para a sua empresa.
             </p>
             
             <div className="bg-green-light bg-opacity-20 p-4 rounded-lg mb-6">
@@ -219,10 +219,9 @@ const PubliqueDemanda: React.FC = () => {
                 Próximos Passos:
               </h3>
               <ul className="font-roboto text-sm text-green-deep space-y-1 text-left">
-                <li>• Profissionais interessados entrarão em contato</li>
-                <li>• Analise as propostas recebidas</li>
-                <li>• Compare perfis e avaliações</li>
-                <li>• Escolha o profissional ideal</li>
+                <li>• Volte à plataforma de tempos em tempos para ver se chegou alguma mensagem</li>
+                <li>• Você também pode buscar profissionais e enviar uma proposta de contrato</li>
+                <li>• Compare perfis e avaliações antes de escolher</li>
               </ul>
             </div>
             
