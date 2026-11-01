@@ -11,6 +11,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import Button from '../../components/ui/Button';
+import CartaoAvisos from '../../components/ui/CartaoAvisos';
 
 const DashboardProfissional: React.FC = () => {
   const { userData } = useAuth();
@@ -49,6 +50,8 @@ const DashboardProfissional: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <CartaoAvisos rotaMensagens="/mensagens-profissional" rotaContratos="/contratos-profissional" mensagensDisponivel={msgDisponivel} />
 
         {/* Área de Ações Rápidas */}
         <div className="mb-8">

@@ -21,6 +21,7 @@ import {
   acoesDaDemanda,
 } from './demandaGestao';
 import Button from '../../components/ui/Button';
+import CartaoAvisos from '../../components/ui/CartaoAvisos';
 import toast from 'react-hot-toast';
 
 const DashboardEmpresa: React.FC = () => {
@@ -91,6 +92,8 @@ const DashboardEmpresa: React.FC = () => {
             Gerencie o perfil da sua empresa e acompanhe suas demandas de SST.
           </p>
         </div>
+
+        <CartaoAvisos rotaMensagens="/mensagens-empresa" rotaContratos="/contratos-empresa" mensagensDisponivel={msgDisponivel} />
 
         {/* Minhas Demandas (dados reais) */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">

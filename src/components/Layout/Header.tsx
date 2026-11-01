@@ -6,6 +6,8 @@ import LoginModal from '../LoginModal';
 import CadastroEmpresaModal from '../CadastroEmpresaModal';
 import CadastroProfissionalModal from '../CadastroProfissionalModal';
 import Button from '../ui/Button';
+import { useAvisos } from '../../contexts/AvisosContext';
+import { textoMensagensNovas, textoPropostasPendentes } from '../../utils/avisos';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,6 +17,15 @@ const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   
   const { currentUser, userType, logout } = useAuth();
+  const { mensagensNovas, propostasPendentes } = useAvisos();
+  const totalAvisos = mensagensNovas + propostasPendentes;
+  const destinoAvisos = mensagensNovas > 0
+    ? (userType === 'company' ? '/mensagens-empresa' : '/mensagens-profissional')
+    : '/contratos-profissional';
+  const descricaoAvisos = [
+    mensagensNovas > 0 ? textoMensagensNovas(mensagensNovas) : '',
+    propostasPendentes > 0 ? textoPropostasPendentes(propostasPendentes) : '',
+  ].filter(Boolean).join(', ');
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -105,10 +116,21 @@ const Header: React.FC = () => {
               {isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   {/* Notifications */}
-                  <button className="p-2 text-gray-600 hover:text-green-deep transition-colors duration-300 relative" aria-label="Notificações">
-                    <Bell size={20} />
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-medium rounded-full" aria-hidden="true"></span>
-                  </button>
+                  {totalAvisos > 0 ? (
+                    <Link
+                      to={destinoAvisos}
+                      className="p-2 text-gray-600 hover:text-green-deep transition-colors duration-300 relative"
+                      aria-label={`Avisos: ${descricaoAvisos}`}
+                      title={descricaoAvisos}
+                    >
+                      <Bell size={20} />
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full" aria-hidden="true"></span>
+                    </Link>
+                  ) : (
+                    <span className="p-2 text-gray-400 relative" role="img" aria-label="Sem avisos novos" title="Sem avisos novos">
+                      <Bell size={20} />
+                    </span>
+                  )}
                   
                   <Link
                     to={getDashboardLink()}
@@ -169,11 +191,14 @@ const Header: React.FC = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-deep focus:outline-none transition-colors duration-300"
+              className="md:hidden relative inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-deep focus:outline-none transition-colors duration-300"
               aria-expanded={isMenuOpen}
-              aria-label="Menu principal"
+              aria-label={totalAvisos > 0 ? `Menu principal (${descricaoAvisos})` : 'Menu principal'}
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {totalAvisos > 0 && !isMenuOpen && (
+                <span className="absolute top-1 right-1 w-3 h-3 bg-red-600 rounded-full" aria-hidden="true"></span>
+              )}
             </button>
           </div>
 
@@ -199,6 +224,16 @@ const Header: React.FC = () => {
                 
                 {isLoggedIn ? (
                   <div className="space-y-2 pt-4 border-t">
+                    {totalAvisos > 0 && (
+                      <Link
+                        to={destinoAvisos}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center space-x-2 px-3 py-2 text-red-700 font-semibold"
+                      >
+                        <Bell size={16} />
+                        <span>{descricaoAvisos}</span>
+                      </Link>
+                    )}
                     <Link
                       to={getDashboardLink()}
                       onClick={() => setIsMenuOpen(false)}

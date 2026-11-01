@@ -1,11 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
+import { useAvisos } from '../../contexts/AvisosContext';
+import ContadorAviso from '../ui/ContadorAviso';
+import { textoMensagensNovas, textoPropostasPendentes } from '../../utils/avisos';
 import { companyMenuItems } from './companyMenu';
 
 const CompanyAreaNav: React.FC = () => {
   const location = useLocation();
   const { disponivel: mensagensDisponivel } = useMessagingDisponivel();
+  const { mensagensNovas, propostasPendentes } = useAvisos();
   const itensVisiveis = companyMenuItems.filter(
     (item) => item.path !== '/mensagens-empresa' || mensagensDisponivel
   );
@@ -40,6 +44,12 @@ const CompanyAreaNav: React.FC = () => {
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
                 <span>{item.label}</span>
+                {item.path === '/mensagens-empresa' && (
+                  <ContadorAviso n={mensagensNovas} descricao={textoMensagensNovas(mensagensNovas)} />
+                )}
+                {item.path === '/contratos-empresa' && (
+                  <ContadorAviso n={propostasPendentes} descricao={textoPropostasPendentes(propostasPendentes)} />
+                )}
               </Link>
             );
           })}

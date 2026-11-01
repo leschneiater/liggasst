@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
+import { useAvisos } from '../../contexts/AvisosContext';
+import ContadorAviso from '../ui/ContadorAviso';
+import { textoMensagensNovas, textoPropostasPendentes } from '../../utils/avisos';
 import {
   LayoutDashboard,
   Search,
@@ -29,6 +32,7 @@ export const professionalAreaPaths: string[] = menuItems.map((item) => item.path
 const ProfessionalAreaNav: React.FC = () => {
   const location = useLocation();
   const { disponivel: mensagensDisponivel } = useMessagingDisponivel();
+  const { mensagensNovas, propostasPendentes } = useAvisos();
   const itensVisiveis = menuItems.filter(
     (item) => item.path !== '/mensagens-profissional' || mensagensDisponivel
   );
@@ -63,6 +67,12 @@ const ProfessionalAreaNav: React.FC = () => {
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
                 <span>{item.label}</span>
+                {item.path === '/mensagens-profissional' && (
+                  <ContadorAviso n={mensagensNovas} descricao={textoMensagensNovas(mensagensNovas)} />
+                )}
+                {item.path === '/contratos-profissional' && (
+                  <ContadorAviso n={propostasPendentes} descricao={textoPropostasPendentes(propostasPendentes)} />
+                )}
               </Link>
             );
           })}

@@ -157,6 +157,16 @@ const contratosProfissionalFix = [
   { id: 'c6', demand_id: null, company_id: 'e3', professional_id: user.id, status: 'cancelled', title: 'Auditoria de segurança - planta Contagem', amount: 6000, starts_at: null, ends_at: null, progress: 0, created_at: '2026-09-02T10:00:00Z', contraparte_nome: 'Construtech', demanda_titulo: null },
   { id: 'c7', demand_id: null, company_id: 'e4', professional_id: user.id, status: 'completed', title: 'PCMSO anual 2025', amount: 3800, starts_at: '2026-08-01', ends_at: '2026-09-30', progress: 100, created_at: '2026-07-28T09:00:00Z', contraparte_nome: 'Clínica Vida', demanda_titulo: null },
 ];
+// Mensagens do build E2E: ?avisos=0 deixa tudo lido (sem aviso). Por padrao
+// ha 3 nao lidas para o usuario da fixture e 1 ja lida; abrir a conversa
+// marca como lida (o mock aplica o update nas linhas), como no app real.
+const lidas = params.get('avisos') === '0';
+const mensagensFix = [
+  { id: 'm1', sender_id: 'p1', receiver_id: user.id, content: 'Boa tarde, vi a demanda de PGR.', read: lidas, created_at: '2026-10-31T13:00:00Z' },
+  { id: 'm2', sender_id: 'p1', receiver_id: user.id, content: 'Posso enviar uma proposta?', read: lidas, created_at: '2026-10-31T13:05:00Z' },
+  { id: 'm3', sender_id: 'p2', receiver_id: user.id, content: 'Tenho disponibilidade em novembro.', read: lidas, created_at: '2026-10-31T15:00:00Z' },
+  { id: 'm4', sender_id: user.id, receiver_id: 'p3', content: 'Obrigado pelo retorno.', read: true, created_at: '2026-10-30T09:00:00Z' },
+];
 const profissionalPublicoFix = [{
   professional_id: 'p1',
   display_name: 'Ana Lima',
@@ -192,6 +202,7 @@ const builder = (tabela: string) => {
     if (tabela === 'companies') linhas = companiesFix as unknown as Record<string, unknown>[];
     if (tabela === 'demands') linhas = demandsFix as unknown as Record<string, unknown>[];
     if (tabela === 'message_reports') linhas = reportsFix as unknown as Record<string, unknown>[];
+    if (tabela === 'messages') linhas = mensagensFix as unknown as Record<string, unknown>[];
     if (tabela === 'trainings') linhas = trainings as unknown as Record<string, unknown>[];
     for (const f of filtros) linhas = linhas.filter((l) => l[f.col] === f.val);
     if (updatePayload) {

@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import { AvisosProvider } from './contexts/AvisosProvider';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import ChunkErrorBoundary from './components/ChunkErrorBoundary';
@@ -74,6 +75,7 @@ function App() {
   return (
     <Router basename="/liggasst">
       <AuthProvider>
+        <AvisosProvider>
           <ScrollToTop />
           <div className="min-h-screen bg-gray-50">
             <Toaster 
@@ -264,6 +266,7 @@ function App() {
             </Suspense>
           </ChunkErrorBoundary>
           </div>
+      </AvisosProvider>
       </AuthProvider>
     </Router>
   );
