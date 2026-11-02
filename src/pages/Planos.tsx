@@ -157,7 +157,7 @@ const Planos: React.FC = () => {
                   Os planos pagos já estão disponíveis?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  Ainda não. Os valores e benefícios desta página foram aprovados para o lançamento e ainda estão em implementação. Quando os planos pagos forem lançados, avisaremos os usuários cadastrados.
+                  Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.
                 </p>
               </div>
 
@@ -175,7 +175,7 @@ const Planos: React.FC = () => {
                   O plano gratuito tem limitações?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  O plano gratuito dá acesso às funcionalidades atuais da plataforma. Está previsto, para o lançamento dos planos pagos, um limite no plano gratuito (profissionais: 5 certificados visíveis e 5 contatos novos por mês; empresas: 3 demandas ativas). Esses limites ainda não são aplicados e nada será restringido sem aviso.
+                  O plano gratuito dá acesso às funcionalidades atuais da plataforma. Os limites previstos ainda não são aplicados.
                 </p>
               </div>
             </div>
