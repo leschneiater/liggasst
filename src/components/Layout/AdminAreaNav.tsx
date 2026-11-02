@@ -5,7 +5,7 @@ import { LayoutDashboard, Flag, GraduationCap } from 'lucide-react';
 const menuItems = [
   { path: '/admin', label: 'Painel', icon: LayoutDashboard },
   { path: '/admin/denuncias', label: 'Denúncias', icon: Flag },
-  { path: '/admin/treinamentos', label: 'Treinamentos', icon: GraduationCap },
+  { path: '/admin/treinamentos', label: 'Capacitação', icon: GraduationCap },
 ];
 
 const AdminAreaNav: React.FC = () => {

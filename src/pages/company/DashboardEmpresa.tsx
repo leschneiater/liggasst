@@ -228,7 +228,7 @@ const DashboardEmpresa: React.FC = () => {
                   icon={GraduationCap}
                   className="h-20 flex-col"
                 >
-                  Treinamentos
+                  Capacitação
                 </Button>
                 <Button
                   as={Link}

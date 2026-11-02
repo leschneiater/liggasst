@@ -74,7 +74,6 @@ const PubliqueDemanda: React.FC = () => {
     'LTCAT - Laudo Técnico de Condições Ambientais do Trabalho',
     'PPP - Perfil Profissiográfico Previdenciário',
     'PCMAT - Programa de Condições e Meio Ambiente de Trabalho',
-    'Treinamentos NR (Normas Regulamentadoras)',
     'Consultoria em SST',
     'Auditoria de Segurança',
     'Perícia Técnica',

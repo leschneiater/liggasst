@@ -309,7 +309,7 @@ const DashboardAdmin: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-poppins font-semibold text-lg text-soft-black">
-                Treinamentos
+                Capacitações
               </h3>
               <GraduationCap size={20} className="text-purple-600" />
             </div>
@@ -435,7 +435,7 @@ const DashboardAdmin: React.FC = () => {
               onClick={() => navigate('/admin/treinamentos')}
             >
               <GraduationCap size={24} className="mb-2 text-purple-600" />
-              <span className="text-xs">Treinamentos</span>
+              <span className="text-xs">Capacitação</span>
             </Button>
             <Button
               variant="outline"

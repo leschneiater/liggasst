@@ -130,7 +130,8 @@ describe('DashboardAdmin', () => {
     // regiao real: SP com 1 profissional e 1 empresa
     expect(screen.getByText('SP')).toBeInTheDocument();
     // treinamento publicado real no cartao
-    expect(screen.getAllByText('Treinamentos').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText('Capacitações')).toBeInTheDocument();
+    expect(screen.getAllByText('Capacitação').length).toBeGreaterThanOrEqual(2);
   });
 
   it('falha de qualquer leitura mostra erro, nunca zeros', async () => {

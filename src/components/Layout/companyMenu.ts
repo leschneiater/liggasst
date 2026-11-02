@@ -22,7 +22,7 @@ export const companyMenuItems: CompanyMenuItem[] = [
   { path: '/mensagens-empresa', label: 'Mensagens', icon: MessageSquare },
   { path: '/contratos-empresa', label: 'Contratos', icon: FileText },
   { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
-  { path: '/treinamentos-empresa', label: 'Treinamentos', icon: GraduationCap },
+  { path: '/treinamentos-empresa', label: 'Capacitação', icon: GraduationCap },
   { path: '/perfil-empresa', label: 'Perfil', icon: Building2 },
   { path: '/assinatura-empresa', label: 'Assinatura', icon: Crown },
 ];

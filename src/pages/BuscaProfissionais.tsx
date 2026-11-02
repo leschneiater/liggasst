@@ -137,7 +137,6 @@ const BuscaProfissionais: React.FC = () => {
     'PPP',
     'NR-35',
     'NR-33',
-    'Treinamentos NR',
     'Consultoria SST',
     'Auditoria',
     'Perícia Técnica'

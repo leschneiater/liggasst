@@ -114,6 +114,6 @@ describe('Pagina Treinamentos (membro)', () => {
       data: [treinamento('2', 'professional')],
     });
     render(<MemoryRouter><Treinamentos /></MemoryRouter>);
-    await waitFor(() => expect(screen.getByText('Nenhum treinamento disponível no momento.')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Nenhuma capacitação disponível no momento.')).toBeInTheDocument());
   });
 });

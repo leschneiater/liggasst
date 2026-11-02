@@ -81,7 +81,7 @@ const Treinamentos: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-3 mb-6">
           <GraduationCap className="w-7 h-7 text-green-deep" aria-hidden="true" />
-          <h1 className="font-poppins text-2xl font-bold text-gray-900">Treinamentos</h1>
+          <h1 className="font-poppins text-2xl font-bold text-gray-900">Capacitação</h1>
         </div>
 
         {loading && <p className="font-roboto text-gray-600">Carregando...</p>}
@@ -92,7 +92,7 @@ const Treinamentos: React.FC = () => {
         )}
         {!loading && !erro && treinamentos.length === 0 && (
           <p className="font-roboto text-gray-600">
-            Nenhum treinamento disponível no momento.
+            Nenhuma capacitação disponível no momento.
           </p>
         )}
 

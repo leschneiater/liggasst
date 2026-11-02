@@ -28,7 +28,7 @@ describe('Menu fixo da area empresa', () => {
     const nav = screen.getByLabelText('Menu da empresa');
     expect(nav.className).toContain('sticky');
     expect(nav.className).toContain('top-16');
-    for (const label of ['Painel', 'Buscar Profissionais', 'Mensagens', 'Contratos', 'Relatórios', 'Treinamentos', 'Perfil', 'Assinatura']) {
+    for (const label of ['Painel', 'Buscar Profissionais', 'Mensagens', 'Contratos', 'Relatórios', 'Capacitação', 'Perfil', 'Assinatura']) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText('Painel').closest('a')).toHaveAttribute('aria-current', 'page');

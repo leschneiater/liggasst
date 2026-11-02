@@ -22,7 +22,7 @@ const menuItems = [
   { path: '/mensagens-profissional', label: 'Mensagens', icon: MessageSquare },
   { path: '/contratos-profissional', label: 'Contratos', icon: FileText },
   { path: '/certificados', label: 'Certificados', icon: Award },
-  { path: '/treinamentos-profissional', label: 'Treinamentos', icon: GraduationCap },
+  { path: '/treinamentos-profissional', label: 'Capacitação', icon: GraduationCap },
   { path: '/perfil-profissional', label: 'Perfil', icon: User },
   { path: '/assinatura-profissional', label: 'Assinatura', icon: Crown },
 ];

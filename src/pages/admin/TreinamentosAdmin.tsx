@@ -130,7 +130,7 @@ const TreinamentosAdmin: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center space-x-3 mb-6">
           <GraduationCap className="w-7 h-7 text-green-deep" aria-hidden="true" />
-          <h1 className="font-poppins text-2xl font-bold text-gray-900">Treinamentos</h1>
+          <h1 className="font-poppins text-2xl font-bold text-gray-900">Capacitação</h1>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-8">
@@ -228,7 +228,7 @@ const TreinamentosAdmin: React.FC = () => {
         {loading && <p className="font-roboto text-gray-600">Carregando...</p>}
         {erro && <p className="font-roboto text-red-600">Não foi possível carregar. Tente novamente.</p>}
         {!loading && !erro && treinamentos.length === 0 && (
-          <p className="font-roboto text-gray-600">Nenhum treinamento cadastrado ainda.</p>
+          <p className="font-roboto text-gray-600">Nenhuma capacitação cadastrada ainda.</p>
         )}
 
         <div className="space-y-4">
