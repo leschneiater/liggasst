@@ -38,7 +38,14 @@ const NOMES_PLANO: Record<string, string> = {
   pro_company: 'Empresa (teste)',
 };
 
+const NOMES_PLANO_PROD: Record<string, string> = {
+  free: 'Gratuito',
+  pro_professional: 'Profissional',
+  pro_company: 'Empresa',
+};
+
 function textoStatusBase(a: Assinatura): string {
+  const emTeste = a.environment !== 'production';
   const fim = a.current_period_end
     ? new Date(a.current_period_end + 'T00:00:00').toLocaleDateString('pt-BR')
     : null;
@@ -46,7 +53,7 @@ function textoStatusBase(a: Assinatura): string {
     case 'active':
       return a.plan === 'free' ? 'Voce esta no plano gratuito' : `Plano pago ativo ate ${fim}`;
     case 'pending_first_payment':
-      return 'Aguardando o primeiro pagamento (checkout de teste em aberto)';
+      return emTeste ? 'Aguardando o primeiro pagamento (checkout de teste em aberto)' : 'Aguardando o primeiro pagamento';
     case 'past_due':
       return `Pagamento em atraso; plano pago garantido ate ${fim}`;
     case 'canceled':
@@ -110,9 +117,9 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
     try {
       const { url } = await criarCheckoutTeste({ profileId: currentUser.id, papel, faturamento: form });
       if (url) window.open(url, '_blank', 'noopener');
-      else toast.error('Checkout de teste criado, mas sem URL retornada');
+      else toast.error(contratoAtivo() ? 'Checkout criado, mas sem URL retornada' : 'Checkout de teste criado, mas sem URL retornada');
     } catch {
-      toast.error('Nao foi possivel abrir o checkout de teste');
+      toast.error(contratoAtivo() ? 'Nao foi possivel abrir o checkout' : 'Nao foi possivel abrir o checkout de teste');
     } finally {
       setAbrindoCheckout(false);
     }
@@ -138,7 +145,7 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
         </div>
         <div>
           <h2 className="font-poppins font-bold text-xl text-soft-black">
-            Plano {NOMES_PLANO[exibida.plan] ?? exibida.plan}
+            Plano {(exibida.environment === 'production' ? NOMES_PLANO_PROD[exibida.plan] : NOMES_PLANO[exibida.plan]) ?? exibida.plan}
           </h2>
           <p className="font-roboto text-gray-600">
             {carregando ? 'Carregando...' : textoStatus(exibida)}
