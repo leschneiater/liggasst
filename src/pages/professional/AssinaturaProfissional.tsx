@@ -43,7 +43,7 @@ const AssinaturaProfissional: React.FC = () => {
             Minha Assinatura
           </h1>
           <p className="font-roboto text-gray-600">
-            Veja seu plano atual e a proposta dos planos pagos, ainda não disponíveis para assinatura
+            Veja seu plano atual e as condições previstas dos planos pagos, ainda não disponíveis para assinatura
           </p>
         </div>
 
