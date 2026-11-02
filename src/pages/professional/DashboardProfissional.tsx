@@ -133,7 +133,7 @@ const DashboardProfissional: React.FC = () => {
                     <span className="font-poppins font-bold text-green-deep">Gratuito</span>
                   </div>
                   <p className="font-roboto text-xs text-gray-600">
-                    Os planos pagos ainda não estão disponíveis. A proposta de valores e benefícios está na página de assinatura.
+                    Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.
                   </p>
                 </div>
               </div>
@@ -185,7 +185,7 @@ const DashboardProfissional: React.FC = () => {
                   </span>
                 </div>
                 <p className="font-roboto text-xs text-gray-600 mb-3">
-                  Os planos pagos ainda não estão disponíveis para assinatura.
+                  Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.
                 </p>
                 <Button 
                   as={Link}
