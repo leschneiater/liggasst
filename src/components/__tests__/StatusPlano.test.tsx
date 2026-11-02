@@ -98,6 +98,7 @@ describe('StatusPlano', () => {
     fireEvent.change(screen.getByText('Numero').nextSibling as Element, { target: { value: '1000' } });
     fireEvent.change(screen.getByText('Bairro').nextSibling as Element, { target: { value: 'Bela Vista' } });
     fireEvent.change(screen.getByText('Celular (obrigatorio no Asaas)').nextSibling as Element, { target: { value: '11999990000' } });
+    fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(botao);
     await waitFor(() => expect(abrirJanela).toHaveBeenCalledWith('https://sandbox.asaas.com/c/chk_1', '_blank', 'noopener'));
     expect(criarCheckoutTesteMock).toHaveBeenCalledWith({
