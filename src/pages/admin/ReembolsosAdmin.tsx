@@ -86,7 +86,7 @@ const ReembolsosAdmin: React.FC = () => {
       <AdminAreaNav />
       <div className="py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="font-poppins font-bold text-3xl text-soft-black mb-1">Reembolsos</h1>
             <p className="font-roboto text-gray-600 text-sm">
@@ -95,7 +95,7 @@ const ReembolsosAdmin: React.FC = () => {
               hora e o resultado real aparece aqui (confirmacao final chega pelo webhook).
             </p>
           </div>
-          <Button variant="secondary" onClick={carregar} disabled={loading}>
+          <Button variant="secondary" className="shrink-0" onClick={carregar} disabled={loading}>
             <RefreshCw size={16} className="mr-2" /> Atualizar
           </Button>
         </div>
