@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Flag, GraduationCap, RotateCcw, Mail } from 'lucide-react';
+import { LayoutDashboard, Flag, GraduationCap, RotateCcw, Mail, Newspaper } from 'lucide-react';
 
 const menuItems = [
   { path: '/admin', label: 'Painel', icon: LayoutDashboard },
   { path: '/admin/denuncias', label: 'Denúncias', icon: Flag },
   { path: '/admin/treinamentos', label: 'Capacitação', icon: GraduationCap },
   { path: '/admin/reembolsos', label: 'Reembolsos', icon: RotateCcw },
+  { path: '/admin/radar', label: 'Radar', icon: Newspaper },
   { path: '/admin/contatos', label: 'Contatos', icon: Mail },
 ];
 
