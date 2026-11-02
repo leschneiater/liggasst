@@ -43,7 +43,7 @@ const AssinaturaEmpresa: React.FC = () => {
             Assinatura da Empresa
           </h1>
           <p className="font-roboto text-gray-600">
-            Veja o plano atual da sua empresa e as condições previstas dos planos pagos, ainda não disponíveis para assinatura
+            Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.
           </p>
         </div>
 
@@ -102,9 +102,11 @@ const AssinaturaEmpresa: React.FC = () => {
                 ))}
               </div>
 
-              <Button variant="outline" fullWidth size="lg" disabled>
-                {currentPlan === plan.id ? 'Plano Atual' : 'Em breve'}
-              </Button>
+              {(currentPlan === plan.id || import.meta.env.VITE_BILLING_CONTRACT_ENABLED !== 'true') && (
+                <Button variant="outline" fullWidth size="lg" disabled>
+                  {currentPlan === plan.id ? 'Plano Atual' : 'Em breve'}
+                </Button>
+              )}
             </div>
           ))}
         </div>
