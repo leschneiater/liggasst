@@ -94,6 +94,7 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
   const [motivoReembolso, setMotivoReembolso] = useState('');
   const [enviandoReembolso, setEnviandoReembolso] = useState(false);
   const [cancelando, setCancelando] = useState(false);
+  const [aceitouTermos, setAceitouTermos] = useState(false);
   const [form, setForm] = useState({
     nome: '', email: '', cpfCnpj: '', postalCode: '', address: '', addressNumber: '', province: '', phone: '',
   });
@@ -117,7 +118,7 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
   const Icone = exibida.plan === 'free' ? Star : Zap;
 
   const assinar = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !aceitouTermos) return;
     setAbrindoCheckout(true);
     try {
       const { url } = await criarCheckoutTeste({ profileId: currentUser.id, papel, faturamento: form });
@@ -279,7 +280,22 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
             {campo('addressNumber', 'Numero')}
             {campo('province', 'Bairro')}
           </div>
-          <Button onClick={assinar} disabled={abrindoCheckout}>
+          <label className="flex items-start gap-2 mb-3 text-left" data-testid="aceite-termos">
+            <input
+              type="checkbox"
+              required
+              checked={aceitouTermos}
+              onChange={(e) => setAceitouTermos(e.target.checked)}
+              className="mt-1 rounded border-gray-300 text-green-deep focus:ring-green-deep"
+            />
+            <span className="font-roboto text-sm text-gray-700">
+              Li e aceito os{' '}
+              <a href={`${import.meta.env.BASE_URL}termos-de-uso/`} target="_blank" rel="noopener noreferrer" className="text-green-deep underline">Termos de Uso</a>
+              {' '}e a{' '}
+              <a href={`${import.meta.env.BASE_URL}politica-de-privacidade/`} target="_blank" rel="noopener noreferrer" className="text-green-deep underline">Política de Privacidade</a>.
+            </span>
+          </label>
+          <Button onClick={assinar} disabled={abrindoCheckout || !aceitouTermos}>
             {abrindoCheckout ? 'Abrindo checkout...' : (contratoAtivo() ? 'Assinar' : 'Assinar (teste)')}
           </Button>
         </div>
