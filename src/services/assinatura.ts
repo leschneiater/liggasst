@@ -7,13 +7,14 @@ export interface Assinatura {
   plan: 'free' | 'pro_professional' | 'pro_company';
   status: 'active' | 'pending_first_payment' | 'past_due' | 'canceled' | 'refunded' | 'chargeback';
   current_period_end: string | null;
+  last_paid_payment_id?: string | null;
   environment?: 'sandbox' | 'production';
 }
 
 export async function fetchAssinatura(profileId: string): Promise<Assinatura | null> {
   const { data, error } = await supabase
     .from('subscriptions')
-    .select('plan, status, current_period_end, environment')
+    .select('plan, status, current_period_end, last_paid_payment_id, environment')
     .eq('profile_id', profileId)
     .maybeSingle();
   if (error) throw error;
