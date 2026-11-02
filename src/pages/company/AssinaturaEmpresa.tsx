@@ -43,7 +43,7 @@ const AssinaturaEmpresa: React.FC = () => {
             Assinatura da Empresa
           </h1>
           <p className="font-roboto text-gray-600">
-            Veja o plano atual da sua empresa e a proposta dos planos pagos, ainda não disponíveis para assinatura
+            Veja o plano atual da sua empresa e as condições previstas dos planos pagos, ainda não disponíveis para assinatura
           </p>
         </div>
 
