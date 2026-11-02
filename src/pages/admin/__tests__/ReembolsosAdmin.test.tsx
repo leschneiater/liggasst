@@ -7,6 +7,8 @@ import ReembolsosAdmin from '../ReembolsosAdmin';
 
 const adminFetchMock = vi.fn();
 const adminDecidirMock = vi.fn();
+// CI nao tem .env: o cliente real do Supabase exige VITE_*; aqui nunca e usado.
+vi.mock('../../../lib/supabase', () => ({ supabase: {} }));
 vi.mock('../../../services/reembolsos', async (importOriginal) => {
   const mod = await importOriginal<typeof import('../../../services/reembolsos')>();
   return {
