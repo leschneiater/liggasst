@@ -7,7 +7,7 @@
 // externalReference -> decide a transicao (decide.ts) -> aplica no banco.
 // O que so se confirma apos implantacao: runtime Deno, secrets e rede.
 import { decidirEvento, PLANO_INICIAL } from './decide.ts';
-import { estadoPedidoPorEvento } from '../asaas-reembolso/decide.ts';
+import { estadoPedidoPorEvento } from './reembolso-decide.ts';
 import type { EstadoPlano, EventoAsaas } from './decide.ts';
 
 interface ErroMin { code?: string; message?: string }
