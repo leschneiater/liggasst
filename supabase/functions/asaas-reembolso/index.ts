@@ -6,7 +6,25 @@ import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { handleReembolso } from './handler.ts';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
+const comCors = (res: Response): Response => {
+  const h = new Headers(res.headers);
+  for (const [k, v] of Object.entries(corsHeaders)) h.set(k, v);
+  return new Response(res.body, { status: res.status, headers: h });
+};
+
 serve(async (req) => {
+  // Preflight do navegador (a aba admin chama esta function de outra origem).
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  return comCors(await tratar(req));
+});
+
+async function tratar(req: Request): Promise<Response> {
   // SANDBOX somente, fixo no codigo (mesma regra do asaas-webhook implantado).
   // Estorno real em producao exige outra decisao, fora deste pacote.
   const asaasEnv = {
@@ -43,4 +61,4 @@ serve(async (req) => {
     fetchFn: fetch,
     adminId: user.id,
   });
-});
+}
