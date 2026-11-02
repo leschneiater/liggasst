@@ -12,7 +12,7 @@ const PoliticaPrivacidade: React.FC = () => {
             Política de Privacidade
           </h1>
           <p className="font-roboto text-xl text-green-light">
-            Última atualização: 31 de outubro de 2026
+            Última atualização: 2 de novembro de 2026
           </p>
         </div>
       </section>
@@ -126,6 +126,14 @@ const PoliticaPrivacidade: React.FC = () => {
                     </p>
                   </div>
                 </div>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    2.4 Dados de assinatura e pagamento
+                  </h3>
+                  <p className="font-roboto text-gray-700">
+                    Ao contratar um plano pago, você informa nome, e-mail, CPF ou CNPJ, celular e endereço de cobrança (CEP, rua, número e bairro). A LiggaSST envia esses dados ao Asaas, que processa o pagamento, para criar o cliente e a cobrança. Os dados do cartão são informados diretamente na página de pagamento do Asaas. Recebemos do Asaas informações sobre a assinatura e os pagamentos, como status, datas e identificadores, para ativar, manter e cancelar o plano.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -221,6 +229,9 @@ const PoliticaPrivacidade: React.FC = () => {
                     Compartilhamos dados com fornecedores que nos auxiliam na operação 
                     da plataforma (hospedagem, pagamentos, análise), sempre sob contratos 
                     de confidencialidade.
+                  </p>
+                  <p className="font-roboto text-gray-700 mt-3">
+                    Nas assinaturas pagas, compartilhamos com o Asaas os dados descritos no item 2.4, apenas os necessários para processar o pagamento e gerenciar a assinatura.
                   </p>
                 </div>
                 <div>
