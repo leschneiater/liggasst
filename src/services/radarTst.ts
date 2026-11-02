@@ -20,6 +20,7 @@ export async function fetchRadarPosts(): Promise<RadarTstResumo[]> {
   const { data, error } = await supabase
     .from('radar_posts')
     .select('id, titulo, resumo, publicado_em')
+    .eq('status', 'publicado')
     .order('publicado_em', { ascending: false });
   if (error) throw error;
   return (data ?? []) as RadarTstResumo[];
@@ -32,6 +33,7 @@ export async function fetchRadarPost(id: string): Promise<RadarTstPost | null> {
     .from('radar_posts')
     .select('id, titulo, resumo, conteudo, publicado_em')
     .eq('id', id)
+    .eq('status', 'publicado')
     .maybeSingle();
   if (error) throw error;
   return (data ?? null) as RadarTstPost | null;
