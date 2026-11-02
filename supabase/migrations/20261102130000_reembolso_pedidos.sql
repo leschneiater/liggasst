@@ -27,6 +27,7 @@ create table if not exists public.reembolso_pedidos (
 
 alter table public.reembolso_pedidos enable row level security;
 
+revoke all on public.reembolso_pedidos from anon, authenticated;
 grant select, insert on public.reembolso_pedidos to authenticated;
 
 -- A conta cria e le os proprios pedidos; a admin le todos.
