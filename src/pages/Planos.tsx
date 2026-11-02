@@ -1,122 +1,23 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Check, X, Star, Crown, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Check, X, Star, Crown } from 'lucide-react';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
+import { PROPOSTA_PROFISSIONAL, PROPOSTA_EMPRESA, type PropostaPublico, AVISO_PLANOS_PAGOS } from '../data/planosProposta';
 
 const Planos: React.FC = () => {
   const [userType, setUserType] = useState<'professional' | 'company'>('professional');
-  const navigate = useNavigate();
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
 
-  const planosProfissional = [
-    {
-      name: 'Gratuito',
-      price: 'R$ 0',
-      period: '/mês',
-      icon: Star,
-      popular: false,
-      features: [
-        'Cadastro de perfil com formação e especialidades',
-        'Perfil visível na busca para empresas cadastradas',
-        'Acesso gratuito'
-      ],
-      limitations: [
-        'Mensagens, contratos, avaliações e certificados ainda em implantação',
-      ]
-    },
-    {
-      name: 'Profissional',
-      price: 'R$ 49',
-      period: '/mês',
-      icon: Zap,
-      popular: true,
-      features: [
-        'Perfil completo com destaque',
-        'Certificados ilimitados',
-        'Contatos ilimitados',
-        'Relatórios detalhados',
-        'Biblioteca completa SST',
-        'Suporte prioritário',
-        'Ferramentas de gestão'
-      ],
-      limitations: []
-    },
-    {
-      name: 'Premium',
-      price: 'R$ 99',
-      period: '/mês',
-      icon: Crown,
-      popular: false,
-      features: [
-        'Todos os recursos do Profissional',
-        'Posição prioritária nas buscas',
-        'Análise de performance',
-        'Calendário integrado',
-        'API para integrações',
-        'Treinamentos exclusivos',
-        'Consultoria personalizada'
-      ],
-      limitations: []
-    }
+  const proposta: PropostaPublico = userType === 'professional' ? PROPOSTA_PROFISSIONAL : PROPOSTA_EMPRESA;
+  const planos = [
+    { name: proposta.gratuito.nome, price: 'R$ 0', period: '/mês', icon: Star, popular: false,
+      features: proposta.gratuito.recursos, limitations: proposta.gratuito.limites },
+    { name: proposta.pago.nome, price: `R$ ${proposta.pago.precoMensal.toFixed(2).replace('.', ',')}`, period: '/mês', icon: Crown, popular: true,
+      features: proposta.pago.recursos, limitations: proposta.pago.limites },
   ];
-
-  const planosEmpresa = [
-    {
-      name: 'Starter',
-      price: 'R$ 0',
-      period: '/mês',
-      icon: Star,
-      popular: false,
-      features: [
-        'Cadastro da empresa',
-        'Busca por profissionais',
-        'Publicação e acompanhamento de demandas',
-        'Perfil da empresa'
-      ],
-      limitations: [
-        'Mensagens, contratos e relatórios ainda em implantação'
-      ]
-    },
-    {
-      name: 'Business',
-      price: 'R$ 149',
-      period: '/mês',
-      icon: Zap,
-      popular: true,
-      features: [
-        'Contatos ilimitados',
-        'Relatórios completos',
-        'Gestão de múltiplos projetos',
-        'Integração com sistemas',
-        'Suporte prioritário',
-        'Perfil premium da empresa',
-        'Análise de fornecedores'
-      ],
-      limitations: []
-    },
-    {
-      name: 'Enterprise',
-      price: 'Personalizado',
-      period: '',
-      icon: Crown,
-      popular: false,
-      features: [
-        'Todos os recursos do Business',
-        'API dedicada',
-        'Gestor de conta dedicado',
-        'Treinamentos personalizados',
-        'Integrações customizadas',
-        'SLA garantido',
-        'Consultoria estratégica'
-      ],
-      limitations: []
-    }
-  ];
-
-  const planos = userType === 'professional' ? planosProfissional : planosEmpresa;
 
   const handlePlanAction = (planName: string, price: string) => {
     if (price === 'R$ 0') {
@@ -126,9 +27,6 @@ const Planos: React.FC = () => {
       } else {
         setIsCadastroEmpresaOpen(true);
       }
-    } else if (price === 'Personalizado') {
-      // Plano enterprise - redirecionar para contato
-      navigate('/contato');
     } else {
       // Planos pagos - abrir modal de cadastro
       if (userType === 'professional') {
@@ -183,10 +81,10 @@ const Planos: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
               <p className="font-roboto text-sm text-blue-900">
-                Os planos pagos ainda não estão disponíveis para assinatura: valores e benefícios dos planos pagos são uma proposta em avaliação e podem mudar antes do lançamento. O plano gratuito reflete o que está disponível hoje.
+                {AVISO_PLANOS_PAGOS}
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {planos.map((plano, index) => (
                 <div
                   key={index}
@@ -231,13 +129,15 @@ const Planos: React.FC = () => {
                     variant={plano.popular ? 'primary' : 'outline'}
                     fullWidth
                     size="lg"
-                    disabled={plano.price !== 'R$ 0' && plano.price !== 'Personalizado'}
+                    disabled={plano.price !== 'R$ 0'}
                   >
-                    {plano.price === 'R$ 0' ? 'Começar Grátis' : 
-                     plano.price === 'Personalizado' ? 'Entrar em Contato' : 'Em breve'}
+                    {plano.price === 'R$ 0' ? 'Começar Grátis' : 'Em breve'}
                   </Button>
                 </div>
               ))}
+            </div>
+            <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-4 max-w-4xl mx-auto">
+              <p className="font-roboto text-sm text-green-900">{proposta.notaSempreGratuito}</p>
             </div>
           </div>
         </section>
@@ -257,7 +157,7 @@ const Planos: React.FC = () => {
                   Os planos pagos já estão disponíveis?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  Ainda não. Os valores e benefícios desta página são uma proposta em avaliação. Quando os planos pagos forem lançados, avisaremos os usuários cadastrados.
+                  Ainda não. Os valores e benefícios desta página foram aprovados para o lançamento e ainda estão em implementação. Quando os planos pagos forem lançados, avisaremos os usuários cadastrados.
                 </p>
               </div>
 
@@ -266,7 +166,7 @@ const Planos: React.FC = () => {
                   Haverá desconto para pagamento anual?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  A proposta inclui desconto para pagamento anual, mas as condições comerciais só serão confirmadas no lançamento dos planos pagos.
+                  Não há desconto anual aprovado. As condições comerciais só serão confirmadas no lançamento dos planos pagos.
                 </p>
               </div>
 
@@ -275,7 +175,7 @@ const Planos: React.FC = () => {
                   O plano gratuito tem limitações?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  O plano gratuito dá acesso às funcionalidades atuais da plataforma: cadastro de perfil, busca de profissionais e publicação de demandas. Áreas ainda em implantação são sinalizadas dentro da plataforma.
+                  O plano gratuito dá acesso às funcionalidades atuais da plataforma. Está previsto, para o lançamento dos planos pagos, um limite no plano gratuito (profissionais: 5 certificados visíveis e 5 contatos novos por mês; empresas: 3 demandas ativas). Esses limites ainda não são aplicados e nada será restringido sem aviso.
                 </p>
               </div>
             </div>
