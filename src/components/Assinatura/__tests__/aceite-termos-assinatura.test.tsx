@@ -11,7 +11,7 @@ vi.mock('../../../contexts/AuthContext', () => ({
 }));
 vi.mock('../../../services/assinatura', () => ({
   fetchAssinatura: vi.fn(async () => livre),
-  criarCheckoutTeste: (...a: unknown[]) => (criarCheckout as any)(...a),
+  criarCheckoutTeste: () => criarCheckout(),
   cancelarAssinatura: vi.fn(),
 }));
 vi.mock('../../../services/reembolsos', () => ({
