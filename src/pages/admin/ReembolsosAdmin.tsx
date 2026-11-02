@@ -82,9 +82,10 @@ const ReembolsosAdmin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-gray py-8">
+    <div className="min-h-screen bg-neutral-gray">
+      <AdminAreaNav />
+      <div className="py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AdminAreaNav />
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="font-poppins font-bold text-3xl text-soft-black mb-1">Reembolsos</h1>
@@ -185,6 +186,7 @@ const ReembolsosAdmin: React.FC = () => {
             </>
           );
         })()}
+      </div>
       </div>
     </div>
   );
