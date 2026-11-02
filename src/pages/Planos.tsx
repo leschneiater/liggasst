@@ -157,7 +157,7 @@ const Planos: React.FC = () => {
                   Os planos pagos já estão disponíveis?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.
+                  Ainda não. Os valores e benefícios desta página foram aprovados para o lançamento e ainda estão em implementação. Quando os planos pagos forem lançados, avisaremos os usuários cadastrados.
                 </p>
               </div>
 
