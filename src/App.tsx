@@ -56,6 +56,7 @@ const BuscaEmpresas = lazy(() => import('./pages/professional/BuscaEmpresas'));
 const DemandasDisponiveis = lazy(() => import('./pages/professional/DemandasDisponiveis'));
 const DenunciasAdmin = lazy(() => import('./pages/admin/DenunciasAdmin'));
 const ContatosAdmin = lazy(() => import('./pages/admin/ContatosAdmin'));
+const RadarAdmin = lazy(() => import('./pages/admin/RadarAdmin'));
 const TreinamentosAdmin = lazy(() => import('./pages/admin/TreinamentosAdmin'));
 const ReembolsosAdmin = lazy(() => import('./pages/admin/ReembolsosAdmin'));
 const RadarTst = lazy(() => import('./pages/RadarTst'));
@@ -273,6 +274,11 @@ function App() {
                 <Route path="/admin/treinamentos" element={
                   <ProtectedRoute userType="admin">
                     <Layout><TreinamentosAdmin /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/radar" element={
+                  <ProtectedRoute userType="admin">
+                    <Layout><RadarAdmin /></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/contatos" element={
