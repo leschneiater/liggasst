@@ -8,13 +8,12 @@
 //   CPF/CNPJ + endereco completo — o perfil do Ligga nao coleta isso hoje) e
 //   chama a edge function asaas-checkout, que devolve a pagina hospedada de
 //   pagamento de TESTE (sandbox, sem cobranca real);
-// - cancelamento nao tem botao aqui: na versao de testes ele acontece no
-//   painel do Asaas sandbox (e o webhook reflete). Politica de cancelamento
-//   (manter ate o fim do periodo pago) e proposta pendente da dona.
+// - cancelamento pelo app: botao atras de VITE_BILLING_CANCEL_ENABLED (OFF);
+//   chama asaas-cancelar; o plano pago segue ate o fim do periodo pago.
 import React, { useEffect, useState } from 'react';
 import { Star, Zap, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { fetchAssinatura, criarCheckoutTeste } from '../../services/assinatura';
+import { fetchAssinatura, criarCheckoutTeste, cancelarAssinatura } from '../../services/assinatura';
 import { solicitarReembolso, fetchMeusPedidosReembolso, ROTULO_STATUS_REEMBOLSO, PedidoReembolso } from '../../services/reembolsos';
 import type { Assinatura } from '../../services/assinatura';
 import Button from '../ui/Button';
@@ -23,6 +22,10 @@ import toast from 'react-hot-toast';
 // Lido em cada render (e nao no modulo) para o gate ser testavel e trocar
 // com o build de cada ambiente.
 const testModeAtivo = () => import.meta.env.VITE_BILLING_TEST_MODE === 'true';
+// Cancelamento pelo app: flag OFF por padrao (build do Pages nao define).
+// Contratacao real: flag OFF por padrao (build do Pages nao define).
+const contratoAtivo = () => import.meta.env.VITE_BILLING_CONTRACT_ENABLED === 'true';
+const cancelamentoAtivo = () => import.meta.env.VITE_BILLING_CANCEL_ENABLED === 'true';
 const contasDeTeste = (): string[] =>
   (import.meta.env.VITE_BILLING_TEST_ACCOUNTS ?? '')
     .split(',')
@@ -78,6 +81,7 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
   const [abrindoReembolso, setAbrindoReembolso] = useState(false);
   const [motivoReembolso, setMotivoReembolso] = useState('');
   const [enviandoReembolso, setEnviandoReembolso] = useState(false);
+  const [cancelando, setCancelando] = useState(false);
   const [form, setForm] = useState({
     nome: '', email: '', cpfCnpj: '', postalCode: '', address: '', addressNumber: '', province: '', phone: '',
   });
@@ -141,6 +145,29 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
           </p>
         </div>
       </div>
+
+      {cancelamentoAtivo() && exibida.plan !== 'free' && (exibida.status === 'active' || exibida.status === 'past_due') && (
+        <div className="mt-6 border-t border-gray-100 pt-4" data-testid="cancelar-assinatura">
+          <p className="font-roboto text-xs text-gray-500 mb-2">
+            Sem multa e sem fidelidade. Ao cancelar, as proximas cobrancas param e o plano pago continua ate o fim do periodo ja pago.
+          </p>
+          <Button
+            variant="secondary"
+            disabled={cancelando}
+            onClick={async () => {
+              if (!window.confirm('Cancelar a assinatura? O plano pago continua ate o fim do periodo ja pago.')) return;
+              setCancelando(true);
+              const r = await cancelarAssinatura();
+              setCancelando(false);
+              if (!r.ok) { toast.error(r.erro ?? 'Nao foi possivel cancelar'); return; }
+              toast.success('Assinatura cancelada. O plano pago continua ate o fim do periodo ja pago.');
+              if (currentUser) fetchAssinatura(currentUser.id).then(setAssinatura).catch(() => undefined);
+            }}
+          >
+            {cancelando ? 'Cancelando...' : 'Cancelar assinatura'}
+          </Button>
+        </div>
+      )}
 
       {exibida.plan !== 'free' && exibida.last_paid_payment_id && (
         <div className="mt-6 border-t border-gray-100 pt-4" data-testid="solicitar-reembolso">
@@ -219,11 +246,17 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
         </div>
       )}
 
-      {contaDeTeste && exibida.plan === 'free' && (
+      {(contaDeTeste || contratoAtivo()) && exibida.plan === 'free' && (
         <div className="mt-6 border-t border-gray-100 pt-4">
-          <p className="font-roboto text-xs text-amber-700 flex items-center gap-1 mb-3">
-            <AlertTriangle size={14} /> Ambiente de TESTES: pagamento no sandbox do Asaas, sem cobranca real.
-          </p>
+          {contratoAtivo() ? (
+            <p className="font-roboto text-xs text-gray-600 mb-3" data-testid="aviso-primeira-cobranca">
+              A primeira mensalidade e cobrada no ato da contratacao, sem periodo de teste gratis. Cancele quando quiser, sem multa e sem fidelidade.
+            </p>
+          ) : (
+            <p className="font-roboto text-xs text-amber-700 flex items-center gap-1 mb-3">
+              <AlertTriangle size={14} /> Ambiente de TESTES: pagamento no sandbox do Asaas, sem cobranca real.
+            </p>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             {campo('nome', 'Nome completo (faturamento)')}
             {campo('email', 'E-mail', 'voce@example.com')}
@@ -235,7 +268,7 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
             {campo('province', 'Bairro')}
           </div>
           <Button onClick={assinar} disabled={abrindoCheckout}>
-            {abrindoCheckout ? 'Abrindo checkout...' : 'Assinar (teste)'}
+            {abrindoCheckout ? 'Abrindo checkout...' : (contratoAtivo() ? 'Assinar' : 'Assinar (teste)')}
           </Button>
         </div>
       )}

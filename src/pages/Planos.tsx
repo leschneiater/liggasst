@@ -129,9 +129,9 @@ const Planos: React.FC = () => {
                     variant={plano.popular ? 'primary' : 'outline'}
                     fullWidth
                     size="lg"
-                    disabled={plano.price !== 'R$ 0'}
+                    disabled={plano.price !== 'R$ 0' && import.meta.env.VITE_BILLING_CONTRACT_ENABLED !== 'true'}
                   >
-                    {plano.price === 'R$ 0' ? 'Começar Grátis' : 'Em breve'}
+                    {plano.price === 'R$ 0' ? 'Começar Grátis' : (import.meta.env.VITE_BILLING_CONTRACT_ENABLED === 'true' ? 'Assinar' : 'Em breve')}
                   </Button>
                 </div>
               ))}

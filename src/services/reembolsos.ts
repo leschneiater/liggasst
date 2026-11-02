@@ -1,6 +1,7 @@
 // Pedidos de reembolso: a conta solicita (insert proprio via RLS) e a admin
 // decide pela edge function asaas-reembolso (aprovar executa o estorno no
 // Asaas; recusar exige motivo). Nada aqui executa estorno no cliente.
+import { funcaoBilling } from './billingEndpoints';
 import { supabase } from '../lib/supabase';
 
 export type StatusReembolso =
@@ -71,7 +72,7 @@ export async function adminFetchPedidosReembolso(): Promise<{
   pedidos?: PedidoReembolso[];
   error?: string;
 }> {
-  const { data, error } = await supabase.functions.invoke('asaas-reembolso', {
+  const { data, error } = await supabase.functions.invoke(funcaoBilling('asaas-reembolso'), {
     body: { acao: 'listar' },
   });
   if (error) return { success: false, error: 'Falha ao carregar pedidos.' };
@@ -84,7 +85,7 @@ export async function adminDecidirReembolso(
   acao: 'aprovar' | 'recusar',
   detalhe?: string,
 ): Promise<{ success: boolean; status?: StatusReembolso; detalhe?: string; error?: string }> {
-  const { data, error } = await supabase.functions.invoke('asaas-reembolso', {
+  const { data, error } = await supabase.functions.invoke(funcaoBilling('asaas-reembolso'), {
     body: { acao, pedido_id: pedidoId, detalhe },
   });
   if (error) return { success: false, error: 'Falha ao executar a decisao.' };

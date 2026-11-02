@@ -22,6 +22,7 @@ const LoadingFallback = () => (
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const ComoFunciona = lazy(() => import('./pages/ComoFunciona'));
 const Planos = lazy(() => import('./pages/Planos'));
+const RetornoAssinatura = lazy(() => import('./pages/RetornoAssinatura'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const Contato = lazy(() => import('./pages/Contato'));
 const SobreNos = lazy(() => import('./pages/SobreNos'));
@@ -110,6 +111,8 @@ function App() {
                 <Route path="/" element={<Layout><LandingPage /></Layout>} />
                 <Route path="/como-funciona" element={<Layout><ComoFunciona /></Layout>} />
                 <Route path="/planos" element={<Layout><Planos /></Layout>} />
+                <Route path="/assinatura/sucesso" element={<Layout><RetornoAssinatura resultado="sucesso" /></Layout>} />
+                <Route path="/assinatura/cancelado" element={<Layout><RetornoAssinatura resultado="cancelado" /></Layout>} />
                 <Route path="/faq" element={<Layout><FAQ /></Layout>} />
                 <Route path="/contato" element={<Layout><Contato /></Layout>} />
                 <Route path="/sobre" element={<Layout><SobreNos /></Layout>} />
