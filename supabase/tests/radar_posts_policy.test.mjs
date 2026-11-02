@@ -109,10 +109,13 @@ await setSub(sandbox, 'pro_professional', 'active', null, 'sandbox');
 // um publicado, um AGENDADO para daqui a 1h NO MESMO DIA (nao pode vazar por
 // comparacao de data) e um agendado para o futuro distante.
 await db.query(
-  `insert into public.radar_posts (titulo, resumo, conteudo, publicado_em)
-   values ('Artigo de teste RLS', 'resumo', 'conteudo', now() - interval '1 hour'),
-          ('Agendado ainda hoje', 'resumo', 'conteudo', now() + interval '1 hour'),
-          ('Rascunho agendado', 'resumo', 'conteudo', '2099-12-31')`);
+  `insert into public.radar_posts (titulo, resumo, conteudo, publicado_em, status)
+   values ('Artigo de teste RLS', 'resumo', 'conteudo', now() - interval '1 hour', 'publicado'),
+          ('Agendado ainda hoje', 'resumo', 'conteudo', now() + interval '1 hour', 'publicado'),
+          ('Rascunho agendado', 'resumo', 'conteudo', '2099-12-31', 'publicado'),
+          ('Rascunho com data passada', 'resumo', 'conteudo', now() - interval '1 day', 'rascunho')`);
+const admin = await criarUsuario('admin@teste.local', { role: 'professional', display_name: 'Admin' });
+await db.query(`update public.profiles set role = 'admin' where id = $1`, [admin]);
 
 const comoUsuario = async (uid, sql, params = [], role = 'authenticated') => {
   await db.query('begin');
@@ -158,22 +161,43 @@ try {
   await comoUsuario(proEmp,
     `insert into public.radar_posts (titulo, resumo, conteudo) values ('x', 'y', 'z')`);
 } catch (e) { erro = e; }
-ok(erro !== null, 'authenticated NAO insere artigo (sem policy de insert)');
+ok(erro !== null, 'authenticated NAO insere artigo (nao admin)');
 
 erro = null;
 try {
   await comoUsuario(proEmp, `update public.radar_posts set titulo = 'x'`);
 } catch (e) { erro = e; }
 const { rows: ainda } = await db.query(`select titulo from public.radar_posts order by publicado_em`);
-ok(ainda.length === 3 && ainda[0].titulo === 'Artigo de teste RLS',
-  'authenticated NAO atualiza artigo (sem policy de update)');
+ok(ainda.length === 4 && !ainda.some((r) => r.titulo === 'x'),
+  'authenticated NAO atualiza artigo (nao admin)');
 
 erro = null;
 try {
   await comoUsuario(proEmp, `delete from public.radar_posts`);
 } catch (e) { erro = e; }
 const { rows: depois } = await db.query(`select id from public.radar_posts`);
-ok(depois.length === 3, 'authenticated NAO apaga artigo (sem policy de delete)');
+ok(depois.length === 4, 'authenticated NAO apaga artigo (nao admin)');
+
+// ---------- RASCUNHO e ADMIN (migracao 20261102210000) ----------
+ok((await contaArtigos(proProf)) === 1, 'assinante pro NAO ve rascunho (mesmo com data passada)');
+ok((await contaArtigos(gratis)) === 0, 'conta gratuita continua sem ler');
+ok((await contaArtigos(admin)) === 4, 'admin le tudo, inclusive rascunhos');
+ok((await contaArtigos(null, 'anon')) <= 0, 'anon continua sem ler');
+const criado = await comoUsuario(admin,
+  `insert into public.radar_posts (titulo, resumo, conteudo) values ('QA admin', 'r', 'c') returning id, status`);
+ok(criado.rows[0].status === 'rascunho', 'admin cria artigo e ele nasce como rascunho');
+ok((await contaArtigos(proProf)) === 1, 'rascunho novo NAO aparece para assinante');
+await comoUsuario(admin, `update public.radar_posts set status = 'publicado', publicado_em = now() where id = $1`, [criado.rows[0].id]);
+ok((await contaArtigos(proProf)) === 2, 'depois de publicar, assinante pro passa a ver');
+ok((await contaArtigos(gratis)) === 0, 'publicado continua invisivel para conta gratuita');
+ok((await contaArtigos(sandbox)) === 0, 'publicado continua invisivel para sandbox (isolamento)');
+await comoUsuario(admin, `delete from public.radar_posts where id = $1`, [criado.rows[0].id]);
+const { rows: restam } = await db.query(`select id from public.radar_posts`);
+ok(restam.length === 4, 'admin exclui so o artigo de teste');
+const tenta = async (uid, sql) => { try { const r = await comoUsuario(uid, sql); return r.rows.length; } catch { return -1; } };
+ok((await tenta(proEmp, `insert into public.radar_posts (titulo, resumo, conteudo, status) values ('x','y','z','publicado') returning id`)) === -1, 'assinante NAO publica (insert negado)');
+ok((await tenta(proProf, `update public.radar_posts set status = 'publicado' where titulo = 'Rascunho com data passada' returning id`)) === 0, 'assinante NAO publica rascunho (update 0 linhas)');
+ok((await tenta(gratis, `delete from public.radar_posts returning id`)) === 0, 'conta gratuita NAO exclui (0 linhas)');
 
 console.log(`\n${pass} ok, ${fail} falhas`);
 process.exit(fail ? 1 : 0);
