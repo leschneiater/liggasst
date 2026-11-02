@@ -1,4 +1,4 @@
--- Caixa de entrada do formulario de Contato. PREPARADO, NAO APLICADO.
+-- Caixa de entrada do formulario de Contato. Aplicada em producao em 02/11/2026.
 -- A mensagem so entra pela edge function contato-enviar (service role).
 -- A admin le, marca e exclui. Nenhuma politica de insert para anon/authenticated.
 -- Nao guarda IP nem anexos. Sem exclusao automatica: a exclusao e manual (admin).
