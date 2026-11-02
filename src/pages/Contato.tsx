@@ -12,6 +12,7 @@ import {
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
+import { enviarContato } from '../services/contatos';
 
 interface ContactFormData {
   nome: string;
@@ -20,6 +21,7 @@ interface ContactFormData {
   empresa: string;
   assunto: string;
   mensagem: string;
+  site?: string;
 }
 
 const Contato: React.FC = () => {
@@ -29,28 +31,17 @@ const Contato: React.FC = () => {
   const onSubmit = async (data: ContactFormData) => {
     setLoading(true);
     try {
-      // Criar o corpo do email
-      const emailBody = `
-Nome: ${data.nome}
-Email: ${data.email}
-Telefone: ${data.telefone || 'Não informado'}
-Empresa: ${data.empresa || 'Não informado'}
-Assunto: ${data.assunto}
-
-Mensagem:
-${data.mensagem}
-      `.trim();
-
-      // Criar o link mailto
-      const mailtoLink = `mailto:contato@liggasst.com.br?subject=${encodeURIComponent(data.assunto)}&body=${encodeURIComponent(emailBody)}`;
-      
-      // Abrir o cliente de email
-      window.location.href = mailtoLink;
-      
-      toast.success('Cliente de email aberto! Complete o envio da mensagem.');
-      reset();
-    } catch {
-      toast.error('Erro ao processar formulário. Tente novamente.');
+      const r = await enviarContato(data);
+      if (r.ok) {
+        toast.success('Mensagem recebida. Vamos responder pelo e-mail que você informou.');
+        reset();
+      } else if (r.motivo === 'limite') {
+        toast.error('Muitas mensagens em pouco tempo. Tente de novo mais tarde.');
+      } else if (r.motivo === 'invalido') {
+        toast.error('Confira os campos e tente de novo.');
+      } else {
+        toast.error('Não foi possível enviar agora. Tente de novo ou escreva para contato@liggasst.com.br.');
+      }
     } finally {
       setLoading(false);
     }
@@ -162,6 +153,16 @@ ${data.mensagem}
                   )}
                 </div>
 
+                {/* Campo-isca contra robôs: fica fora da tela e sem foco. */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}>
+                  <label>Não preencha este campo<input type="text" tabIndex={-1} autoComplete="off" {...register('site')} /></label>
+                </div>
+
+                <p className="font-roboto text-sm text-gray-600" data-testid="aviso-contato">
+                  Usamos seus dados para responder esta mensagem e para proteger o formulário contra spam e abuso. Veja a{' '}
+                  <a href={`${import.meta.env.BASE_URL}politica-de-privacidade/`} target="_blank" rel="noopener noreferrer" className="text-green-deep underline">Política de Privacidade</a>.
+                </p>
+
                 <Button
                   type="submit"
                   loading={loading}
@@ -230,7 +231,7 @@ ${data.mensagem}
                   </h3>
                 </div>
                 <p className="font-roboto text-gray-700">
-                  Respondemos todas as mensagens em até 24 horas durante dias úteis.
+                  Respondemos pelo e-mail informado, em dias úteis.
                 </p>
               </div>
             </div>
