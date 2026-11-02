@@ -6,7 +6,7 @@
 // para usuarios existentes; ate la nada e restringido nem cobrado.
 
 export const AVISO_PLANOS_PAGOS =
-  'Os planos pagos ainda não estão disponíveis para assinatura. As condições abaixo foram aprovadas para o lançamento e ainda estão em implementação: hoje nada é cobrado e nenhum limite é aplicado ao plano gratuito.';
+  'Os planos pagos estão disponíveis para assinatura: Profissional R$ 39,90/mês e Empresa R$ 99,90/mês. Nenhum limite é aplicado ao plano gratuito.';
 export const TEXTO_LIMITES_NAO_APLICADOS = 'previsto para o lançamento dos planos pagos, ainda não aplicado';
 
 export interface PlanoProposta {
