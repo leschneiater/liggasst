@@ -11,6 +11,7 @@ import {
   FileText,
   Award,
   GraduationCap,
+  Radar,
   User,
   Crown
 } from 'lucide-react';
@@ -23,6 +24,7 @@ const menuItems = [
   { path: '/contratos-profissional', label: 'Contratos', icon: FileText },
   { path: '/certificados', label: 'Certificados', icon: Award },
   { path: '/treinamentos-profissional', label: 'Capacitação', icon: GraduationCap },
+  { path: '/radar-tst-profissional', label: 'Radar TST', icon: Radar },
   { path: '/perfil-profissional', label: 'Perfil', icon: User },
   { path: '/assinatura-profissional', label: 'Assinatura', icon: Crown },
 ];

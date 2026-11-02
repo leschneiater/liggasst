@@ -155,3 +155,25 @@ Aplicadas via SQL editor em UMA transacao, com guarda de frescor (md5 das 4 func
 Verificacao pos-aplicacao (catalogo): md5 de prosrc das 7 funcoes iguais ao PGlite local; check de verification_status inclui awaiting_completion; trigger profiles_conclusao_cadastro presente; 2 perfis seguem approved; EXECUTE anon+authenticated em search_professionals, get_professional_public e search_companies_public; completar_cadastro so authenticated.
 Rollback preparado e NAO executado: ver supabase/drafts/ROLLBACK_migracoes_login_google_NAO_EXECUTADO.sql (nao coberto: constraint, coluna linkedin_url, revoke em ratings).
 Provider Google habilitado no Supabase Auth (client ID do projeto GCP liggasst; secret somente no cofre).
+
+## 2026-11-02 (~00:26, -03) — Radar TST (radar_posts)
+
+- `20261102010000_radar_posts.sql` — APLICADA via SQL editor em 02/11/2026
+  ~00:26 (-03). Autorizacao: mudancas de banco necessarias ao Radar cobertas
+  pela confirmacao da usuaria "Pode continuar com tudo e publicar" (WhatsApp
+  02/11/2026 00:11:35) e pelo escopo confirmado pelo assistente principal.
+- Verificacao pos-aplicacao:
+  - Catalogo: tabela `public.radar_posts` com `rowsecurity=true`; policy
+    `radar_posts_select_pagantes` registrada verbatim (exige
+    `environment='production'` E `publicado_em <= now()`).
+  - Negativo remoto 1: SELECT via PostgREST com anon key → HTTP 200 `[]`
+    COM 2 fixtures presentes (controle positivo de existencia via SQL editor).
+  - Negativo remoto 2: como conta com assinatura SANDBOX pro ativa
+    (set role authenticated + request.jwt.claims no mesmo batch) →
+    `count(radar_posts) = 0`; controle na mesma sessao: a propria
+    subscription visivel (RLS e claims ativos).
+  - Fixtures descartaveis FIXTURE-RLS-* inseridas e DELETADAS; count final 0.
+  - Acesso comercial positivo segue PENDENTE: so com a primeira assinatura
+    de producao legitima (nenhuma conta artificial marcada como producao).
+- Reparo futuro: registrar versao em supabase_migrations.schema_migrations
+  antes de qualquer `supabase db push` (mesmo procedimento das anteriores).

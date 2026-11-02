@@ -55,6 +55,7 @@ const BuscaEmpresas = lazy(() => import('./pages/professional/BuscaEmpresas'));
 const DemandasDisponiveis = lazy(() => import('./pages/professional/DemandasDisponiveis'));
 const DenunciasAdmin = lazy(() => import('./pages/admin/DenunciasAdmin'));
 const TreinamentosAdmin = lazy(() => import('./pages/admin/TreinamentosAdmin'));
+const RadarTst = lazy(() => import('./pages/RadarTst'));
 const Treinamentos = lazy(() => import('./pages/Treinamentos'));
 
 // Company Pages
@@ -240,6 +241,16 @@ function App() {
                 <Route path="/treinamentos-empresa" element={
                   <ProtectedRoute userType="company">
                     <Layout><Treinamentos /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/radar-tst-profissional" element={
+                  <ProtectedRoute userType="professional">
+                    <Layout><RadarTst /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/radar-tst-empresa" element={
+                  <ProtectedRoute userType="company">
+                    <Layout><RadarTst /></Layout>
                   </ProtectedRoute>
                 } />
 

@@ -69,7 +69,7 @@ describe('Menu fixo da area empresa', () => {
     const esperado = [
       '/dashboard-empresa', '/busca-profissionais-empresa', '/mensagens-empresa',
       '/contratos-empresa', '/relatorios', '/treinamentos-empresa',
-      '/perfil-empresa', '/assinatura-empresa',
+      '/radar-tst-empresa', '/perfil-empresa', '/assinatura-empresa',
     ];
     expect([...companyAreaPaths].sort()).toEqual([...esperado].sort());
     expect(companyAreaPaths.filter((p) => professionalAreaPaths.includes(p))).toEqual([]);

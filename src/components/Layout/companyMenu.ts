@@ -5,7 +5,7 @@ import {
   MessageSquare,
   FileText,
   BarChart3,
-  GraduationCap,
+  GraduationCap, Radar,
   Building2,
   Crown
 } from 'lucide-react';
@@ -23,6 +23,7 @@ export const companyMenuItems: CompanyMenuItem[] = [
   { path: '/contratos-empresa', label: 'Contratos', icon: FileText },
   { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
   { path: '/treinamentos-empresa', label: 'Capacitação', icon: GraduationCap },
+  { path: '/radar-tst-empresa', label: 'Radar TST', icon: Radar },
   { path: '/perfil-empresa', label: 'Perfil', icon: Building2 },
   { path: '/assinatura-empresa', label: 'Assinatura', icon: Crown },
 ];
