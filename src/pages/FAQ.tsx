@@ -47,11 +47,11 @@ const FAQ: React.FC = () => {
     planos: [
       {
         question: 'Quais são os planos disponíveis?',
-        answer: 'Hoje o uso é gratuito para profissionais e empresas. Os planos pagos exibidos na página Planos têm condições aprovadas para o lançamento, ainda em implementação, e não estão disponíveis para assinatura.'
+        answer: 'Hoje o uso é gratuito para profissionais e empresas. Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.'
       },
       {
         question: 'Posso cancelar minha assinatura?',
-        answer: 'Ainda não existe cobrança nem assinatura paga na plataforma. Quando os planos pagos forem lançados, as condições de cancelamento serão informadas antes da contratação.'
+        answer: 'Você cancela quando quiser pela sua conta, sem multa e sem fidelidade. O acesso continua até o fim do período pago.'
       },
       {
         question: 'Como funciona o pagamento?',
