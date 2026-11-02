@@ -47,7 +47,7 @@ const FAQ: React.FC = () => {
     planos: [
       {
         question: 'Quais são os planos disponíveis?',
-        answer: 'Hoje o uso é gratuito para profissionais e empresas. Os planos pagos exibidos na página Planos têm condições aprovadas para o lançamento, ainda em implementação, e não estão disponíveis para assinatura.'
+        answer: 'Hoje o uso é gratuito para profissionais e empresas. Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.'
       },
       {
         question: 'Posso cancelar minha assinatura?',
