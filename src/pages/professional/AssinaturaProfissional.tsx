@@ -4,7 +4,7 @@ import Button from '../../components/ui/Button';
 import StatusPlano from '../../components/Assinatura/StatusPlano';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchAssinatura } from '../../services/assinatura';
-import { PROPOSTA_PROFISSIONAL } from '../../data/planosProposta';
+import { PROPOSTA_PROFISSIONAL, AVISO_PLANOS_PAGOS } from '../../data/planosProposta';
 
 const AssinaturaProfissional: React.FC = () => {
   const { currentUser } = useAuth();
@@ -53,7 +53,7 @@ const AssinaturaProfissional: React.FC = () => {
         {/* Plans Grid */}
         <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
             <p className="font-roboto text-sm text-blue-900">
-                Os planos pagos ainda não estão disponíveis para assinatura: valores e benefícios dos planos pagos são uma proposta em avaliação e podem mudar antes do lançamento. O plano gratuito reflete o que está disponível hoje.
+                {AVISO_PLANOS_PAGOS}
             </p>
           </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 max-w-3xl mx-auto">
