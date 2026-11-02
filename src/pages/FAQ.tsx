@@ -27,7 +27,7 @@ const FAQ: React.FC = () => {
       },
       {
         question: 'A LiggaSST é gratuita?',
-        answer: 'Sim, no momento o cadastro e o uso da plataforma são gratuitos para empresas e profissionais. Estamos avaliando planos pagos com recursos adicionais; qualquer mudança será comunicada antes.'
+        answer: 'Você pode usar a LiggaSST gratuitamente, com cadastro para empresas e profissionais. Também há planos pagos opcionais: Profissional por R$ 39,90/mês e Empresa por R$ 99,90/mês. Hoje nenhum limite é aplicado ao plano gratuito.'
       }
     ],
     cadastro: [
@@ -47,7 +47,7 @@ const FAQ: React.FC = () => {
     planos: [
       {
         question: 'Quais são os planos disponíveis?',
-        answer: 'Hoje o uso é gratuito para profissionais e empresas. Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.'
+        answer: 'Gratuito, Profissional (R$ 39,90/mês) e Empresa (R$ 99,90/mês). Você pode assinar pela sua conta; as condições estão na página Planos.'
       },
       {
         question: 'Posso cancelar minha assinatura?',
@@ -55,7 +55,7 @@ const FAQ: React.FC = () => {
       },
       {
         question: 'Como funciona o pagamento?',
-        answer: 'Nenhum pagamento é processado hoje. As formas de pagamento serão informadas quando os planos pagos forem lançados.'
+        answer: 'A assinatura é mensal e recorrente, processada pelo parceiro Asaas. A primeira mensalidade é cobrada no ato da contratação, sem período de teste grátis. Você cancela quando quiser pela sua conta, sem multa e sem fidelidade. O acesso continua até o fim do período pago.'
       }
     ],
     profissionais: [
@@ -65,7 +65,7 @@ const FAQ: React.FC = () => {
       },
       {
         question: 'Preciso pagar comissão?',
-        answer: 'Não. No momento a plataforma é gratuita e não cobramos comissão dos profissionais.'
+        answer: 'Hoje a LiggaSST não cobra comissão dos profissionais. O uso gratuito continua disponível; os planos pagos são opcionais.'
       },
       {
         question: 'Como faço upload dos meus certificados?',
