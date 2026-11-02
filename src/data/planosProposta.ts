@@ -1,7 +1,13 @@
 // Fonte unica de planos para /planos e telas Minha Assinatura.
-// Precos (39,90/99,90): confirmados pela dona do produto no WhatsApp em
-// 01/11/2026 19:53 ("isso mesmo!"). BENEFICIOS: PROPOSTA em avaliacao
-// (arquivo de proposta, geracao 10) - nada publicado, sujeito a revisao dela.
+// Condicoes aprovadas em 01/11/2026 (precos 39,90/99,90; gratuito profissional
+// 5 certificados visiveis e 5 contatos novos por mes; gratuito empresa 3
+// demandas ativas; pago sem limite fixo e com destaque). PREVISTAS para o
+// lancamento dos planos pagos: AINDA NAO APLICADAS. Falta aprovar a transicao
+// para usuarios existentes; ate la nada e restringido nem cobrado.
+
+export const AVISO_PLANOS_PAGOS =
+  'Os planos pagos ainda não estão disponíveis para assinatura. As condições abaixo foram aprovadas para o lançamento e ainda estão em implementação: hoje nada é cobrado e nenhum limite é aplicado ao plano gratuito.';
+export const TEXTO_LIMITES_NAO_APLICADOS = 'previsto para o lançamento dos planos pagos, ainda não aplicado';
 
 export interface PlanoProposta {
   id: string;
@@ -23,7 +29,7 @@ export const PROPOSTA_PROFISSIONAL: PropostaPublico = {
     nome: 'Gratuito',
     precoMensal: 0,
     recursos: ['Perfil completo, vitrine, busca, mensagens, contratos e avaliações, como hoje'],
-    limites: ['Limites propostos: certificados e contatos novos por mês (quantidades ainda em decisão; nada será restringido sem aprovação)'],
+    limites: ['Até 5 certificados visíveis e 5 contatos novos por mês (' + TEXTO_LIMITES_NAO_APLICADOS + ')'],
   },
   pago: {
     id: 'profissional',
@@ -31,7 +37,7 @@ export const PROPOSTA_PROFISSIONAL: PropostaPublico = {
     precoMensal: 39.9,
     recursos: [
       'Contatos novos e certificados sem limite fixo (uso razoável, contra abuso e spam)',
-      'Perfil em destaque na busca (ainda a construir)',
+      'Perfil em destaque na busca (em implementação)',
     ],
     limites: [],
   },
@@ -44,7 +50,7 @@ export const PROPOSTA_EMPRESA: PropostaPublico = {
     nome: 'Gratuito',
     precoMensal: 0,
     recursos: ['Perfil, busca de profissionais, mensagens, contratos e avaliações, como hoje'],
-    limites: ['Limite proposto de demandas ativas (quantidade ainda em decisão; nada será restringido sem aprovação)'],
+    limites: ['Até 3 demandas ativas (' + TEXTO_LIMITES_NAO_APLICADOS + ')'],
   },
   pago: {
     id: 'empresa',
@@ -52,7 +58,7 @@ export const PROPOSTA_EMPRESA: PropostaPublico = {
     precoMensal: 99.9,
     recursos: [
       'Demandas sem limite fixo (uso razoável)',
-      'Empresa em destaque na vitrine (ainda a construir)',
+      'Empresa em destaque na vitrine (em implementação)',
     ],
     limites: [],
   },
