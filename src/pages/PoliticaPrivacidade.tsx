@@ -134,6 +134,14 @@ const PoliticaPrivacidade: React.FC = () => {
                     Ao contratar um plano pago, você informa nome, e-mail, CPF ou CNPJ, celular e endereço de cobrança (CEP, rua, número e bairro). A LiggaSST envia esses dados ao Asaas, que processa o pagamento, para criar o cliente e a cobrança. Os dados do cartão são informados diretamente na página de pagamento do Asaas. Recebemos do Asaas informações sobre a assinatura e os pagamentos, como status, datas e identificadores, para ativar, manter e cancelar o plano.
                   </p>
                 </div>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                    2.5 Mensagens do formulário de contato
+                  </h3>
+                  <p className="font-roboto text-gray-700">
+                    Se você usar o formulário de contato, recebemos nome, e-mail, telefone e empresa (se informados), assunto e mensagem. Usamos esses dados para responder você e para proteger o formulário contra spam e abuso. Só a equipe de administração da LiggaSST acessa as mensagens. As mensagens ficam armazenadas até serem excluídas pela administração. Você pode solicitar a exclusão pelo canal indicado no item 9.
+                  </p>
+                </div>
               </div>
             </div>
 
