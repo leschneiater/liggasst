@@ -18,6 +18,9 @@ vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ currentUser: contaAtual, userType: 'professional', loading: false }),
 }));
 
+// CI roda sem .env: o cliente supabase real nao pode ser carregado
+vi.mock('../../lib/supabase', () => ({ supabase: {} }));
+
 const solicitarReembolsoMock = vi.fn();
 const fetchMeusPedidosMock = vi.fn();
 vi.mock('../../services/reembolsos', async (importOriginal) => {
