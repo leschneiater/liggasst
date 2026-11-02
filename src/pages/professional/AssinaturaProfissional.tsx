@@ -1,85 +1,38 @@
-import React, { useState } from 'react';
-import { 
-  Crown, 
-  Check, 
-  X, 
-  CreditCard, 
-  Calendar,
-  Star,
-  Zap,
-  Shield,
-  TrendingUp,
-  Users
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Crown, Check, X, Star } from 'lucide-react';
 import Button from '../../components/ui/Button';
-import toast from 'react-hot-toast';
+import StatusPlano from '../../components/Assinatura/StatusPlano';
+import { useAuth } from '../../contexts/AuthContext';
+import { fetchAssinatura } from '../../services/assinatura';
+import { PROPOSTA_PROFISSIONAL } from '../../data/planosProposta';
 
 const AssinaturaProfissional: React.FC = () => {
-  const [currentPlan] = useState('gratuito');
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const { currentUser } = useAuth();
+  const [currentPlan, setCurrentPlan] = useState('gratuito');
+  useEffect(() => {
+    let vivo = true;
+    if (!currentUser) return;
+    fetchAssinatura(currentUser.id)
+      .then((a) => {
+        if (!vivo || !a || a.plan === 'free') return;
+        // so assinatura de PRODUCAO marca o card pago como atual (sandbox e teste)
+        if (a.environment !== 'production') return;
+        // plano pago ativo/cancelado-ate-o-fim: marca o card pago como atual
+        if (['active', 'past_due', 'canceled'].includes(a.status)) setCurrentPlan('profissional');
+      })
+      .catch(() => { /* mantem gratuito */ });
+    return () => { vivo = false; };
+  }, [currentUser]);
 
+  const proposta = PROPOSTA_PROFISSIONAL;
   const plans = [
-    {
-      id: 'gratuito',
-      name: 'Gratuito',
-      price: { monthly: 0, yearly: 0 },
-      icon: Star,
-      popular: false,
-      features: [
-        'Cadastro de perfil com formação e especialidades',
-        'Perfil visível na busca para empresas cadastradas',
-        'Acesso gratuito'
-      ],
-      limitations: [
-        'Mensagens, contratos, avaliações e certificados ainda em implantação'
-      ]
-    },
-    {
-      id: 'profissional',
-      name: 'Profissional',
-      price: { monthly: 49, yearly: 490 },
-      icon: Zap,
-      popular: true,
-      features: [
-        'Perfil completo com destaque',
-        'Certificados ilimitados',
-        'Contatos ilimitados',
-        'Relatórios detalhados',
-        'Biblioteca completa SST',
-        'Suporte prioritário',
-        'Ferramentas de gestão'
-      ],
-      limitations: []
-    },
-    {
-      id: 'premium',
-      name: 'Premium',
-      price: { monthly: 99, yearly: 990 },
-      icon: Crown,
-      popular: false,
-      features: [
-        'Todos os recursos do Profissional',
-        'Posição prioritária nas buscas',
-        'Análise de performance',
-        'Calendário integrado',
-        'API para integrações',
-        'Treinamentos exclusivos',
-        'Consultoria personalizada'
-      ],
-      limitations: []
-    }
+    { ...proposta.gratuito, name: proposta.gratuito.nome, price: proposta.gratuito.precoMensal,
+      icon: Star, popular: false, features: proposta.gratuito.recursos, limitations: proposta.gratuito.limites },
+    { ...proposta.pago, name: proposta.pago.nome, price: proposta.pago.precoMensal,
+      icon: Crown, popular: true, features: proposta.pago.recursos, limitations: proposta.pago.limites },
   ];
 
-  const currentPlanData = plans.find(p => p.id === currentPlan);
 
-  const handleCancelSubscription = () => {
-    toast.success('Assinatura cancelada com sucesso');
-    // Aqui você processaria o cancelamento
-  };
-
-  const getDiscountPercentage = () => {
-    return Math.round(((12 - 10) / 12) * 100); // 2 meses grátis = ~17% desconto
-  };
 
   return (
     <div className="min-h-screen bg-neutral-gray py-8">
@@ -94,72 +47,8 @@ const AssinaturaProfissional: React.FC = () => {
           </p>
         </div>
 
-        {/* Current Plan Status */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-green-light rounded-full flex items-center justify-center">
-                {currentPlanData && <currentPlanData.icon size={24} className="text-green-deep" />}
-              </div>
-              <div>
-                <h2 className="font-poppins font-bold text-xl text-soft-black">
-                  Plano {currentPlanData?.name}
-                </h2>
-                <p className="font-roboto text-gray-600">
-                  {currentPlan === 'gratuito' 
-                    ? 'Você está no plano gratuito'
-                    : 'Próxima cobrança em 15 de Fevereiro, 2024'
-                  }
-                </p>
-              </div>
-            </div>
-            
-            {currentPlan !== 'gratuito' && (
-              <div className="text-right">
-                <p className="font-poppins font-bold text-2xl text-green-deep">
-                  R$ {currentPlanData?.price.monthly}/mês
-                </p>
-                <button
-                  onClick={handleCancelSubscription}
-                  className="font-roboto text-sm text-red-600 hover:text-red-800"
-                >
-                  Cancelar assinatura
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Billing Cycle Toggle */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white p-2 rounded-lg border border-gray-200">
-            <div className="flex items-center space-x-1">
-              <button
-                onClick={() => setBillingCycle('monthly')}
-                className={`px-4 py-2 rounded-md font-roboto font-medium transition-colors ${
-                  billingCycle === 'monthly'
-                    ? 'bg-green-deep text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Mensal
-              </button>
-              <button
-                onClick={() => setBillingCycle('yearly')}
-                className={`px-4 py-2 rounded-md font-roboto font-medium transition-colors relative ${
-                  billingCycle === 'yearly'
-                    ? 'bg-green-deep text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Anual
-                <span className="absolute -top-2 -right-2 bg-green-medium text-white text-xs px-2 py-1 rounded-full">
-                  -{getDiscountPercentage()}%
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Plano real da conta (public.subscriptions) - versao de testes */}
+        <StatusPlano papel="professional" />
 
         {/* Plans Grid */}
         <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
@@ -167,7 +56,7 @@ const AssinaturaProfissional: React.FC = () => {
                 Os planos pagos ainda não estão disponíveis para assinatura: valores e benefícios dos planos pagos são uma proposta em avaliação e podem mudar antes do lançamento. O plano gratuito reflete o que está disponível hoje.
             </p>
           </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 max-w-3xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.id}
@@ -192,17 +81,10 @@ const AssinaturaProfissional: React.FC = () => {
                 </h3>
                 <div className="flex items-baseline justify-center">
                   <span className="font-poppins font-bold text-4xl text-green-deep">
-                    R$ {plan.price[billingCycle]}
+                    R$ {plan.price.toFixed(2).replace('.', ',')}
                   </span>
-                  <span className="font-roboto text-gray-600 ml-1">
-                    {billingCycle === 'monthly' ? '/mês' : '/ano'}
-                  </span>
+                  <span className="font-roboto text-gray-600 ml-1">/mês</span>
                 </div>
-                {billingCycle === 'yearly' && plan.price.yearly > 0 && (
-                  <p className="font-roboto text-sm text-green-600 mt-1">
-                    Economize R$ {(plan.price.monthly * 12) - plan.price.yearly} por ano
-                  </p>
-                )}
               </div>
 
               <div className="space-y-4 mb-8">
@@ -232,88 +114,11 @@ const AssinaturaProfissional: React.FC = () => {
           ))}
         </div>
 
-        {/* Benefits Section */}
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
-          <h2 className="font-poppins font-bold text-2xl text-soft-black mb-6 text-center">
-            O que os planos pagos pretendem oferecer
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <TrendingUp size={24} className="text-blue-600" />
-              </div>
-              <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                Mais Visibilidade
-              </h3>
-              <p className="font-roboto text-sm text-gray-600">
-                Apareça em destaque nas buscas e receba mais oportunidades
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Shield size={24} className="text-green-600" />
-              </div>
-              <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                Perfil na Busca
-              </h3>
-              <p className="font-roboto text-sm text-gray-600">
-                Seu perfil aparece na busca de profissionais para empresas cadastradas
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Users size={24} className="text-purple-600" />
-              </div>
-              <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                Contatos Ilimitados
-              </h3>
-              <p className="font-roboto text-sm text-gray-600">
-                Receba quantas propostas quiser sem limitações
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Calendar size={24} className="text-yellow-600" />
-              </div>
-              <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
-                Ferramentas Avançadas
-              </h3>
-              <p className="font-roboto text-sm text-gray-600">
-                Acesso a relatórios, calendário e gestão completa
-              </p>
-            </div>
-          </div>
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+          <p className="font-roboto text-sm text-green-900">
+            {proposta.notaSempreGratuito}
+          </p>
         </div>
-
-        {/* Payment Methods */}
-        {currentPlan !== 'gratuito' && (
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <h2 className="font-poppins font-semibold text-xl text-soft-black mb-4">
-              Forma de Pagamento
-            </h2>
-            
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <CreditCard size={24} className="text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="font-roboto font-medium text-soft-black">
-                  Cartão de Crédito
-                </p>
-                <p className="font-roboto text-sm text-gray-600">
-                  **** **** **** 1234 - Visa
-                </p>
-              </div>
-              <Button variant="outline" size="sm">
-                Alterar
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
