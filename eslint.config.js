@@ -24,5 +24,10 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
     },
+  },
+  {
+    // Edge Function de reembolso: o supabase-js e injetado e tipado como any (igual ao teste).
+    files: ['supabase/functions/asaas-reembolso/handler.ts'],
+    rules: { '@typescript-eslint/no-explicit-any': 'off' },
   }
 );

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars -- dublês de teste */
 // Teste de integracao do handler REAL da Edge Function asaas-webhook
 // (handler.ts + decide.ts), com supabase e Asaas simulados em memoria.
 // Sem Deno, sem rede, sem banco de producao.

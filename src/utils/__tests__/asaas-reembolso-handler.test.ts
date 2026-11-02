@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars -- dublês de teste */
 // Teste da funcao asaas-reembolso REAL (handler + decide) com supabase e
 // Asaas em memoria. Sem Deno, sem rede. Confirma: decisao so uma vez
 // (transicao atomica), estorno nunca duplicado (consulta previa de refunds),
