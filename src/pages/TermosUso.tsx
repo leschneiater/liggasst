@@ -83,7 +83,6 @@ const TermosUso: React.FC = () => {
                     <li>E-mail: contato@liggasst.com.br</li>
                     <li>Telefone/WhatsApp: (11) 98886-1490</li>
                 </ul>
-                <p className="font-roboto text-gray-700 mb-4 leading-relaxed"><strong>Fornecedor:</strong> Letícia Schneiater Gentil, CPF 381.228.918-02, pessoa física.</p>
                 <p className="font-roboto text-gray-700 mb-4 leading-relaxed">O processamento do pagamento é feito pelo parceiro Asaas (checkout), que não é o vendedor do serviço; isso não substitui a identificação do fornecedor.</p>
             
           </div>
