@@ -53,7 +53,12 @@ function textoStatusBase(a: Assinatura): string {
     case 'active':
       return a.plan === 'free' ? 'Voce esta no plano gratuito' : `Plano pago ativo ate ${fim}`;
     case 'pending_first_payment':
-      return emTeste ? 'Aguardando o primeiro pagamento (checkout de teste em aberto)' : 'Aguardando o primeiro pagamento';
+      if (emTeste) return 'Aguardando o primeiro pagamento (checkout de teste em aberto)';
+      // Producao: o plano segue gratuito ate o pagamento ser confirmado. Nao afirma
+      // que o checkout esta aberto nem que foi cancelado (a linha nao guarda isso).
+      return a.plan === 'free'
+        ? 'Contratação não concluída. Você segue no plano gratuito. Se acabou de pagar, a confirmação pode levar alguns minutos.'
+        : 'Aguardando o primeiro pagamento';
     case 'past_due':
       return `Pagamento em atraso; plano pago garantido ate ${fim}`;
     case 'canceled':
