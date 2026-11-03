@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -7,6 +7,7 @@ import {
   Calendar, 
   DollarSign,
   FileText,
+  Save,
   Users,
   Clock,
   Send,
@@ -44,7 +45,10 @@ const PubliqueDemanda: React.FC = () => {
   
   const { currentUser } = useAuth();
   
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<DemandFormData>();
+  const { register, handleSubmit, formState: { errors }, reset, getValues } = useForm<DemandFormData>();
+  // Contato do cadastro como carregado: so e regravado ao publicar se mudou.
+  const contatoCadastro = useRef<{ razao_social: string; responsible_name: string; responsible_phone: string } | null>(null);
+  const [salvandoRascunho, setSalvandoRascunho] = useState(false);
 
   // Verificar se o usuário está logado
   useEffect(() => {
@@ -60,6 +64,11 @@ const PubliqueDemanda: React.FC = () => {
     fetchOwnCompany(currentUser.id).then((result) => {
       if (!result.success || !result.data) return;
       const company = result.data as Record<string, string | null>;
+      contatoCadastro.current = {
+        razao_social: (company.razao_social ?? '').trim(),
+        responsible_name: (company.responsible_name ?? '').trim(),
+        responsible_phone: (company.responsible_phone ?? '').trim(),
+      };
       reset({
         empresa: company.razao_social ?? '',
         contato: company.responsible_name ?? '',
@@ -105,9 +114,12 @@ const PubliqueDemanda: React.FC = () => {
       //    restrita ao dono/admin), nunca na demanda, que é visível a todos
       //    os usuários autenticados.
       const companyData: Record<string, string> = {};
-      if (data.empresa.trim()) companyData.razao_social = data.empresa.trim();
-      if (data.contato.trim()) companyData.responsible_name = data.contato.trim();
-      if (data.telefone.trim()) companyData.responsible_phone = data.telefone.trim();
+      const atual = contatoCadastro.current;
+      const mudou = (campo: 'razao_social' | 'responsible_name' | 'responsible_phone', valor: string) =>
+        valor !== '' && (!atual || atual[campo] !== valor);
+      if (mudou('razao_social', data.empresa.trim())) companyData.razao_social = data.empresa.trim();
+      if (mudou('responsible_name', data.contato.trim())) companyData.responsible_name = data.contato.trim();
+      if (mudou('responsible_phone', data.telefone.trim())) companyData.responsible_phone = data.telefone.trim();
       if (Object.keys(companyData).length > 0) {
         const companyResult = await updateCompany(currentUser.id, companyData);
         if (!companyResult.success) throw new Error('Falha ao salvar contato');
@@ -146,6 +158,42 @@ const PubliqueDemanda: React.FC = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Rascunho privado: so titulo e descricao sao obrigatorios, nada e
+  // publicado e o cadastro da empresa nunca e tocado.
+  const salvarRascunho = async () => {
+    const v = getValues();
+    if (!v.titulo?.trim() || !v.descricao?.trim()) {
+      toast.error('Para salvar um rascunho, preencha ao menos o título e a descrição.');
+      return;
+    }
+    setSalvandoRascunho(true);
+    try {
+      const descricaoCompleta = v.requisitos?.trim()
+        ? `${v.descricao.trim()}\n\nRequisitos: ${v.requisitos.trim()}`
+        : v.descricao.trim();
+      const result = await publishDemand({
+        title: v.titulo.trim(),
+        description: descricaoCompleta,
+        service_type: v.tipoServico || null,
+        city: v.localizacao?.trim() || null,
+        state: v.estado || null,
+        budget: v.orcamento ? Number(v.orcamento) : null,
+        deadline: v.prazo || null,
+        modalidade: v.modalidade || null,
+        urgencia: v.urgencia || null,
+        tipo_orcamento: v.tipoOrcamento || null,
+      }, 'draft');
+      if (!result.success) throw new Error('Rascunho não salvo');
+      toast.success('Rascunho salvo. Ele não aparece para ninguém além de você.');
+      navigate('/dashboard-empresa');
+    } catch (error) {
+      console.error('Erro ao salvar rascunho:', error);
+      toast.error('Não foi possível salvar o rascunho. Tente novamente.');
+    } finally {
+      setSalvandoRascunho(false);
     }
   };
 
@@ -290,6 +338,11 @@ const PubliqueDemanda: React.FC = () => {
 
         <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="flex justify-end -mb-2">
+              <Button type="button" variant="outline" size="sm" icon={Save} onClick={salvarRascunho} loading={salvandoRascunho}>
+                Salvar rascunho
+              </Button>
+            </div>
             {/* Step 1: Service Details */}
             {step === 1 && (
               <div className="space-y-6">
