@@ -60,7 +60,7 @@ const EditarDemanda: React.FC = () => {
         setSituacao({ tipo: 'sem-acesso' });
         return;
       }
-      if (demanda.status !== 'active') {
+      if (demanda.status !== 'active' && demanda.status !== 'draft') {
         setSituacao({ tipo: 'nao-editavel', status: demanda.status });
         return;
       }
@@ -105,7 +105,7 @@ const EditarDemanda: React.FC = () => {
       if (!result.success && result.conflict) {
         // Conflito: a demanda foi encerrada depois que a tela abriu.
         // Nada foi sobrescrito; volta ao painel com o estado real.
-        toast.error('Esta demanda não está mais ativa. Nenhuma alteração foi salva.');
+        toast.error('Esta demanda não está mais editável. Nenhuma alteração foi salva.');
         navigate('/dashboard-empresa');
         return;
       }
@@ -161,7 +161,7 @@ const EditarDemanda: React.FC = () => {
             <p className="font-roboto text-gray-600 max-w-md mx-auto mb-6">
               {situacao.tipo === 'sem-acesso'
                 ? 'Ela não está entre as demandas da sua empresa.'
-                : 'Somente demandas ativas podem ser editadas.'}
+                : 'Somente rascunhos e demandas ativas podem ser editados.'}
             </p>
             <Button as={Link} to="/dashboard-empresa" variant="outline" size="sm">
               Voltar ao painel
