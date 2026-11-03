@@ -31,7 +31,8 @@ const RelatoriosEmpresa: React.FC = () => {
       setCarregando(false);
       return;
     }
-    setDemandas(result.data as DemandaGestaoRow[]);
+    // Rascunho nao e demanda publicada: fica fora dos cards, do total e do CSV.
+    setDemandas((result.data as DemandaGestaoRow[]).filter((d) => d.status !== 'draft'));
     setCarregando(false);
   };
 
