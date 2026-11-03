@@ -136,15 +136,6 @@ const VitrineEmpresas: React.FC = () => {
           </p>
         </div>
 
-        {/* Aviso: vitrine nao indica contratacao ativa */}
-        <div className="bg-green-light bg-opacity-40 border border-green-light rounded-xl p-4 mb-6">
-          <p className="font-roboto text-sm text-green-deep">
-            Esta é uma vitrine da rede. Estar listada aqui não significa que a empresa tem
-            vagas ou demandas abertas no momento. Para ver detalhes, responder a demandas
-            e conversar com as empresas, crie sua conta gratuita e faça login.
-          </p>
-        </div>
-
         {/* Search and Filters */}
         <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
