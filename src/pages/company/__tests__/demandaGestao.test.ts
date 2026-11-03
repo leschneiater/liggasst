@@ -27,9 +27,13 @@ describe('acoesDaDemanda', () => {
   });
 
   it('demandas em outros status não têm ações', () => {
-    for (const status of ['draft', 'in_progress', 'completed', 'cancelled']) {
+    for (const status of ['in_progress', 'completed', 'cancelled']) {
       expect(acoesDaDemanda(status)).toEqual([]);
     }
+  });
+
+  it('rascunho pode ser editado, publicado ou descartado', () => {
+    expect(acoesDaDemanda('draft')).toEqual(['editar', 'publicar', 'descartar']);
   });
 
   it('status desconhecido não ganha ação por engano', () => {
@@ -41,6 +45,8 @@ describe('STATUS_DESTINO_ACAO', () => {
   it('mapeia concluir/cancelar para os status do schema', () => {
     expect(STATUS_DESTINO_ACAO.concluir).toBe('completed');
     expect(STATUS_DESTINO_ACAO.cancelar).toBe('cancelled');
+    expect(STATUS_DESTINO_ACAO.publicar).toBe('active');
+    expect(STATUS_DESTINO_ACAO.descartar).toBeUndefined();
     expect(STATUS_DESTINO_ACAO.editar).toBeUndefined();
   });
 });
