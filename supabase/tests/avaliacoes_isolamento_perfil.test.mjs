@@ -79,11 +79,12 @@ const cu = async (email, meta) => (await db.query(
 const emp = await cu('e@x.local', { role: 'company', display_name: 'Empresa Ficticia' });
 const proOk = await cu('p@x.local', { role: 'professional', display_name: 'Prof Aprovado' });
 const proTest = await cu('pt@x.local', { role: 'professional', display_name: 'Prof Teste' });
+const empT = await cu('et@x.local', { role: 'company', display_name: 'Empresa Teste' });
 const comum = await cu('c@x.local', { role: 'professional', display_name: 'Comum' });
 const tester = await cu('t@x.local', { role: 'professional', display_name: 'Tester' });
-await db.query(`update public.profiles set verification_status='approved' where id in ($1,$2,$3,$4,$5)`,
-  [emp, proOk, proTest, comum, tester]);
-await db.query(`update public.profiles set is_test=true where id in ($1,$2)`, [proTest, tester]);
+await db.query(`update public.profiles set verification_status='approved' where id in ($1,$2,$3,$4,$5,$6)`,
+  [emp, proOk, proTest, comum, tester, empT]);
+await db.query(`update public.profiles set is_test=true where id in ($1,$2,$3)`, [proTest, tester, empT]);
 await db.query(`insert into private.messaging_allowlist (user_id) values ($1)`, [tester]);
 
 const cm = async (uid, sql, params = [], role = 'authenticated') => {
@@ -97,13 +98,14 @@ const cm = async (uid, sql, params = [], role = 'authenticated') => {
 };
 
 // contrato concluido + avaliacao dos dois lados (revelada) para proOk e proTest
-for (const pid of [proOk, proTest]) {
-  const c = (await cm(emp,
+// (paridade de gate em contratos: perfil de teste so contrata com empresa de teste)
+for (const [pid, empC] of [[proOk, emp], [proTest, empT]]) {
+  const c = (await cm(empC,
     `insert into public.contracts (company_id, professional_id, demand_id, title, amount)
-     values ($1,$2,null,'Contrato ficticio',100) returning id`, [emp, pid])).rows[0].id;
+     values ($1,$2,null,'Contrato ficticio',100) returning id`, [empC, pid])).rows[0].id;
   await cm(pid, `select public.responder_contrato($1,'aceitar')`, [c]);
-  await cm(emp, `select public.concluir_contrato($1)`, [c]);
-  await cm(emp, `select public.avaliar_contrato($1::uuid,5::smallint,'comentario ficticio')`, [c]);
+  await cm(empC, `select public.concluir_contrato($1)`, [c]);
+  await cm(empC, `select public.avaliar_contrato($1::uuid,5::smallint,'comentario ficticio')`, [c]);
   await cm(pid, `select public.avaliar_contrato($1::uuid,4::smallint,null)`, [c]);
 }
 
