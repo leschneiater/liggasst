@@ -133,6 +133,9 @@ const PoliticaPrivacidade: React.FC = () => {
                   <p className="font-roboto text-gray-700">
                     Ao contratar um plano pago, você informa nome, e-mail, CPF ou CNPJ, celular e endereço de cobrança (CEP, rua, número e bairro). A LiggaSST envia esses dados ao Asaas, que processa o pagamento, para criar o cliente e a cobrança. Os dados do cartão são informados diretamente na página de pagamento do Asaas. Recebemos do Asaas informações sobre a assinatura e os pagamentos, como status, datas e identificadores, para ativar, manter e cancelar o plano.
                   </p>
+                  <p className="font-roboto text-gray-700" style={{ marginTop: "0.75rem" }}>
+                    Também guardamos o registro dos avisos (eventos) que o Asaas nos envia sobre assinaturas e pagamentos, no formato em que são recebidos, para não processar o mesmo aviso duas vezes e para ter histórico de auditoria. O prazo para eliminar esses registros está descrito no item 7.
+                  </p>
                 </div>
                 <div>
                   <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
@@ -335,7 +338,7 @@ const PoliticaPrivacidade: React.FC = () => {
                   <ul className="list-disc list-inside space-y-1 font-roboto text-sm text-gray-700">
                     <li>Dados de conta ativa: Durante a vigência da conta</li>
                     <li>Dados de conta inativa: Até 2 anos após inatividade</li>
-                    <li>Dados financeiros: 5 anos (exigência legal)</li>
+                    <li>Dados de assinatura e pagamento guardados no banco da LiggaSST: mantidos enquanto a conta existir e apagados quando a conta é excluída. Isso não vale para registros mantidos pelo Asaas. Registros de eventos do Asaas (item 2.4): o fluxo atual não os exclui automaticamente junto com a conta; o prazo e a rotina de eliminação ainda estão pendentes.</li>
                     <li>Logs de segurança: 6 meses</li>
                   </ul>
                 </div>
