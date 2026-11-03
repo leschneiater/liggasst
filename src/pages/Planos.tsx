@@ -4,7 +4,7 @@ import { Check, X, Star, Crown } from 'lucide-react';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
-import { PROPOSTA_PROFISSIONAL, PROPOSTA_EMPRESA, type PropostaPublico, AVISO_PLANOS_PAGOS } from '../data/planosProposta';
+import { PROPOSTA_PROFISSIONAL, PROPOSTA_EMPRESA, type PropostaPublico } from '../data/planosProposta';
 
 const Planos: React.FC = () => {
   const [userType, setUserType] = useState<'professional' | 'company'>('professional');
@@ -79,11 +79,6 @@ const Planos: React.FC = () => {
         {/* Plans Section */}
         <section className="py-20 bg-neutral-gray">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <p className="font-roboto text-sm text-blue-900">
-                {AVISO_PLANOS_PAGOS}
-              </p>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {planos.map((plano, index) => (
                 <div
@@ -135,9 +130,6 @@ const Planos: React.FC = () => {
                   </Button>
                 </div>
               ))}
-            </div>
-            <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-4 max-w-4xl mx-auto">
-              <p className="font-roboto text-sm text-green-900">{proposta.notaSempreGratuito}</p>
             </div>
           </div>
         </section>
