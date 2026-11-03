@@ -12,13 +12,14 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
-import { fetchDemands, updateDemand } from '../../services/database';
+import { deleteDemandRascunho, fetchDemands, updateDemand } from '../../services/database';
 import {
   DemandaGestaoRow,
   ROTULOS_ACAO_DEMANDA,
   ROTULOS_STATUS_DEMANDA,
   STATUS_DESTINO_ACAO,
   acoesDaDemanda,
+  rascunhoPublicavel,
 } from './demandaGestao';
 import Button from '../../components/ui/Button';
 import CartaoAvisos from '../../components/ui/CartaoAvisos';
@@ -29,7 +30,7 @@ const DashboardEmpresa: React.FC = () => {
   const { disponivel: msgDisponivel } = useMessagingDisponivel();
   const [demands, setDemands] = useState<DemandaGestaoRow[]>([]);
   const [demandsLoading, setDemandsLoading] = useState(true);
-  const [confirmacao, setConfirmacao] = useState<{ id: string; acao: 'concluir' | 'cancelar' } | null>(null);
+  const [confirmacao, setConfirmacao] = useState<{ id: string; acao: 'concluir' | 'cancelar' | 'publicar' | 'descartar' } | null>(null);
   const [acaoLoading, setAcaoLoading] = useState(false);
 
   const carregarDemandas = () => {
@@ -52,23 +53,38 @@ const DashboardEmpresa: React.FC = () => {
   const executarAcao = async () => {
     if (!confirmacao) return;
     const destino = STATUS_DESTINO_ACAO[confirmacao.acao];
-    if (!destino) return;
+    if (!destino && confirmacao.acao !== 'descartar') return;
     setAcaoLoading(true);
     try {
-      const result = await updateDemand(confirmacao.id, { status: destino });
+      if (confirmacao.acao === 'descartar') {
+        const descarte = await deleteDemandRascunho(confirmacao.id);
+        if (!descarte.success && !descarte.conflict) throw new Error('Falha ao descartar');
+        if (descarte.success) toast.success('Rascunho descartado.');
+        else toast.error('Este rascunho não existe mais. A lista foi atualizada.');
+        setConfirmacao(null);
+        carregarDemandas();
+        return;
+      }
+      const result = await updateDemand(confirmacao.id, { status: destino as string });
       if (!result.success && result.conflict) {
         // Conflito: a demanda ja nao estava ativa (ex.: outra aba encerrou).
         // Nada foi sobrescrito; a lista recarrega com o estado real.
-        toast.error('Esta demanda não está mais ativa. A lista foi atualizada.');
+        toast.error(
+          confirmacao.acao === 'publicar'
+            ? 'Este rascunho não está mais disponível. A lista foi atualizada.'
+            : 'Esta demanda não está mais ativa. A lista foi atualizada.'
+        );
         setConfirmacao(null);
         carregarDemandas();
         return;
       }
       if (!result.success) throw new Error('Falha ao atualizar status');
       toast.success(
-        confirmacao.acao === 'concluir'
-          ? 'Demanda marcada como concluída. Ela saiu da vitrine pública.'
-          : 'Demanda cancelada. Ela saiu da vitrine pública.'
+        confirmacao.acao === 'publicar'
+          ? 'Demanda publicada.'
+          : confirmacao.acao === 'concluir'
+            ? 'Demanda marcada como concluída. Ela saiu da vitrine pública.'
+            : 'Demanda cancelada. Ela saiu da vitrine pública.'
       );
       setConfirmacao(null);
       carregarDemandas();
@@ -109,7 +125,7 @@ const DashboardEmpresa: React.FC = () => {
             <p className="font-roboto text-gray-500 text-sm">Carregando demandas...</p>
           ) : demands.length === 0 ? (
             <p className="font-roboto text-gray-500 text-sm">
-              Nenhuma demanda publicada ainda. Publique a primeira para encontrar profissionais.
+              Nenhuma demanda ainda. Publique a primeira para encontrar profissionais ou salve um rascunho.
             </p>
           ) : (
             <ul className="divide-y divide-gray-100">
@@ -142,6 +158,30 @@ const DashboardEmpresa: React.FC = () => {
                           {ROTULOS_ACAO_DEMANDA.editar}
                         </Button>
                       )}
+                      {acoes.includes('publicar') && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (!rascunhoPublicavel(demanda as unknown as Record<string, unknown>)) {
+                              toast.error('Complete o rascunho em "Editar" (todos os campos da demanda) antes de publicar.');
+                              return;
+                            }
+                            setConfirmacao({ id: demanda.id, acao: 'publicar' });
+                          }}
+                        >
+                          {ROTULOS_ACAO_DEMANDA.publicar}
+                        </Button>
+                      )}
+                      {acoes.includes('descartar') && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setConfirmacao({ id: demanda.id, acao: 'descartar' })}
+                        >
+                          {ROTULOS_ACAO_DEMANDA.descartar}
+                        </Button>
+                      )}
                       {acoes.includes('concluir') && (
                         <Button
                           variant="ghost"
@@ -165,9 +205,13 @@ const DashboardEmpresa: React.FC = () => {
                   {confirmacao?.id === demanda.id && (
                     <div className="mt-2 bg-neutral-gray rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2">
                       <p className="font-roboto text-sm text-soft-black flex-1">
-                        {confirmacao.acao === 'concluir'
-                          ? 'Concluir esta demanda? Ela sai da vitrine pública e fica no seu histórico.'
-                          : 'Cancelar esta demanda? Ela sai da vitrine pública e fica no seu histórico.'}
+                        {confirmacao.acao === 'publicar'
+                          ? 'Publicar este rascunho? Ele passa a aparecer na vitrine pública.'
+                          : confirmacao.acao === 'descartar'
+                            ? 'Descartar este rascunho? Ele será apagado definitivamente e não pode ser recuperado.'
+                            : confirmacao.acao === 'concluir'
+                              ? 'Concluir esta demanda? Ela sai da vitrine pública e fica no seu histórico.'
+                              : 'Cancelar esta demanda? Ela sai da vitrine pública e fica no seu histórico.'}
                       </p>
                       <div className="flex gap-2">
                         <Button size="sm" onClick={executarAcao} loading={acaoLoading}>
