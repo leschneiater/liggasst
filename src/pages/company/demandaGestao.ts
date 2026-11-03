@@ -21,12 +21,14 @@ export const ROTULOS_STATUS_DEMANDA: Record<string, string> = {
   cancelled: 'Cancelada',
 };
 
-export type AcaoDemanda = 'editar' | 'concluir' | 'cancelar';
+export type AcaoDemanda = 'editar' | 'concluir' | 'cancelar' | 'publicar' | 'descartar';
 
 export const ROTULOS_ACAO_DEMANDA: Record<AcaoDemanda, string> = {
   editar: 'Editar',
   concluir: 'Concluir',
   cancelar: 'Cancelar',
+  publicar: 'Publicar',
+  descartar: 'Descartar',
 };
 
 // Enquanto nao ha contratos na plataforma, a empresa gerencia a demanda
@@ -34,6 +36,7 @@ export const ROTULOS_ACAO_DEMANDA: Record<AcaoDemanda, string> = {
 // Concluidas/canceladas saem da vitrine publica (a policy demands_select so
 // expoe status 'active' para outras contas) e ficam no historico da empresa.
 const ACOES_POR_STATUS: Record<string, AcaoDemanda[]> = {
+  draft: ['editar', 'publicar', 'descartar'],
   active: ['editar', 'concluir', 'cancelar'],
 };
 
@@ -42,7 +45,14 @@ export const acoesDaDemanda = (status: string): AcaoDemanda[] => ACOES_POR_STATU
 export const STATUS_DESTINO_ACAO: Partial<Record<AcaoDemanda, string>> = {
   concluir: 'completed',
   cancelar: 'cancelled',
+  publicar: 'active',
 };
+
+// Campos que o formulario de publicacao exige. Um rascunho pode estar
+// incompleto; so publica quando todos estao preenchidos.
+export const rascunhoPublicavel = (d: Record<string, unknown>): boolean =>
+  ['title', 'description', 'service_type', 'city', 'state', 'deadline', 'modalidade', 'urgencia', 'tipo_orcamento']
+    .every((c) => typeof d[c] === 'string' && (d[c] as string).trim() !== '');
 
 export const TIPOS_SERVICO_DEMANDA = [
   'PCMSO - Programa de Controle Médico de Saúde Ocupacional',
