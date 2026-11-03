@@ -420,18 +420,45 @@ export const getProfilePublic = async (id: string) => {
   }
 };
 
-export const publishDemand = async (demandData: ProfileData) => {
+export const publishDemand = async (
+  demandData: ProfileData,
+  status: 'draft' | 'active' = 'active',
+) => {
   try {
     const user = await getAuthenticatedUser();
     const { data, error } = await supabase.from('demands').insert({
       ...demandData,
       company_id: user.id,
-      status: 'active',
+      status,
     }).select().single();
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
     console.error('Erro ao publicar demanda:', error);
+    return { success: false, error };
+  }
+};
+
+// Descarte definitivo: SOMENTE rascunho proprio. O filtro status='draft' e
+// company_id vai no proprio delete e a policy demands_delete_rascunho reforca
+// no banco; demanda ativa/encerrada nunca e apagada (0 linhas = conflito).
+export const deleteDemandRascunho = async (id: string) => {
+  try {
+    const user = await getAuthenticatedUser();
+    const { data, error } = await supabase
+      .from('demands')
+      .delete()
+      .eq('id', id)
+      .eq('company_id', user.id)
+      .eq('status', 'draft')
+      .select('id');
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return { success: false, conflict: true, error: new Error('Rascunho não encontrado') };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao descartar rascunho:', error);
     return { success: false, error };
   }
 };
@@ -486,7 +513,7 @@ export const updateDemand = async (
       .update(seguro)
       .eq('id', id)
       .eq('company_id', user.id)
-      .eq('status', 'active')
+      .in('status', ['draft', 'active'])
       .select()
       .maybeSingle();
     if (error) throw error;
@@ -494,7 +521,7 @@ export const updateDemand = async (
       return {
         success: false,
         conflict: true,
-        error: new Error('Demanda não está ativa ou não pertence à empresa logada'),
+        error: new Error('Demanda não está editável ou não pertence à empresa logada'),
       };
     }
     return { success: true, data };
