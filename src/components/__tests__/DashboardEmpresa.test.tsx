@@ -6,12 +6,14 @@ import DashboardEmpresa from '../../pages/company/DashboardEmpresa';
 
 const fetchDemandsMock = vi.fn();
 const updateDemandMock = vi.fn();
+const deleteRascunhoMock = vi.fn();
 const useAuthMock = vi.fn();
 const useMessagingDisponivelMock = vi.fn();
 
 vi.mock('../../services/database', () => ({
   fetchDemands: (...args: unknown[]) => fetchDemandsMock(...args),
   updateDemand: (...args: unknown[]) => updateDemandMock(...args),
+  deleteDemandRascunho: (...args: unknown[]) => deleteRascunhoMock(...args),
 }));
 
 vi.mock('react-hot-toast', () => ({
@@ -30,6 +32,7 @@ describe('DashboardEmpresa', () => {
   beforeEach(() => {
     fetchDemandsMock.mockReset().mockResolvedValue({ success: true, data: [] });
     updateDemandMock.mockReset().mockResolvedValue({ success: true, data: {} });
+    deleteRascunhoMock.mockReset().mockResolvedValue({ success: true });
     useAuthMock.mockReset().mockReturnValue({
       currentUser: { id: 'empresa-1' },
       userType: 'company',
@@ -110,6 +113,53 @@ describe('DashboardEmpresa', () => {
     await waitFor(() =>
       expect(updateDemandMock).toHaveBeenCalledWith('d1', { status: 'cancelled' })
     );
+  });
+
+  const rascunho = {
+    id: 'r1', title: 'Rascunho PGR', service_type: null, city: null, state: null,
+    status: 'draft', created_at: '2026-10-25T10:00:00Z',
+  };
+
+  it('rascunho oferece editar/publicar/descartar e nao concluir/cancelar', async () => {
+    fetchDemandsMock.mockResolvedValue({ success: true, data: [rascunho] });
+    render(<MemoryRouter><DashboardEmpresa /></MemoryRouter>);
+    await screen.findByText('Rascunho PGR');
+    expect(screen.getByText('Rascunho')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^editar$/i })).toHaveAttribute('href', '/editar-demanda/r1');
+    expect(screen.getByRole('button', { name: /^publicar$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^descartar$/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^concluir$/i })).not.toBeInTheDocument();
+  });
+
+  it('descarta rascunho somente apos confirmacao', async () => {
+    fetchDemandsMock.mockResolvedValue({ success: true, data: [rascunho] });
+    render(<MemoryRouter><DashboardEmpresa /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: /^descartar$/i }));
+    expect(deleteRascunhoMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /^confirmar$/i }));
+    await waitFor(() => expect(deleteRascunhoMock).toHaveBeenCalledWith('r1'));
+    expect(updateDemandMock).not.toHaveBeenCalled();
+    await waitFor(() => expect(fetchDemandsMock).toHaveBeenCalledTimes(2));
+  });
+
+  it('rascunho incompleto nao publica pelo painel', async () => {
+    fetchDemandsMock.mockResolvedValue({ success: true, data: [{ ...rascunho, description: 'x' }] });
+    render(<MemoryRouter><DashboardEmpresa /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: /^publicar$/i }));
+    expect(screen.queryByRole('button', { name: /^confirmar$/i })).not.toBeInTheDocument();
+    expect(updateDemandMock).not.toHaveBeenCalled();
+  });
+
+  it('rascunho completo publica (draft -> active) apos confirmacao', async () => {
+    fetchDemandsMock.mockResolvedValue({ success: true, data: [{
+      ...rascunho, description: 'd', service_type: 'PGR', city: 'SP', state: 'SP',
+      deadline: '2026-12-01', modalidade: 'remoto', urgencia: 'baixa', tipo_orcamento: 'fixo',
+    }] });
+    render(<MemoryRouter><DashboardEmpresa /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: /^publicar$/i }));
+    expect(updateDemandMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /^confirmar$/i }));
+    await waitFor(() => expect(updateDemandMock).toHaveBeenCalledWith('r1', { status: 'active' }));
   });
 
   it('nao oferece atalho para a rota inexistente de downloads', async () => {
