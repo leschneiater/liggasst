@@ -4,7 +4,7 @@ import Button from '../../components/ui/Button';
 import StatusPlano from '../../components/Assinatura/StatusPlano';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchAssinatura } from '../../services/assinatura';
-import { PROPOSTA_PROFISSIONAL, AVISO_PLANOS_PAGOS } from '../../data/planosProposta';
+import { PROPOSTA_PROFISSIONAL } from '../../data/planosProposta';
 
 const AssinaturaProfissional: React.FC = () => {
   const { currentUser } = useAuth();
@@ -51,11 +51,6 @@ const AssinaturaProfissional: React.FC = () => {
         <StatusPlano papel="professional" />
 
         {/* Plans Grid */}
-        <div className="mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="font-roboto text-sm text-blue-900">
-                {AVISO_PLANOS_PAGOS}
-            </p>
-          </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 max-w-3xl mx-auto">
           {plans.map((plan) => (
             <div
@@ -111,11 +106,6 @@ const AssinaturaProfissional: React.FC = () => {
           ))}
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-          <p className="font-roboto text-sm text-green-900">
-            {proposta.notaSempreGratuito}
-          </p>
-        </div>
       </div>
     </div>
   );
