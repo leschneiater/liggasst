@@ -187,7 +187,7 @@ const PubliqueDemanda: React.FC = () => {
         tipo_orcamento: v.tipoOrcamento || null,
       }, 'draft');
       if (!result.success) throw new Error('Rascunho não salvo');
-      toast.success('Rascunho salvo. Ele não aparece para ninguém além de você.');
+      toast.success('Rascunho salvo. Visível apenas para você e a administração da plataforma.');
       navigate('/dashboard-empresa');
     } catch (error) {
       console.error('Erro ao salvar rascunho:', error);
