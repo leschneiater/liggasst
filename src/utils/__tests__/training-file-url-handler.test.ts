@@ -16,6 +16,7 @@ const mkDeps = (opts: {
   subscription?: SubOpts;
   signedUrl?: string;
   authError?: boolean;
+  acessoEquipe?: boolean;
 }) => {
   const createSignedUrl = vi.fn().mockResolvedValue({ data: { signedUrl: opts.signedUrl ?? 'https://assinada.example/x.pdf' }, error: null });
   const singleProfile = vi.fn().mockResolvedValue({ data: opts.profile ?? null });
@@ -33,6 +34,7 @@ const mkDeps = (opts: {
       })),
     })),
     storage: { from: vi.fn(() => ({ createSignedUrl })) },
+    rpc: vi.fn().mockResolvedValue({ data: opts.acessoEquipe ?? false, error: null }),
   };
   return {
     deps: { supabaseUrl: 'https://proj.example', serviceRoleKey: 'k', createClient: () => client },
@@ -187,5 +189,25 @@ describe('handler training-file-url (integracao com deps simuladas)', () => {
       training: { audience: 'both', status: 'published', pdf_path: PDF },
     });
     expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(200);
+  });
+  // Funcionario (feature 3): o plano conferido e o da empresa via RPC
+  // equipe_treinamento_acesso; a propria assinatura do employee nao existe.
+  it('funcionario com atribuicao da empresa pagante recebe 200', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'f1' },
+      profile: { role: 'employee', verification_status: 'approved' },
+      training: { audience: 'company', status: 'published', pdf_path: PDF },
+      acessoEquipe: true,
+    });
+    expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(200);
+  });
+  it('funcionario SEM atribuicao recebe 403', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'f1' },
+      profile: { role: 'employee', verification_status: 'approved' },
+      training: { audience: 'company', status: 'published', pdf_path: PDF },
+      acessoEquipe: false,
+    });
+    expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(403);
   });
 });

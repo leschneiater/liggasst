@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  userType?: 'professional' | 'company' | 'admin';
+  userType?: 'professional' | 'company' | 'admin' | 'employee';
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, userType }) => {
@@ -46,6 +46,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, userType }) =
       return <Navigate to="/dashboard-profissional" replace />;
     } else if (currentUserType === 'company') {
       return <Navigate to="/dashboard-empresa" replace />;
+    } else if (currentUserType === 'employee') {
+      return <Navigate to="/minha-capacitacao" replace />;
     } else if (currentUserType === 'admin') {
       return <Navigate to="/admin" replace />;
     } else {

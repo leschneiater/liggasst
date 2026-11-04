@@ -70,7 +70,7 @@ describe('Menu fixo da area empresa', () => {
       '/dashboard-empresa', '/busca-profissionais-empresa', '/mensagens-empresa',
       '/contratos-empresa', '/relatorios', '/treinamentos-empresa',
       '/radar-tst-empresa', '/perfil-empresa', '/assinatura-empresa',
-      '/calendario-conformidade',
+      '/calendario-conformidade', '/capacitacao-equipe',
     ];
     expect([...companyAreaPaths].sort()).toEqual([...esperado].sort());
     expect(companyAreaPaths.filter((p) => professionalAreaPaths.includes(p))).toEqual([]);

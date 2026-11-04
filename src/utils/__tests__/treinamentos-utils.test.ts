@@ -55,6 +55,26 @@ describe('decidirAcessoPdf (logica real da Edge Function)', () => {
   it('perfil ausente e bloqueado', () => {
     expect(decidirAcessoPdf(null, pub('both'), true).ok).toBe(false);
   });
+  // Funcionario (feature 3): nao tem plano proprio; o 4o parametro
+  // acessoEquipe vem da RPC equipe_treinamento_acesso (atribuicao da
+  // empresa pagante). Audience nao se aplica: a empresa escolhe o
+  // treinamento para a equipe.
+  it('funcionario sem atribuicao e bloqueado', () => {
+    const r = decidirAcessoPdf(aprovado('employee'), pub('company'), false, false);
+    expect(r).toEqual({ ok: false, status: 403, erro: 'treinamento nao atribuido a voce' });
+  });
+  it('funcionario com atribuicao acessa publicado, mesmo fora do publico', () => {
+    expect(decidirAcessoPdf(aprovado('employee'), pub('professional'), false, true).ok).toBe(true);
+    expect(decidirAcessoPdf(aprovado('employee'), pub('both'), false, true).ok).toBe(true);
+  });
+  it('funcionario nao acessa rascunho nem conteudo de teste alheio', () => {
+    const rasc = { audience: 'both', status: 'draft', pdf_path: 't.pdf' };
+    expect(decidirAcessoPdf(aprovado('employee'), rasc, false, true).ok).toBe(false);
+    const teste = { audience: 'both', status: 'published', pdf_path: 't.pdf', is_test: true };
+    expect(decidirAcessoPdf(aprovado('employee'), teste, false, true)).toEqual({ ok: false, status: 404, erro: 'arquivo nao encontrado' });
+    const perfilTeste = { role: 'employee', verification_status: 'approved', is_test: true };
+    expect(decidirAcessoPdf(perfilTeste, teste, false, true).ok).toBe(true);
+  });
 });
 
 describe('assinaturaPagaJanela (mesma janela da RLS de radar_posts)', () => {

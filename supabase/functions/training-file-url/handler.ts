@@ -23,6 +23,8 @@ export interface SupabaseClientMin {
       createSignedUrl: (path: string, ttl: number) => Promise<{ data: { signedUrl?: string } | null; error: unknown }>;
     };
   };
+  // Opcional no recorte: so o caminho do funcionario (employee) usa.
+  rpc?: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error?: unknown }>;
 }
 
 export interface Deps {
@@ -90,10 +92,21 @@ export const handleRequest = async (req: Request, deps: Deps): Promise<Response>
       .maybeSingle();
 
     const hoje = new Date().toISOString().slice(0, 10);
+    // Funcionario: o plano conferido e o da empresa que atribuiu o
+    // treinamento (a propria conta employee nao assina).
+    let acessoEquipe = false;
+    if ((profile as PerfilChamador | null)?.role === 'employee' && admin.rpc) {
+      const { data } = await admin.rpc('equipe_treinamento_acesso', {
+        p_training_id: trainingId,
+        p_employee_id: user.id,
+      });
+      acessoEquipe = data === true;
+    }
     const decisao = decidirAcessoPdf(
       profile as PerfilChamador | null,
       training as TreinamentoAlvo | null,
       assinaturaPagaJanela(assinatura as AssinaturaRow | null, hoje),
+      acessoEquipe,
     );
     if (!decisao.ok) return json({ error: decisao.erro }, decisao.status);
 

@@ -45,6 +45,8 @@ export const AVISO_LIMITES = {
     'Suas demandas já podem receber propostas e o chat continua livre. Comparar preço, prazo, certificados e avaliações lado a lado é recurso do plano Empresa.',
   calendario:
     'O calendário de conformidade, com validades dos documentos de SST e alertas de vencimento, é recurso do plano Empresa.',
+  equipe:
+    'A capacitação da equipe, com treinamentos atribuídos aos seus funcionários e acompanhamento de conclusão, é recurso do plano Empresa.',
 } as const;
 
 export const MSG_LIMITE_CONTATOS =

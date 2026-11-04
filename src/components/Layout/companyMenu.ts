@@ -5,7 +5,7 @@ import {
   MessageSquare,
   FileText,
   BarChart3,
-  GraduationCap, Radar,
+  GraduationCap, Users, Radar,
   CalendarClock,
   Building2,
   Crown
@@ -24,6 +24,7 @@ export const companyMenuItems: CompanyMenuItem[] = [
   { path: '/contratos-empresa', label: 'Contratos', icon: FileText },
   { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
   { path: '/treinamentos-empresa', label: 'Capacitação', icon: GraduationCap },
+  { path: '/capacitacao-equipe', label: 'Equipe', icon: Users },
   { path: '/radar-tst-empresa', label: 'Radar TST', icon: Radar },
   { path: '/calendario-conformidade', label: 'Conformidade', icon: CalendarClock },
   { path: '/perfil-empresa', label: 'Perfil', icon: Building2 },

@@ -43,6 +43,7 @@ export const decidirAcessoPdf = (
   perfil: PerfilChamador | null,
   treinamento: TreinamentoAlvo | null,
   planoPago: boolean,
+  acessoEquipe = false,
 ): DecisaoAcesso => {
   if (!perfil || perfil.verification_status !== 'approved') {
     return { ok: false, status: 403, erro: 'conta nao aprovada' };
@@ -51,6 +52,22 @@ export const decidirAcessoPdf = (
     return { ok: false, status: 404, erro: 'arquivo nao encontrado' };
   }
   const isAdmin = perfil.role === 'admin';
+  // Funcionario nao tem plano proprio: o acesso ao PDF vem da atribuicao
+  // feita pela empresa pagante (RPC public.equipe_treinamento_acesso, que ja
+  // confere vinculo ativo + plano da empresa). O publico (audience) nao se
+  // aplica: a empresa escolhe o treinamento para a equipe.
+  if (perfil.role === 'employee' && !isAdmin) {
+    if (!acessoEquipe) {
+      return { ok: false, status: 403, erro: 'treinamento nao atribuido a voce' };
+    }
+    if (treinamento.is_test && !perfil.is_test) {
+      return { ok: false, status: 404, erro: 'arquivo nao encontrado' };
+    }
+    if (treinamento.status !== 'published') {
+      return { ok: false, status: 403, erro: 'treinamento nao disponivel para este usuario' };
+    }
+    return { ok: true };
+  }
   // Capacitacao e exclusiva de assinantes pagos (decisao da dona 03/11/2026);
   // admin gerencia e por isso baixa sem plano pago.
   if (!isAdmin && !planoPago) {

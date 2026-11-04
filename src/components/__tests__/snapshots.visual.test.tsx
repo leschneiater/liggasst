@@ -12,6 +12,8 @@ import BuscaEmpresas from '../../pages/professional/BuscaEmpresas';
 import PubliqueDemanda from '../../pages/PubliqueDemanda';
 import ComparadorPropostas from '../../pages/company/ComparadorPropostas';
 import CalendarioConformidade from '../../pages/company/CalendarioConformidade';
+import CapacitacaoEquipe from '../../pages/company/CapacitacaoEquipe';
+import MinhaCapacitacao from '../../pages/MinhaCapacitacao';
 import DemandasDisponiveis from '../../pages/professional/DemandasDisponiveis';
 import Treinamentos from '../../pages/Treinamentos';
 import Layout from '../Layout/Layout';
@@ -120,6 +122,38 @@ const fetchAssinaturaMock = vi.fn().mockResolvedValue({
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...a: unknown[]) => fetchAssinaturaMock(...a),
 }));
+vi.mock('../../services/capacitacaoEquipe', () => {
+  const treinamento = (id: string, title: string, extra: Record<string, unknown> = {}) => ({
+    id, title, audience: 'company',
+    youtube_url: null, link_url: null, pdf_path: null, ...extra,
+  });
+  const atribuicoesFixture = [
+    { id: 'a1', company_employee_id: 'e1', training_id: '1', status: 'completed', assigned_at: '2026-11-02T10:00:00Z', completed_at: '2026-11-03T15:30:00Z',
+      trainings: treinamento('1', 'NR-35 - Trabalho em altura', { pdf_path: '11111111-1111-1111-1111-111111111111.pdf' }) },
+    { id: 'a2', company_employee_id: 'e1', training_id: '2', status: 'assigned', assigned_at: '2026-11-04T09:00:00Z', completed_at: null,
+      trainings: treinamento('2', 'Primeiros socorros na empresa', { link_url: 'https://exemplo.com/apostila' }) },
+    { id: 'a3', company_employee_id: 'e2', training_id: '1', status: 'assigned', assigned_at: '2026-11-04T09:05:00Z', completed_at: null,
+      trainings: treinamento('1', 'NR-35 - Trabalho em altura', { pdf_path: '11111111-1111-1111-1111-111111111111.pdf' }) },
+  ];
+  return {
+    fetchEquipe: vi.fn().mockResolvedValue({ success: true, data: [
+      { id: 'e1', company_id: 'emp-1', employee_profile_id: 'f1', email: 'maria@empresa.com', display_name: 'Maria Souza', active: true, invited_at: '2026-11-01T10:00:00Z' },
+      { id: 'e2', company_id: 'emp-1', employee_profile_id: null, email: 'joao@empresa.com', display_name: 'João Lima', active: true, invited_at: '2026-11-03T10:00:00Z' },
+    ] }),
+    adicionarFuncionario: vi.fn(),
+    setFuncionarioAtivo: vi.fn(),
+    removerFuncionario: vi.fn(),
+    fetchAtribuicoesEquipe: vi.fn().mockResolvedValue({ success: true, data: atribuicoesFixture }),
+    atribuirTreinamento: vi.fn(),
+    removerAtribuicao: vi.fn(),
+    fetchMinhasAtribuicoes: vi.fn().mockResolvedValue({
+      success: true,
+      data: atribuicoesFixture.filter((a) => a.company_employee_id === 'e1'),
+      vinculos: [{ id: 'e1', company_id: 'emp-1' }],
+    }),
+    concluirAtribuicao: vi.fn(),
+  };
+});
 vi.mock('../../hooks/useMessagingDisponivel', () => ({ useMessagingDisponivel: () => ({ disponivel: true }) }));
 vi.mock('../Layout/Header', () => ({ default: () => <div className="h-16 bg-white border-b flex items-center px-6 font-poppins font-bold text-green-deep">LiggaSST</div> }));
 vi.mock('../Layout/Footer', () => ({ default: () => <div className="h-12 bg-gray-100" /> }));
@@ -248,6 +282,46 @@ describe('snapshots visuais', () => {
     await calFree.findByTestId('aviso-limite-calendario');
     salvar('empresa-calendario-conformidade-gratuito', calFree.container.innerHTML);
     calFree.unmount();
+
+    // Capacitacao da equipe (plano Empresa): pago ve equipe + atribuicoes;
+    // free ve o aviso com caminho para /planos.
+    (window as unknown as { __role?: string }).__role = 'company';
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'pro_company', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const eq = render(
+      <MemoryRouter initialEntries={['/capacitacao-equipe']}>
+        <CapacitacaoEquipe />
+      </MemoryRouter>,
+    );
+    await eq.findByTestId('resumo-equipe');
+    await eq.findByText('Maria Souza');
+    salvar('empresa-capacitacao-equipe', eq.container.innerHTML);
+    eq.unmount();
+
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'free', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const eqFree = render(
+      <MemoryRouter initialEntries={['/capacitacao-equipe']}>
+        <CapacitacaoEquipe />
+      </MemoryRouter>,
+    );
+    await eqFree.findByTestId('aviso-limite-equipe');
+    salvar('empresa-capacitacao-equipe-gratuito', eqFree.container.innerHTML);
+    eqFree.unmount();
+
+    // Visao do funcionario (conta propria, papel employee).
+    (window as unknown as { __role?: string }).__role = 'employee';
+    const minha = render(
+      <MemoryRouter initialEntries={['/minha-capacitacao']}>
+        <MinhaCapacitacao />
+      </MemoryRouter>,
+    );
+    await minha.findByTestId('progresso-funcionario');
+    await minha.findAllByText('Primeiros socorros na empresa');
+    salvar('funcionario-minha-capacitacao', minha.container.innerHTML);
+    minha.unmount();
 
     const empresa = render(
       <MemoryRouter initialEntries={['/dashboard-empresa']}>

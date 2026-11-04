@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { User, Building2, UserCheck } from 'lucide-react';
+import { User, Building2, GraduationCap, UserCheck } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -12,7 +12,7 @@ import Input from '../../components/ui/Input';
 // ate la ela nao aparece em buscas nem usa mensagens/demandas/contratos.
 const CompletarCadastro: React.FC = () => {
   const { currentUser, userData, completarCadastro } = useAuth();
-  const [role, setRole] = useState<'professional' | 'company' | null>(null);
+  const [role, setRole] = useState<'professional' | 'company' | 'employee' | null>(null);
   const [displayName, setDisplayName] = useState(
     (userData?.nome as string) ?? (userData?.nomeEmpresa as string) ?? ''
   );
@@ -103,6 +103,13 @@ const CompletarCadastro: React.FC = () => {
                 UserCheck,
                 'Sou profissional',
                 'Quero oferecer meus serviços de SST e aparecer nas buscas de empresas.'
+              )}
+              {card(
+                role === 'employee',
+                () => setRole('employee'),
+                GraduationCap,
+                'Sou funcionário',
+                'Quero fazer os treinamentos de SST liberados pela minha empresa.'
               )}
             </div>
 

@@ -11,7 +11,7 @@ interface RegisterFormData {
   email: string;
   password: string;
   confirmPassword: string;
-  userType: 'professional' | 'company';
+  userType: 'professional' | 'company' | 'employee';
   name: string;
 }
 
@@ -91,12 +91,21 @@ const Register: React.FC = () => {
                   />
                   <span className="font-roboto text-sm">Empresa</span>
                 </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="employee"
+                    {...register('userType')}
+                    className="text-green-deep focus:ring-green-deep mr-2"
+                  />
+                  <span className="font-roboto text-sm">Funcionário</span>
+                </label>
               </div>
             </div>
 
             <Input
-              label={watchUserType === 'professional' ? "Nome Completo" : "Nome da Empresa"}
-              placeholder={watchUserType === 'professional' ? "Seu nome completo" : "Razão social da empresa"}
+              label={watchUserType === 'company' ? "Nome da Empresa" : "Nome Completo"}
+              placeholder={watchUserType === 'company' ? "Razão social da empresa" : "Seu nome completo"}
               error={errors.name?.message}
               {...register('name', { required: 'Nome é obrigatório' })}
             />

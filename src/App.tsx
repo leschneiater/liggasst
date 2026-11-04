@@ -61,6 +61,8 @@ const TreinamentosAdmin = lazy(() => import('./pages/admin/TreinamentosAdmin'));
 const ReembolsosAdmin = lazy(() => import('./pages/admin/ReembolsosAdmin'));
 const RadarTst = lazy(() => import('./pages/RadarTst'));
 const Treinamentos = lazy(() => import('./pages/Treinamentos'));
+const MinhaCapacitacao = lazy(() => import('./pages/MinhaCapacitacao'));
+const CapacitacaoEquipe = lazy(() => import('./pages/company/CapacitacaoEquipe'));
 
 // Company Pages
 const DashboardEmpresa = lazy(() => import('./pages/company/DashboardEmpresa'));
@@ -244,6 +246,16 @@ function App() {
                 <Route path="/demandas/:id/propostas" element={
                   <ProtectedRoute userType="company">
                     <Layout><ComparadorPropostas /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/capacitacao-equipe" element={
+                  <ProtectedRoute userType="company">
+                    <Layout><CapacitacaoEquipe /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/minha-capacitacao" element={
+                  <ProtectedRoute userType="employee">
+                    <Layout><MinhaCapacitacao /></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/calendario-conformidade" element={

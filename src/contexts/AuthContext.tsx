@@ -4,7 +4,7 @@ import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
 
-export type UserRole = 'professional' | 'company' | 'admin';
+export type UserRole = 'professional' | 'company' | 'admin' | 'employee';
 
 interface AuthUser {
   id: string;
@@ -42,12 +42,12 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithOAuth: (provider: 'google' | 'azure') => Promise<void>;
-  completarCadastro: (role: 'professional' | 'company', displayName: string) => Promise<void>;
+  completarCadastro: (role: 'professional' | 'company' | 'employee', displayName: string) => Promise<void>;
   signup: (
     email: string,
     password: string,
     userData: Record<string, unknown>,
-    type: 'professional' | 'company'
+    type: 'professional' | 'company' | 'employee'
   ) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -86,12 +86,13 @@ const esperar = (ms: number) => new Promise<void>((resolve) => { setTimeout(reso
 const redirectForRole = (role: UserRole) => {
   if (role === 'company') return '/dashboard-empresa';
   if (role === 'admin') return '/admin';
+  if (role === 'employee') return '/minha-capacitacao';
   return '/dashboard-profissional';
 };
 
 const metadataForSignup = (
   data: Record<string, unknown>,
-  role: 'professional' | 'company'
+  role: 'professional' | 'company' | 'employee'
 ) => ({
   role,
   display_name: data.display_name ?? (role === 'company' ? data.nomeEmpresa : data.nome) ?? data.name,
@@ -349,7 +350,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Conclusao de cadastro para contas OAuth: a RPC completar_cadastro e o
   // unico caminho que aprova (grants de coluna + guard no banco impedem
   // atualizacao direta de role/verification_status).
-  const completarCadastro = async (role: 'professional' | 'company', displayName: string) => {
+  const completarCadastro = async (role: 'professional' | 'company' | 'employee', displayName: string) => {
     if (!currentUser) throw new Error('Usuário não autenticado.');
     const { error } = await supabase.rpc('completar_cadastro', {
       p_role: role,
@@ -369,7 +370,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string,
     password: string,
     data: Record<string, unknown>,
-    type: 'professional' | 'company'
+    type: 'professional' | 'company' | 'employee'
   ) => {
     setLoading(true);
     try {
