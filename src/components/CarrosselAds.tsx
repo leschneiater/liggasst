@@ -2,7 +2,8 @@
 // aparece so nas areas logadas de contas free; assinante pago e
 // visitante nunca veem. Banners, ordem, tempo por arte e maximo de
 // artes vem do painel admin; clique conta via RPC e abre o link (se
-// houver) em nova aba.
+// houver) em nova aba. Caixa fixa 4:1 em todas as telas (decisao dela
+// 04/11: tamanho fixo), com object-cover para ajuste fino.
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePlanoFree } from '../hooks/usePlanoFree';
@@ -57,7 +58,7 @@ const CarrosselAds: React.FC = () => {
         <img
           src={adImagemUrl(banner.imagem_path)}
           alt={banner.titulo}
-          className="w-full h-32 sm:h-40 object-cover"
+          className="w-full aspect-[4/1] object-cover"
         />
       </button>
       {banners.length > 1 && (

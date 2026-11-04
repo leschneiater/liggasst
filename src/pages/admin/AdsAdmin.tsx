@@ -9,8 +9,9 @@ import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
 import {
-  AdBanner, adImagemUrl, atualizarBanner, criarBanner, excluirBanner,
-  fetchAdsConfig, fetchTodosBanners, salvarAdsConfig, uploadArteAd,
+  AD_ARTE_IDEAL, AdBanner, adImagemUrl, atualizarBanner, erroProporcaoArte,
+  criarBanner, dimensoesArte, excluirBanner, fetchAdsConfig, fetchTodosBanners,
+  salvarAdsConfig, uploadArteAd,
 } from '../../services/ads';
 
 const VAZIO = { titulo: '', link: '', ordem: 0, ativo: true };
@@ -21,6 +22,7 @@ const AdsAdmin: React.FC = () => {
   const [erro, setErro] = useState<string | null>(null);
   const [form, setForm] = useState(VAZIO);
   const [arte, setArte] = useState<File | null>(null);
+  const [erroArte, setErroArte] = useState<string | null>(null);
   const [editando, setEditando] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [cfg, setCfg] = useState({ intervalo_segundos: 5, max_ativos: 5 });
@@ -51,12 +53,12 @@ const AdsAdmin: React.FC = () => {
       if (editando) {
         await atualizarBanner(editando, campos);
         toast.success('Anúncio salvo.');
-        setEditando(null); setForm(VAZIO); setArte(null);
+        setEditando(null); setForm(VAZIO); setArte(null); setErroArte(null);
       } else {
         const imagem_path = await uploadArteAd(arte as File);
         await criarBanner({ ...campos, imagem_path });
         toast.success('Anúncio criado.');
-        setForm(VAZIO); setArte(null);
+        setForm(VAZIO); setArte(null); setErroArte(null);
       }
       await carregar();
     } catch { toast.error('Não foi possível salvar.'); }
@@ -125,9 +127,33 @@ const AdsAdmin: React.FC = () => {
           </div>
           {!editando && (
             <div>
-              <label htmlFor="ads-arte" className="block text-sm font-medium text-gray-700 mb-1">Arte (JPG, PNG ou WebP, até 2 MB)</label>
+              <label htmlFor="ads-arte" className="block text-sm font-medium text-gray-700 mb-1">Arte (JPG, PNG ou WebP, até {AD_ARTE_IDEAL.maxMB} MB)</label>
               <input id="ads-arte" type="file" accept="image/jpeg,image/png,image/webp" className={campo}
-                onChange={(e) => setArte(e.target.files?.[0] ?? null)} />
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  setErroArte(null);
+                  if (!f) { setArte(null); return; }
+                  dimensoesArte(f)
+                    .then((d) => {
+                      const erro = erroProporcaoArte(d.largura, d.altura);
+                      if (erro) {
+                        setArte(null); setErroArte(erro);
+                        e.target.value = '';
+                      } else {
+                        setArte(f);
+                      }
+                    })
+                    .catch(() => { setArte(null); setErroArte('Não foi possível ler a imagem. Tente outro arquivo.'); e.target.value = ''; });
+                }} />
+              <p className="text-xs text-gray-500 mt-1">
+                Tamanho fixo: proporção 4:1, ideal {AD_ARTE_IDEAL.largura} × {AD_ARTE_IDEAL.altura} px. O banner ocupa essa
+                caixa em todas as telas (celular e computador); artes fora da proporção não são aceitas.
+              </p>
+              {erroArte && (
+                <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-2" role="alert">
+                  {erroArte}
+                </p>
+              )}
             </div>
           )}
           <div>

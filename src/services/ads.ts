@@ -1,3 +1,4 @@
+export { AD_ARTE_IDEAL, erroProporcaoArte, dimensoesArte } from './adsFormat';
 // Carrossel de anuncios do plano gratuito (decisao dela 04/11): banners
 // so para conta free logada; admin gerencia artes, link, ordem, ativo,
 // tempo por arte e maximo de artes. Clique conta via RPC no servidor.
