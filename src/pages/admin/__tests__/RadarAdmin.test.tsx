@@ -70,3 +70,12 @@ describe('RadarAdmin', () => {
     expect(excluir).not.toHaveBeenCalled();
   });
 });
+
+describe('capa do artigo (pedido dela 04/11)', () => {
+  it('mostra o campo de capa com o tamanho fixo', async () => {
+    listar.mockResolvedValue({ ok: true, itens: [] });
+    render(<MemoryRouter><RadarAdmin /></MemoryRouter>);
+    expect(await screen.findByLabelText(/Capa \(opcional/)).toBeTruthy();
+    expect(screen.getByText(/Tamanho fixo: proporção 1,9:1, ideal 1200 × 630 px/)).toBeTruthy();
+  });
+});

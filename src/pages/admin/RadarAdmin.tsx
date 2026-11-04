@@ -6,10 +6,13 @@ import { RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
+import { RADAR_CAPA_IDEAL, dimensoesArte, erroProporcaoCapa } from '../../services/adsFormat';
+import { publicStorageUrl } from '../../services/publicUrl';
+
+const radarCapaUrl = (p: string | null) => (p ? publicStorageUrl('radar-covers', p) : null);
 import {
   adminListarRadar, adminCriarRadar, adminEditarRadar, adminDefinirStatusRadar, adminExcluirRadar,
-  RadarAdminPost, StatusRadar,
-} from '../../services/radarAdmin';
+  RadarAdminPost, StatusRadar, adminDefinirCapaRadar, uploadRadarCapa } from '../../services/radarAdmin';
 
 const ROTULO: Record<StatusRadar, string> = { rascunho: 'Rascunho', publicado: 'Publicado' };
 const VAZIO = { titulo: '', resumo: '', conteudo: '' };
@@ -19,6 +22,8 @@ const RadarAdmin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [form, setForm] = useState(VAZIO);
+  const [capa, setCapa] = useState<File | null>(null);
+  const [erroCapa, setErroCapa] = useState<string | null>(null);
   const [editando, setEditando] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
 
@@ -37,17 +42,31 @@ const RadarAdmin: React.FC = () => {
     if (!valido) { toast.error('Preencha título, resumo e conteúdo.'); return; }
     setSalvando(true);
     const campos = { titulo: form.titulo.trim(), resumo: form.resumo.trim(), conteudo: form.conteudo.trim() };
+    let artigoId: string | null = null;
     if (editando) {
-      if (await adminEditarRadar(editando, campos)) { toast.success('Artigo salvo.'); setEditando(null); setForm(VAZIO); await carregar(); }
+      if (await adminEditarRadar(editando, campos)) artigoId = editando;
       else toast.error('Não foi possível salvar.');
-    } else if (await adminCriarRadar(campos)) {
-      toast.success('Rascunho salvo.'); setForm(VAZIO); await carregar();
-    } else toast.error('Não foi possível salvar.');
+    } else {
+      const criado = await adminCriarRadar(campos);
+      if (criado) artigoId = criado.id;
+      else toast.error('Não foi possível salvar.');
+    }
+    if (artigoId && capa) {
+      try {
+        const path = await uploadRadarCapa(capa);
+        if (!(await adminDefinirCapaRadar(artigoId, path))) throw new Error('capa');
+      } catch { toast.error('Artigo salvo, mas a capa não subiu. Tente editar e enviar de novo.'); setSalvando(false); return; }
+    }
+    if (artigoId) {
+      toast.success(editando ? 'Artigo salvo.' : 'Rascunho salvo.');
+      setEditando(null); setForm(VAZIO); setCapa(null); setErroCapa(null);
+      await carregar();
+    }
     setSalvando(false);
   };
 
-  const editar = (p: RadarAdminPost) => { setEditando(p.id); setForm({ titulo: p.titulo, resumo: p.resumo, conteudo: p.conteudo }); window.scrollTo?.({ top: 0 }); };
-  const cancelar = () => { setEditando(null); setForm(VAZIO); };
+  const editar = (p: RadarAdminPost) => { setEditando(p.id); setForm({ titulo: p.titulo, resumo: p.resumo, conteudo: p.conteudo }); setCapa(null); setErroCapa(null); window.scrollTo?.({ top: 0 }); };
+  const cancelar = () => { setEditando(null); setForm(VAZIO); setCapa(null); setErroCapa(null); };
 
   const alternar = async (p: RadarAdminPost) => {
     const novo: StatusRadar = p.status === 'publicado' ? 'rascunho' : 'publicado';
@@ -86,6 +105,48 @@ const RadarAdmin: React.FC = () => {
             <label htmlFor="radar-conteudo" className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
             <textarea id="radar-conteudo" rows={10} className={campo} value={form.conteudo} onChange={(e) => setForm({ ...form, conteudo: e.target.value })} />
             <p className="text-xs text-gray-500 mt-1">Texto simples. Use linha em branco para separar parágrafos.</p>
+          </div>
+          <div>
+            <label htmlFor="radar-capa" className="block text-sm font-medium text-gray-700 mb-1">Capa (opcional, JPG, PNG ou WebP, até {RADAR_CAPA_IDEAL.maxMB} MB)</label>
+            {editando && (() => {
+              const atual = itens.find((x) => x.id === editando);
+              const url = atual ? radarCapaUrl(atual.capa_path) : null;
+              return url ? (
+                <div className="mb-2">
+                  <img src={url} alt="Capa atual" className="w-64 aspect-[1200/630] object-cover rounded-lg" />
+                  <button type="button" className="block text-xs text-red-600 mt-1 hover:underline"
+                    onClick={async () => {
+                      if (!editando) return;
+                      if (await adminDefinirCapaRadar(editando, null)) { toast.success('Capa removida.'); await carregar(); }
+                      else toast.error('Não foi possível remover a capa.');
+                    }}>
+                    Remover capa atual
+                  </button>
+                </div>
+              ) : null;
+            })()}
+            <input id="radar-capa" type="file" accept="image/jpeg,image/png,image/webp" className={campo}
+              onChange={(e) => {
+                const f = e.target.files?.[0] ?? null;
+                setErroCapa(null);
+                if (!f) { setCapa(null); return; }
+                dimensoesArte(f)
+                  .then((d) => {
+                    const erro = erroProporcaoCapa(d.largura, d.altura);
+                    if (erro) { setCapa(null); setErroCapa(erro); e.target.value = ''; }
+                    else setCapa(f);
+                  })
+                  .catch(() => { setCapa(null); setErroCapa('Não foi possível ler a imagem. Tente outro arquivo.'); e.target.value = ''; });
+              }} />
+            <p className="text-xs text-gray-500 mt-1">
+              Tamanho fixo: proporção 1,9:1, ideal {RADAR_CAPA_IDEAL.largura} × {RADAR_CAPA_IDEAL.altura} px. A capa aparece
+              no topo do artigo e no card da lista; imagens fora da proporção não são aceitas.
+            </p>
+            {erroCapa && (
+              <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-2" role="alert">
+                {erroCapa}
+              </p>
+            )}
           </div>
           <div className="flex gap-2">
             <Button type="submit" disabled={salvando}>{editando ? 'Salvar alterações' : 'Salvar rascunho'}</Button>

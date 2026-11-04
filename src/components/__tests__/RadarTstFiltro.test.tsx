@@ -36,6 +36,7 @@ const fetchRadarPostMock = vi.fn();
 vi.mock('../../services/radarTst', () => ({
   fetchRadarPosts: (...args: unknown[]) => fetchRadarPostsMock(...args),
   fetchRadarPost: (...args: unknown[]) => fetchRadarPostMock(...args),
+  radarCapaUrl: (p: string | null) => (p ? `https://cdn.test/${p}` : null),
 }));
 
 const assinaturaPaga: Assinatura = {

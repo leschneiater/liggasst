@@ -4,13 +4,20 @@
 // qualquer outra conta, a query retorna lista vazia — fail-closed.
 // Nada de artigo no bundle do frontend.
 import { supabase } from '../lib/supabase';
+import { publicStorageUrl } from './publicUrl';
 
 export interface RadarTstPost {
   id: string;
   titulo: string;
   resumo: string;
   conteudo: string;
+  capa_path: string | null;
   publicado_em: string; // timestamptz ISO
+}
+
+// Capa do artigo (bucket publico radar-covers; pedido dela 04/11).
+export function radarCapaUrl(capaPath: string | null): string | null {
+  return capaPath ? publicStorageUrl('radar-covers', capaPath) : null;
 }
 
 export type RadarTstResumo = Omit<RadarTstPost, 'conteudo'>;
@@ -19,7 +26,7 @@ export type RadarTstResumo = Omit<RadarTstPost, 'conteudo'>;
 export async function fetchRadarPosts(): Promise<RadarTstResumo[]> {
   const { data, error } = await supabase
     .from('radar_posts')
-    .select('id, titulo, resumo, publicado_em')
+    .select('id, titulo, resumo, capa_path, publicado_em')
     .eq('status', 'publicado')
     .order('publicado_em', { ascending: false });
   if (error) throw error;
@@ -31,7 +38,7 @@ export async function fetchRadarPosts(): Promise<RadarTstResumo[]> {
 export async function fetchRadarPost(id: string): Promise<RadarTstPost | null> {
   const { data, error } = await supabase
     .from('radar_posts')
-    .select('id, titulo, resumo, conteudo, publicado_em')
+    .select('id, titulo, resumo, conteudo, capa_path, publicado_em')
     .eq('id', id)
     .eq('status', 'publicado')
     .maybeSingle();

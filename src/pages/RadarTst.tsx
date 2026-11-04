@@ -12,7 +12,7 @@ import { Radar, Lock, AlertTriangle, Search, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchAssinatura } from '../services/assinatura';
 import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
-import { fetchRadarPosts, fetchRadarPost, type RadarTstPost, type RadarTstResumo } from '../services/radarTst';
+import { fetchRadarPosts, fetchRadarPost, type RadarTstPost, type RadarTstResumo, radarCapaUrl } from '../services/radarTst';
 import Button from '../components/ui/Button';
 
 const RadarTst: React.FC = () => {
@@ -118,6 +118,13 @@ const RadarTst: React.FC = () => {
               <ArrowLeft size={16} aria-hidden="true" />
               <span>Voltar para a lista</span>
             </button>
+            {radarCapaUrl(aberto.capa_path) && (
+              <img
+                src={radarCapaUrl(aberto.capa_path) as string}
+                alt={`Capa: ${aberto.titulo}`}
+                className="w-full aspect-[1200/630] object-cover rounded-lg mb-4"
+              />
+            )}
             <h2 className="font-poppins font-bold text-xl text-soft-black mb-1">{aberto.titulo}</h2>
             <p className="font-roboto text-sm text-gray-500 mb-4">
               {new Date(aberto.publicado_em).toLocaleDateString('pt-BR')}
@@ -167,6 +174,13 @@ const RadarTst: React.FC = () => {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === 'Enter') abrirArtigo(post.id); }}
                 >
+                  {radarCapaUrl(post.capa_path) && (
+                    <img
+                      src={radarCapaUrl(post.capa_path) as string}
+                      alt=""
+                      className="w-full aspect-[1200/630] object-cover rounded-lg mb-3"
+                    />
+                  )}
                   <h2 className="font-poppins font-semibold text-lg text-soft-black">{post.titulo}</h2>
                   <p className="font-roboto text-sm text-gray-500 mb-2">
                     {new Date(post.publicado_em).toLocaleDateString('pt-BR')}

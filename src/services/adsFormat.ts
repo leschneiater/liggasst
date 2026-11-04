@@ -10,16 +10,49 @@ export const AD_ARTE_IDEAL = {
   maxMB: 2,
 } as const;
 
+export interface ImagemIdeal {
+  largura: number;
+  altura: number;
+  proporcao: number;
+  tolerancia: number;
+  maxMB: number;
+  rotulo: string;
+}
+
+// Capa de artigo do Radar TST (pedido dela 04/11): 1200x630,
+// proporcao fixa com o mesmo criterio do carrossel (validar/bloquear).
+export const RADAR_CAPA_IDEAL: ImagemIdeal = {
+  largura: 1200,
+  altura: 630,
+  proporcao: 1200 / 630,
+  tolerancia: 0.15,
+  maxMB: 2,
+  rotulo: 'capa',
+};
+
 // Validacao BLOQUEANTE da proporcao (decisao dela 04/11: tamanho fixo).
 // Retorna a mensagem de erro quando fora da tolerancia; null quando ok.
-export function erroProporcaoArte(largura: number, altura: number): string | null {
+export function erroProporcao(ideal: ImagemIdeal, largura: number, altura: number): string | null {
   if (!(largura > 0) || !(altura > 0)) return null;
   const p = largura / altura;
-  const min = AD_ARTE_IDEAL.proporcao * (1 - AD_ARTE_IDEAL.tolerancia);
-  const max = AD_ARTE_IDEAL.proporcao * (1 + AD_ARTE_IDEAL.tolerancia);
+  const min = ideal.proporcao * (1 - ideal.tolerancia);
+  const max = ideal.proporcao * (1 + ideal.tolerancia);
   if (p >= min && p <= max) return null;
-  const atual = p >= 10 ? p.toFixed(0) : p.toFixed(1);
-  return `Esta arte tem proporção ${atual}:1 e não pode ser usada. A proporção precisa ser 4:1 (${AD_ARTE_IDEAL.largura}×${AD_ARTE_IDEAL.altura} px).`;
+  const fmt = (n: number) => {
+    const s = n >= 10 ? n.toFixed(0) : n.toFixed(1);
+    return s.endsWith('.0') ? s.slice(0, -2) : s;
+  };
+  const atual = fmt(p);
+  const esperada = fmt(ideal.proporcao);
+  return `Esta ${ideal.rotulo} tem proporção ${atual}:1 e não pode ser usada. A proporção precisa ser ${esperada}:1 (${ideal.largura}×${ideal.altura} px).`;
+}
+
+export function erroProporcaoArte(largura: number, altura: number): string | null {
+  return erroProporcao({ ...AD_ARTE_IDEAL, rotulo: 'arte' }, largura, altura);
+}
+
+export function erroProporcaoCapa(largura: number, altura: number): string | null {
+  return erroProporcao(RADAR_CAPA_IDEAL, largura, altura);
 }
 
 // Le as dimensoes da imagem escolhida para o aviso de proporcao.

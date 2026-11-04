@@ -13,6 +13,7 @@ vi.mock('../../services/assinatura', () => ({
 const fetchRadarPostsMock = vi.fn();
 vi.mock('../../services/radarTst', () => ({
   fetchRadarPosts: (...args: unknown[]) => fetchRadarPostsMock(...args),
+  radarCapaUrl: (p: string | null) => (p ? `https://cdn.test/${p}` : null),
 }));
 
 const authValue = { currentUser: { id: 'u1', verified: true }, loading: false };
