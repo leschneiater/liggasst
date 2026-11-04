@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Flag, GraduationCap, RotateCcw, Mail, Newspaper, Megaphone } from 'lucide-react';
+import { LayoutDashboard, Flag, GraduationCap, RotateCcw, Mail, Newspaper, Megaphone, Users } from 'lucide-react';
 
 const menuItems = [
   { path: '/admin', label: 'Painel', icon: LayoutDashboard },
@@ -9,6 +9,7 @@ const menuItems = [
   { path: '/admin/reembolsos', label: 'Reembolsos', icon: RotateCcw },
   { path: '/admin/radar', label: 'Radar', icon: Newspaper },
   { path: '/admin/publicidade', label: 'Publicidade', icon: Megaphone },
+  { path: '/admin/acessos', label: 'Acessos', icon: Users },
   { path: '/admin/contatos', label: 'Contatos', icon: Mail },
 ];
 

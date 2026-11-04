@@ -1,6 +1,7 @@
 // Leitura do plano da conta logada (public.subscriptions) e chamada do
 // checkout de TESTE (sandbox Asaas). Versao de testes: o plano exibido vem
 // sempre da tabela (mantida pelo webhook), nunca de estado local.
+import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
 import { funcaoBilling } from './billingEndpoints';
 import { supabase } from '../lib/supabase';
 
@@ -19,7 +20,28 @@ export async function fetchAssinatura(profileId: string): Promise<Assinatura | n
     .eq('profile_id', profileId)
     .maybeSingle();
   if (error) throw error;
-  return data as Assinatura | null;
+  const assinatura = data as Assinatura | null;
+  // Cortesia (decisao dela 04/11): quando a assinatura da tabela nao esta
+  // paga-ativa, pergunta o plano efetivo ao banco (regra unica). Se houver
+  // cortesia ativa, devolve uma assinatura SINTETICA de assinante pago -
+  // a pessoa ve e usa tudo como assinante normal, sem indicacao de cortesia.
+  if (!assinaturaPagaAtiva(assinatura)) {
+    const { data: efetivo, error: erroEfetivo } = await supabase.rpc('plano_efetivo');
+    if (!erroEfetivo && (efetivo === 'pro_professional' || efetivo === 'pro_company')) {
+      const { data: cort } = await supabase
+        .from('cortesias')
+        .select('valida_ate')
+        .is('revogada_em', null)
+        .maybeSingle();
+      return {
+        plan: efetivo,
+        status: 'active',
+        current_period_end: (cort?.valida_ate as string | null) ?? null,
+        environment: 'production',
+      };
+    }
+  }
+  return assinatura;
 }
 
 export interface CheckoutTestePayload {
