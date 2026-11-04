@@ -3,7 +3,7 @@
 // Conta free ve o aviso com caminho para /planos; a gestao dos itens e paga.
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CalendarClock, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, CalendarClock, ChevronLeft, ChevronRight, LayoutList, CalendarDays, CalendarRange, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AvisoLimitesPlano from '../../components/AvisoLimitesPlano';
@@ -16,12 +16,23 @@ import {
 } from '../../services/conformidade';
 import {
   DIAS_ALERTA_VENCIMENTO,
+  DIAS_SEMANA_CURTO,
+  DIAS_SEMANA_LONGO,
   ItemConformidade,
   ROTULOS_SAUDE,
   TIPOS_DOCUMENTO,
+  VisaoCalendario,
+  diasDaSemana,
   diasParaVencer,
+  deslocarMes,
+  deslocarSemana,
+  gradeDoMes,
+  isoHoje,
+  itensPorData,
   ordenarItens,
   resumoSaude,
+  rotuloMes,
+  rotuloSemana,
   saudeItem,
 } from '../../utils/calendarioConformidade';
 
@@ -41,6 +52,20 @@ const ESTILO_SAUDE: Record<string, string> = {
   em_dia: 'bg-green-light text-green-deep',
 };
 
+// Borda/preenchimento dos chips nas visoes de calendario (mesma leitura de
+// cor da lista: vermelho vencido, ambar a vencer, verde em dia).
+const ESTILO_CHIP_DIA: Record<string, string> = {
+  vencido: 'bg-red-100 text-red-800 border border-red-200',
+  a_vencer: 'bg-amber-100 text-amber-800 border border-amber-200',
+  em_dia: 'bg-green-50 text-green-deep border border-green-light',
+};
+
+const OPCOES_VISAO: { id: VisaoCalendario; rotulo: string; Icone: typeof LayoutList }[] = [
+  { id: 'lista', rotulo: 'Lista', Icone: LayoutList },
+  { id: 'mensal', rotulo: 'Calendário', Icone: CalendarDays },
+  { id: 'semanal', rotulo: 'Planner semanal', Icone: CalendarRange },
+];
+
 const formatarData = (iso: string): string => {
   const [ano, mes, dia] = iso.split('-');
   return `${dia}/${mes}/${ano}`;
@@ -57,6 +82,12 @@ const CalendarioConformidade: React.FC = () => {
   const [formAberto, setFormAberto] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState<string | null>(null);
+  const [visao, setVisao] = useState<VisaoCalendario>('lista');
+  const [mesVisivel, setMesVisivel] = useState(() => {
+    const d = new Date();
+    return { ano: d.getFullYear(), mes: d.getMonth() };
+  });
+  const [semanaVisivel, setSemanaVisivel] = useState(() => new Date());
   const hoje = useMemo(() => new Date(), []);
 
   const carregar = async () => {
@@ -184,6 +215,25 @@ const CalendarioConformidade: React.FC = () => {
               </Button>
             </div>
 
+            {!formAberto && (
+              <div className="flex gap-1 mb-6 bg-white rounded-xl shadow-sm border border-gray-100 p-1 w-fit" data-testid="alternar-visao">
+                {OPCOES_VISAO.map(({ id, rotulo, Icone }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setVisao(id)}
+                    aria-pressed={visao === id}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-roboto text-sm font-medium transition-colors ${
+                      visao === id ? 'bg-green-deep text-white' : 'text-gray-600 hover:bg-neutral-gray'
+                    }`}
+                  >
+                    <Icone size={16} />
+                    {rotulo}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {formAberto && (
               <form
                 onSubmit={salvar}
@@ -293,7 +343,111 @@ const CalendarioConformidade: React.FC = () => {
               </div>
             )}
 
-            {!loading && !erro && ordenados.length > 0 && (
+            {!loading && !erro && itens.length > 0 && visao === 'mensal' && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4" data-testid="visao-mensal">
+                <div className="flex items-center justify-between mb-4">
+                  <button type="button" onClick={() => setMesVisivel((m) => deslocarMes(m.ano, m.mes, -1))}
+                    className="p-2 rounded-lg hover:bg-neutral-gray" aria-label="Mês anterior">
+                    <ChevronLeft size={18} />
+                  </button>
+                  <h2 className="font-poppins font-semibold text-lg text-soft-black capitalize">
+                    {rotuloMes(mesVisivel.ano, mesVisivel.mes)}
+                  </h2>
+                  <button type="button" onClick={() => setMesVisivel((m) => deslocarMes(m.ano, m.mes, 1))}
+                    className="p-2 rounded-lg hover:bg-neutral-gray" aria-label="Próximo mês">
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-7 gap-1">
+                  {DIAS_SEMANA_CURTO.map((d) => (
+                    <div key={d} className="text-center font-roboto text-xs font-semibold text-gray-500 py-1">
+                      {d}
+                    </div>
+                  ))}
+                  {gradeDoMes(mesVisivel.ano, mesVisivel.mes).flat().map((dia) => {
+                    const itensDia = (itensPorData(itens)[dia.iso] ?? []);
+                    return (
+                      <div
+                        key={dia.iso}
+                        className={`min-h-20 rounded-lg border p-1 ${
+                          dia.noMes ? 'border-gray-100 bg-white' : 'border-transparent bg-neutral-gray/50'
+                        } ${dia.iso === isoHoje() ? 'ring-2 ring-green-medium' : ''}`}
+                      >
+                        <p className={`text-right font-roboto text-xs mb-1 ${dia.noMes ? 'text-gray-700' : 'text-gray-400'}`}>
+                          {dia.dia}
+                        </p>
+                        <div className="space-y-1">
+                          {itensDia.map((item) => (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => abrirEdicao(item)}
+                              title={`${item.titulo} (${item.tipo})`}
+                              className={`block w-full text-left truncate rounded px-1 py-0.5 font-roboto text-xs ${ESTILO_CHIP_DIA[saudeItem(item.validade, hoje)]}`}
+                            >
+                              {item.titulo}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {!loading && !erro && itens.length > 0 && visao === 'semanal' && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4" data-testid="visao-semanal">
+                <div className="flex items-center justify-between mb-4">
+                  <button type="button" onClick={() => setSemanaVisivel((s0) => deslocarSemana(s0, -1))}
+                    className="p-2 rounded-lg hover:bg-neutral-gray" aria-label="Semana anterior">
+                    <ChevronLeft size={18} />
+                  </button>
+                  <h2 className="font-poppins font-semibold text-lg text-soft-black">
+                    {rotuloSemana(diasDaSemana(semanaVisivel))}
+                  </h2>
+                  <button type="button" onClick={() => setSemanaVisivel((s0) => deslocarSemana(s0, 1))}
+                    className="p-2 rounded-lg hover:bg-neutral-gray" aria-label="Próxima semana">
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+                <div className="grid grid-cols-7 gap-2">
+                  {diasDaSemana(semanaVisivel).map((dia, idx) => {
+                    const itensDia = (itensPorData(itens)[dia.iso] ?? []);
+                    return (
+                      <div
+                        key={dia.iso}
+                        className={`rounded-lg border border-gray-100 p-2 min-h-32 ${dia.iso === isoHoje() ? 'ring-2 ring-green-medium' : ''}`}
+                      >
+                        <p className="font-roboto text-xs font-semibold text-gray-500">
+                          {DIAS_SEMANA_LONGO[idx]}
+                        </p>
+                        <p className="font-roboto text-sm text-soft-black mb-2">{dia.dia}</p>
+                        <div className="space-y-1">
+                          {itensDia.length === 0 ? (
+                            <p className="font-roboto text-xs text-gray-300">—</p>
+                          ) : (
+                            itensDia.map((item) => (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => abrirEdicao(item)}
+                                className={`block w-full text-left rounded px-2 py-1 font-roboto text-xs ${ESTILO_CHIP_DIA[saudeItem(item.validade, hoje)]}`}
+                              >
+                                <span className="block font-medium truncate">{item.titulo}</span>
+                                <span className="block truncate opacity-80">{item.tipo}</span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {!loading && !erro && ordenados.length > 0 && visao === 'lista' && (
               <ul className="space-y-3" data-testid="lista-conformidade">
                 {ordenados.map((item) => {
                   const saude = saudeItem(item.validade, hoje);

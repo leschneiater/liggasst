@@ -123,6 +123,43 @@ describe('CalendarioConformidade', () => {
     expect(screen.queryByTestId('sugerir-profissionais-i3')).toBeNull();
   });
 
+  it('alterna entre lista, calendario mensal e planner semanal', async () => {
+    planoPagoMock.mockReturnValue(true);
+    renderizar();
+    await waitFor(() => expect(screen.getByTestId('lista-conformidade')).toBeTruthy());
+    expect(screen.getByTestId('alternar-visao')).toBeTruthy();
+
+    fireEvent.click(screen.getByText('Calendário'));
+    await waitFor(() => expect(screen.getByTestId('visao-mensal')).toBeTruthy());
+    expect(screen.queryByTestId('lista-conformidade')).toBeNull();
+    // O item vence daqui a 10 dias: o titulo aparece na grade do mes atual.
+    expect(screen.getAllByText('PGR da matriz').length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByText('Planner semanal'));
+    await waitFor(() => expect(screen.getByTestId('visao-semanal')).toBeTruthy());
+    expect(screen.getByText('Segunda-feira')).toBeTruthy();
+    expect(screen.queryByTestId('visao-mensal')).toBeNull();
+
+    fireEvent.click(screen.getByText('Lista'));
+    await waitFor(() => expect(screen.getByTestId('lista-conformidade')).toBeTruthy());
+    expect(screen.queryByTestId('visao-semanal')).toBeNull();
+  });
+
+  it('navegar para o mes do vencimento mostra o item na grade', async () => {
+    planoPagoMock.mockReturnValue(true);
+    fetchItensMock.mockResolvedValue({
+      success: true,
+      data: [{ ...itemFixture, validade: isoDaquiA(45) }],
+    });
+    renderizar();
+    await waitFor(() => expect(screen.getByTestId('lista-conformidade')).toBeTruthy());
+    fireEvent.click(screen.getByText('Calendário'));
+    await waitFor(() => expect(screen.getByTestId('visao-mensal')).toBeTruthy());
+    expect(screen.queryByText('PGR da matriz')).toBeNull();
+    fireEvent.click(screen.getByLabelText('Próximo mês'));
+    await waitFor(() => expect(screen.getByText('PGR da matriz')).toBeTruthy());
+  });
+
   it('excluir pede confirmacao antes de chamar o service', async () => {
     planoPagoMock.mockReturnValue(true);
     renderizar();

@@ -228,6 +228,13 @@ describe('snapshots visuais', () => {
     await calPago.findByTestId('lista-conformidade');
     await calPago.findByText('PGR da matriz');
     salvar('empresa-calendario-conformidade-pago', calPago.container.innerHTML);
+    // Visao mensal e planner semanal (pedido dela em 04/11 08:15).
+    (await calPago.findByText('Calendário')).click();
+    await calPago.findByTestId('visao-mensal');
+    salvar('empresa-calendario-conformidade-mensal', calPago.container.innerHTML);
+    (await calPago.findByText('Planner semanal')).click();
+    await calPago.findByTestId('visao-semanal');
+    salvar('empresa-calendario-conformidade-semanal', calPago.container.innerHTML);
     calPago.unmount();
 
     fetchAssinaturaMock.mockResolvedValue({
