@@ -14,6 +14,7 @@ import ComparadorPropostas from '../../pages/company/ComparadorPropostas';
 import CalendarioConformidade from '../../pages/company/CalendarioConformidade';
 import CapacitacaoEquipe from '../../pages/company/CapacitacaoEquipe';
 import MinhaCapacitacao from '../../pages/MinhaCapacitacao';
+import AssinaturaEmpresa from '../../pages/company/AssinaturaEmpresa';
 import DemandasDisponiveis from '../../pages/professional/DemandasDisponiveis';
 import Treinamentos from '../../pages/Treinamentos';
 import Layout from '../Layout/Layout';
@@ -154,6 +155,11 @@ vi.mock('../../services/capacitacaoEquipe', () => {
     concluirAtribuicao: vi.fn(),
   };
 });
+vi.mock('../../services/reembolsos', () => ({
+  fetchMeusPedidosReembolso: vi.fn().mockResolvedValue([]),
+  solicitarReembolso: vi.fn(),
+  ROTULO_STATUS_REEMBOLSO: {},
+}));
 vi.mock('../../hooks/useMessagingDisponivel', () => ({ useMessagingDisponivel: () => ({ disponivel: true }) }));
 vi.mock('../Layout/Header', () => ({ default: () => <div className="h-16 bg-white border-b flex items-center px-6 font-poppins font-bold text-green-deep">LiggaSST</div> }));
 vi.mock('../Layout/Footer', () => ({ default: () => <div className="h-12 bg-gray-100" /> }));
@@ -322,6 +328,24 @@ describe('snapshots visuais', () => {
     await minha.findAllByText('Primeiros socorros na empresa');
     salvar('funcionario-minha-capacitacao', minha.container.innerHTML);
     minha.unmount();
+
+    // Upgrade no card pago da Assinatura (pedido dela 04/11 11:10): com a
+    // cobranca real ligada e a conta gratuita, o card Empresa tem o botao
+    // que leva ao formulario de contratacao (StatusPlano logo acima).
+    vi.stubEnv('VITE_BILLING_CONTRACT_ENABLED', 'true');
+    (window as unknown as { __role?: string }).__role = 'company';
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'free', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const assin = render(
+      <MemoryRouter initialEntries={['/assinatura-empresa']}>
+        <AssinaturaEmpresa />
+      </MemoryRouter>,
+    );
+    await assin.findByRole('button', { name: 'Assinar o plano Empresa' });
+    salvar('empresa-assinatura-upgrade', assin.container.innerHTML);
+    assin.unmount();
+    vi.unstubAllEnvs();
 
     const empresa = render(
       <MemoryRouter initialEntries={['/dashboard-empresa']}>

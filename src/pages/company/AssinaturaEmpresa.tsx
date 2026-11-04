@@ -24,6 +24,16 @@ const AssinaturaEmpresa: React.FC = () => {
     return () => { vivo = false; };
   }, [currentUser]);
 
+  // Leva ao cartao do plano real (StatusPlano), onde fica o formulario de
+  // contratacao com checkout Asaas.
+  const irParaContratacao = () => {
+    const el = document.querySelector('[data-testid="status-plano"]');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const campo = el.querySelector('input');
+    if (campo instanceof HTMLElement) window.setTimeout(() => campo.focus(), 400);
+  };
+
   const proposta = PROPOSTA_EMPRESA;
   const plans = [
     { ...proposta.gratuito, name: proposta.gratuito.nome, price: proposta.gratuito.precoMensal,
@@ -97,11 +107,19 @@ const AssinaturaEmpresa: React.FC = () => {
                 ))}
               </div>
 
-              {(currentPlan === plan.id || import.meta.env.VITE_BILLING_CONTRACT_ENABLED !== 'true') && (
+              {currentPlan === plan.id || import.meta.env.VITE_BILLING_CONTRACT_ENABLED !== 'true' ? (
                 <Button variant="outline" fullWidth size="lg" disabled>
                   {currentPlan === plan.id ? 'Plano Atual' : 'Em breve'}
                 </Button>
-              )}
+              ) : plan.id !== 'gratuito' ? (
+                // Com a cobranca real ligada, a conta gratuita ve no card pago o
+                // botao de upgrade, que leva ao formulario de contratacao real
+                // (StatusPlano acima: dados de faturamento + aceite + checkout
+                // Asaas). O card gratuito da conta pagante nao oferece downgrade.
+                <Button variant="primary" fullWidth size="lg" onClick={irParaContratacao}>
+                  Assinar o plano {plan.name}
+                </Button>
+              ) : null}
             </div>
           ))}
         </div>
