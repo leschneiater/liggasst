@@ -240,7 +240,9 @@ export const sendMessage = async (senderId: string, receiverId: string, content:
     return { success: true, data };
   } catch (error) {
     console.error('Erro ao enviar mensagem:', error);
-    return { success: false, error };
+    // code exposto para a UI distinguir bloqueio de RLS (ex.: limite de
+    // contato novo do plano gratuito) de falha generica.
+    return { success: false, error, code: (error as { code?: string })?.code };
   }
 };
 
@@ -435,7 +437,7 @@ export const publishDemand = async (
     return { success: true, data };
   } catch (error) {
     console.error('Erro ao publicar demanda:', error);
-    return { success: false, error };
+    return { success: false, error, code: (error as { code?: string })?.code };
   }
 };
 

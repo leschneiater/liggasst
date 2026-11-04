@@ -13,6 +13,10 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import { deleteDemandRascunho, fetchDemands, updateDemand } from '../../services/database';
+import { fetchAssinatura } from '../../services/assinatura';
+import { assinaturaPagaAtiva } from '../../utils/assinaturaAcesso';
+import { demandasAtivasMinhas } from '../../services/limites';
+import { bloquearNovaDemandaAtiva, MSG_LIMITE_DEMANDAS } from '../../utils/limitesPlano';
 import {
   DemandaGestaoRow,
   ROTULOS_ACAO_DEMANDA,
@@ -65,7 +69,27 @@ const DashboardEmpresa: React.FC = () => {
         carregarDemandas();
         return;
       }
+      // Limite do plano gratuito (3 demandas ativas) ao publicar rascunho:
+      // pre-checagem falha aberta; o trigger do banco decide em corrida.
+      if (confirmacao.acao === 'publicar' && currentUser) {
+        const [assinatura, ativas] = await Promise.all([
+          fetchAssinatura(currentUser.id).catch(() => null),
+          demandasAtivasMinhas(),
+        ]);
+        if (bloquearNovaDemandaAtiva({ pago: assinaturaPagaAtiva(assinatura), demandasAtivas: ativas ?? 0 })) {
+          toast.error(MSG_LIMITE_DEMANDAS);
+          setConfirmacao(null);
+          setAcaoLoading(false);
+          return;
+        }
+      }
       const result = await updateDemand(confirmacao.id, { status: destino as string });
+      if (!result.success && result.error && String((result.error as { message?: string }).message || '').includes('limite de 3 demandas')) {
+        toast.error(MSG_LIMITE_DEMANDAS);
+        setConfirmacao(null);
+        setAcaoLoading(false);
+        return;
+      }
       if (!result.success && result.conflict) {
         // Conflito: a demanda ja nao estava ativa (ex.: outra aba encerrou).
         // Nada foi sobrescrito; a lista recarrega com o estado real.

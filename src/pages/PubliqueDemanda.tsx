@@ -16,6 +16,12 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { publishDemand, fetchOwnCompany, updateCompany } from '../services/database';
+import { fetchAssinatura } from '../services/assinatura';
+import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
+import { demandasAtivasMinhas } from '../services/limites';
+import { bloquearNovaDemandaAtiva, MSG_LIMITE_DEMANDAS } from '../utils/limitesPlano';
+import AvisoLimitesPlano from '../components/AvisoLimitesPlano';
+import { usePlanoPago } from '../hooks/usePlanoPago';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
@@ -44,6 +50,7 @@ const PubliqueDemanda: React.FC = () => {
   const navigate = useNavigate();
   
   const { currentUser } = useAuth();
+  const planoPago = usePlanoPago();
   
   const { register, handleSubmit, formState: { errors }, reset, getValues } = useForm<DemandFormData>();
   // Contato do cadastro como carregado: so e regravado ao publicar se mudou.
@@ -104,6 +111,16 @@ const PubliqueDemanda: React.FC = () => {
         ? `${data.descricao}\n\nRequisitos: ${data.requisitos}`
         : data.descricao;
       if (!currentUser) throw new Error('Usuário não autenticado');
+      // Limite do plano gratuito: 3 demandas ativas. Pre-checagem falha
+      // aberta; em corrida, o bloqueio real vem da RLS (mapeado abaixo).
+      const [assinatura, ativas] = await Promise.all([
+        fetchAssinatura(currentUser.id).catch(() => null),
+        demandasAtivasMinhas(),
+      ]);
+      if (bloquearNovaDemandaAtiva({ pago: assinaturaPagaAtiva(assinatura), demandasAtivas: ativas ?? 0 })) {
+        toast.error(MSG_LIMITE_DEMANDAS);
+        return;
+      }
       // 1) Contato primeiro: o update é idempotente (mesma linha do cadastro)
       //    e falhas ANTES do insert deixam o retry seguro, sem demanda duplicada.
       //    Se o insert commitar no servidor mas a resposta se perder
@@ -138,6 +155,10 @@ const PubliqueDemanda: React.FC = () => {
         urgencia: data.urgencia,
         tipo_orcamento: data.tipoOrcamento,
       });
+      if (!result.success && (result as { code?: string }).code === '42501') {
+        toast.error(MSG_LIMITE_DEMANDAS);
+        return;
+      }
       if (!result.success) {
         // Resultado desconhecido: o insert pode ter commitado no servidor e a
         // resposta se perdeu. Não há como confirmar nem desfazer daqui —
@@ -309,6 +330,8 @@ const PubliqueDemanda: React.FC = () => {
             Descreva a necessidade da sua empresa e publique a demanda na plataforma
           </p>
         </div>
+
+        <AvisoLimitesPlano tipo="demandas" pago={planoPago} />
 
         {/* Progress Indicator */}
         <div className="mb-8">

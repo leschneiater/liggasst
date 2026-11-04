@@ -298,6 +298,8 @@ export const supabase = {
       return wrap(role === 'company' ? minhasAvaliacoesEmpresaFix : role === 'professional' ? minhasAvaliacoesProfissionalFix : []);
     }
     if (fn2 === 'avaliacoes_resumo') return wrap({ media: 4.5, total: 2 });
+    if (fn2 === 'limite_contato_novo_atingido') return wrap(false);
+    if (fn2 === 'demandas_ativas_minhas') return wrap(0);
     if (fn2 === 'avaliacoes_do_perfil') {
       const perfil = String(params?.p_profile ?? '');
       return wrap(perfil.startsWith('e') ? avaliacoesPerfilEmpresaFix : avaliacoesPerfilProfissionalFix);

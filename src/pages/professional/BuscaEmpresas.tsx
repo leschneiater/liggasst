@@ -5,6 +5,8 @@ import { Search, SlidersHorizontal, MapPin, Building2, MessageSquare, Users, Ref
 import Button from '../../components/ui/Button';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import { fetchCompanies } from '../../services/database';
+import { usePlanoPago } from '../../hooks/usePlanoPago';
+import AvisoLimitesPlano from '../../components/AvisoLimitesPlano';
 
 interface Company {
   id: string;
@@ -53,6 +55,7 @@ const segmentos = [
 ];
 
 const BuscaEmpresas: React.FC = () => {
+  const planoPago = usePlanoPago();
   const navigate = useNavigate();
   const { disponivel: msgDisponivel } = useMessagingDisponivel();
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -131,6 +134,8 @@ const BuscaEmpresas: React.FC = () => {
             Encontre empresas que precisam dos seus serviços de SST
           </p>
         </div>
+
+        <AvisoLimitesPlano tipo="contatos" pago={planoPago} />
 
         {/* Search and Filters */}
         <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 mb-6">

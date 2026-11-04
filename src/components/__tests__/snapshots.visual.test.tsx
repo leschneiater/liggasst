@@ -7,6 +7,9 @@ import { describe, it, vi } from 'vitest';
 import { writeFileSync, readFileSync, readdirSync, mkdirSync } from 'fs';
 import path from 'path';
 import TreinamentosAdmin from '../../pages/admin/TreinamentosAdmin';
+import CertificadosProfissional from '../../pages/professional/CertificadosProfissional';
+import BuscaEmpresas from '../../pages/professional/BuscaEmpresas';
+import PubliqueDemanda from '../../pages/PubliqueDemanda';
 import Treinamentos from '../../pages/Treinamentos';
 import Layout from '../Layout/Layout';
 
@@ -39,6 +42,28 @@ vi.mock('../../services/database', () => ({
   fetchTrainingsMembro: (...a: unknown[]) => fetchTrainingsMembroMock(...a),
   getTrainingPdfUrl: vi.fn().mockResolvedValue({ success: true, signedUrl: 'https://exemplo.com/assinado.pdf' }),
   createTraining: vi.fn(), updateTraining: vi.fn(), deleteTraining: vi.fn(), uploadTrainingPdf: vi.fn(),
+  fetchMyCertificates: vi.fn().mockResolvedValue({ success: true, data: [
+    { id: 'c1', professional_id: 'u1', name: 'NR-35', issuer: 'SENAI', issued_at: '2026-01-10', expires_at: null, storage_path: 'x.pdf', status: 'approved', visible_to_companies: true, created_at: '2026-01-10T00:00:00Z', updated_at: '2026-01-10T00:00:00Z' },
+  ] }),
+  fetchCompanies: vi.fn().mockResolvedValue({ success: true, data: [
+    { id: 'e1', display_name: 'TechCorp Ltda', city: 'São Paulo', state: 'SP', segment: 'Tecnologia', employee_count: '51-100', description: 'Indústria de componentes.', needs: ['PGR'] },
+  ] }),
+  fetchOwnCompany: vi.fn().mockResolvedValue({ success: true, data: { razao_social: 'Empresa Teste', responsible_name: 'Fulana', responsible_phone: '11999990000' } }),
+  publishDemand: vi.fn(), updateCompany: vi.fn(),
+}));
+// CertificadosProfissional importa o cliente direto; stub minimo (as
+// interacoes reais passam pelos servicos ja mockados).
+vi.mock('../../lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(),
+    rpc: vi.fn(),
+    storage: { from: () => ({ remove: vi.fn(), upload: vi.fn(), list: vi.fn() }) },
+    functions: { invoke: vi.fn() },
+  },
+}));
+vi.mock('../../services/limites', () => ({
+  demandasAtivasMinhas: vi.fn().mockResolvedValue(0),
+  limiteContatoNovoAtingido: vi.fn().mockResolvedValue(false),
 }));
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ userType: (window as unknown as { __role?: string }).__role ?? 'professional', currentUser: { id: 'u1', verified: true }, loading: false }),
@@ -88,6 +113,27 @@ describe('snapshots visuais', () => {
     const gratuito = render(<MemoryRouter initialEntries={['/treinamentos-profissional']}><Treinamentos /></MemoryRouter>);
     await gratuito.findByText('Conteúdo exclusivo para assinantes');
     salvar('membro-treinamentos-bloqueado', gratuito.container.innerHTML);
+
+    // Avisos dos limites do plano gratuito (assinatura free).
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'free', status: 'active', current_period_end: null, environment: 'production',
+    });
+    (window as unknown as { __role?: string }).__role = 'professional';
+    const certs = render(<MemoryRouter initialEntries={['/certificados']}><CertificadosProfissional /></MemoryRouter>);
+    await certs.findByTestId('aviso-limite-certificados');
+    salvar('profissional-certificados-aviso-limite', certs.container.innerHTML);
+    certs.unmount();
+
+    const buscaEmp = render(<MemoryRouter initialEntries={['/buscar-empresas']}><BuscaEmpresas /></MemoryRouter>);
+    await buscaEmp.findByTestId('aviso-limite-contatos');
+    salvar('profissional-busca-empresas-aviso-limite', buscaEmp.container.innerHTML);
+    buscaEmp.unmount();
+
+    (window as unknown as { __role?: string }).__role = 'company';
+    const pub = render(<MemoryRouter initialEntries={['/publique-demanda']}><PubliqueDemanda /></MemoryRouter>);
+    await pub.findByTestId('aviso-limite-demandas');
+    salvar('empresa-publique-demanda-aviso-limite', pub.container.innerHTML);
+    pub.unmount();
 
     const empresa = render(
       <MemoryRouter initialEntries={['/dashboard-empresa']}>

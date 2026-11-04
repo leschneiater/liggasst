@@ -16,6 +16,14 @@ vi.mock('../../services/database', () => ({
   deleteDemandRascunho: (...args: unknown[]) => deleteRascunhoMock(...args),
 }));
 
+const fetchAssinaturaMock = vi.fn();
+const demandasAtivasMock = vi.fn();
+vi.mock('../../services/assinatura', () => ({
+  fetchAssinatura: (...a: unknown[]) => fetchAssinaturaMock(...a),
+}));
+vi.mock('../../services/limites', () => ({
+  demandasAtivasMinhas: (...a: unknown[]) => demandasAtivasMock(...a),
+}));
 vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },
 }));
@@ -31,6 +39,8 @@ vi.mock('../../hooks/useMessagingDisponivel', () => ({
 describe('DashboardEmpresa', () => {
   beforeEach(() => {
     fetchDemandsMock.mockReset().mockResolvedValue({ success: true, data: [] });
+    fetchAssinaturaMock.mockReset().mockResolvedValue(null);
+    demandasAtivasMock.mockReset().mockResolvedValue(0);
     updateDemandMock.mockReset().mockResolvedValue({ success: true, data: {} });
     deleteRascunhoMock.mockReset().mockResolvedValue({ success: true });
     useAuthMock.mockReset().mockReturnValue({
@@ -158,6 +168,34 @@ describe('DashboardEmpresa', () => {
     render(<MemoryRouter><DashboardEmpresa /></MemoryRouter>);
     fireEvent.click(await screen.findByRole('button', { name: /^publicar$/i }));
     expect(updateDemandMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /^confirmar$/i }));
+    await waitFor(() => expect(updateDemandMock).toHaveBeenCalledWith('r1', { status: 'active' }));
+  });
+
+  it('empresa free com 3 demandas ativas nao publica rascunho', async () => {
+    demandasAtivasMock.mockResolvedValue(3);
+    fetchDemandsMock.mockResolvedValue({ success: true, data: [{
+      ...rascunho, description: 'd', service_type: 'PGR', city: 'SP', state: 'SP',
+      deadline: '2026-12-01', modalidade: 'remoto', urgencia: 'baixa', tipo_orcamento: 'fixo',
+    }] });
+    render(<MemoryRouter><DashboardEmpresa /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: /^publicar$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^confirmar$/i }));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(updateDemandMock).not.toHaveBeenCalled();
+  });
+
+  it('empresa pagante publica rascunho mesmo com 3 demandas ativas', async () => {
+    demandasAtivasMock.mockResolvedValue(3);
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'pro_company', status: 'active', current_period_end: null, environment: 'production',
+    });
+    fetchDemandsMock.mockResolvedValue({ success: true, data: [{
+      ...rascunho, description: 'd', service_type: 'PGR', city: 'SP', state: 'SP',
+      deadline: '2026-12-01', modalidade: 'remoto', urgencia: 'baixa', tipo_orcamento: 'fixo',
+    }] });
+    render(<MemoryRouter><DashboardEmpresa /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: /^publicar$/i }));
     fireEvent.click(screen.getByRole('button', { name: /^confirmar$/i }));
     await waitFor(() => expect(updateDemandMock).toHaveBeenCalledWith('r1', { status: 'active' }));
   });

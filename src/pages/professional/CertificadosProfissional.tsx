@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { usePlanoPago } from '../../hooks/usePlanoPago';
+import AvisoLimitesPlano from '../../components/AvisoLimitesPlano';
 import { Award, Upload, FileText, Calendar, Building2, Eye, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
@@ -39,6 +41,7 @@ const formatarData = (iso: string): string =>
   new Date(iso + 'T00:00:00').toLocaleDateString('pt-BR');
 
 const CertificadosProfissional: React.FC = () => {
+  const planoPago = usePlanoPago();
   const [certificados, setCertificados] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -203,6 +206,8 @@ const CertificadosProfissional: React.FC = () => {
             Envie e gerencie seus certificados e documentos de SST. Você escolhe quais aparecem no seu perfil para empresas cadastradas.
           </p>
         </div>
+
+        <AvisoLimitesPlano tipo="certificados" pago={planoPago} />
 
         {/* Formulário de envio */}
         <form onSubmit={enviar} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">

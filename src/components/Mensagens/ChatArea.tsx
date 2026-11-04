@@ -4,6 +4,8 @@ import { MessageSquare, Send, ArrowLeft, Ban, Flag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchMessages, sendMessage, markMessageAsRead, getProfilePublic, getProfessionalPublic, fetchCompanies, fetchMyBlocks, blockUser, unblockUser, reportUser } from '../../services/database';
+import { limiteContatoNovoAtingido } from '../../services/limites';
+import { MSG_LIMITE_CONTATOS } from '../../utils/limitesPlano';
 
 interface MessageRow {
   id: string;
@@ -161,11 +163,22 @@ const ChatArea: React.FC<{ subtitulo: string }> = ({ subtitulo }) => {
       return;
     }
     setSending(true);
+    // Aviso previo do limite do plano gratuito (5 contatos novos/mes). A
+    // pre-checagem falha aberta; em corrida ou leitura indisponivel, o
+    // bloqueio real e da RLS (42501) e cai na mesma mensagem.
+    const limiteAtingido = await limiteContatoNovoAtingido(activeId);
+    if (limiteAtingido) {
+      setSending(false);
+      toast.error(MSG_LIMITE_CONTATOS);
+      return;
+    }
     const result = await sendMessage(myId, activeId, texto);
     setSending(false);
     if (result.success && result.data) {
       setMessages(prev => [...prev, result.data as MessageRow]);
       setDraft('');
+    } else if ((result as { code?: string }).code === '42501') {
+      toast.error(MSG_LIMITE_CONTATOS);
     } else {
       toast.error('Não foi possível enviar esta mensagem.');
     }
