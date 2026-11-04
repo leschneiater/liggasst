@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, FileText, ExternalLink, Link2, Lock, AlertTriangle } from 'lucide-react';
+import { GraduationCap, FileText, Link2, Lock, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';

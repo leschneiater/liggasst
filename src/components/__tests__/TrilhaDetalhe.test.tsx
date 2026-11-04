@@ -9,10 +9,17 @@ import TrilhaDetalhe from '../../pages/TrilhaDetalhe';
 const fetchTrilhaDetalheMock = vi.fn();
 const concluirSecaoMock = vi.fn();
 const getSecaoTrilhaPdfUrlMock = vi.fn();
+const fetchTentativaRecenteMock = vi.fn();
 vi.mock('../../services/trilhas', () => ({
   fetchTrilhaDetalhe: (...args: unknown[]) => fetchTrilhaDetalheMock(...args),
   concluirSecao: (...args: unknown[]) => concluirSecaoMock(...args),
   getSecaoTrilhaPdfUrl: (...args: unknown[]) => getSecaoTrilhaPdfUrlMock(...args),
+  fetchTentativaRecente: (...args: unknown[]) => fetchTentativaRecenteMock(...args),
+}));
+
+// A prova em si e testada em ProvaTrilha.test.tsx; aqui ela vira um stub.
+vi.mock('../../components/ProvaTrilha', () => ({
+  default: () => <div>PROVA ABERTA</div>,
 }));
 
 const fetchAssinaturaMock = vi.fn();
@@ -139,5 +146,73 @@ describe('TrilhaDetalhe', () => {
     // Seção de PDF continua bloqueada para conclusão.
     const bloqueados = screen.getAllByText('Abra o conteúdo para concluir');
     expect(bloqueados.length).toBeGreaterThan(0);
+  });
+});
+
+describe('TrilhaDetalhe - avaliacao (trilha certified, etapa 3)', () => {
+  const trilhaCert = {
+    ...trilhaBase,
+    kind: 'certified',
+    exam_question_count: 10,
+    exam_pass_score: 70,
+  };
+
+  it('secoes pendentes: avaliacao aparece bloqueada, sem botao', async () => {
+    fetchAssinaturaMock.mockResolvedValue(ASSINATURA_PAGA);
+    fetchTrilhaDetalheMock.mockResolvedValue({
+      success: true,
+      data: { trilha: trilhaCert, secoes: secoesBase, concluidas: new Set(['s1']) },
+    });
+    fetchTentativaRecenteMock.mockResolvedValue({ success: true, data: null });
+    renderPagina();
+    await screen.findByText('Avaliação final');
+    expect(screen.getByText(/Conclua todas as seções para liberar a avaliação/)).toBeTruthy();
+    expect(screen.queryByText('Iniciar avaliação')).toBeNull();
+  });
+
+  it('trilha concluida e sem tentativa: botao Iniciar avaliacao abre a prova', async () => {
+    fetchAssinaturaMock.mockResolvedValue(ASSINATURA_PAGA);
+    fetchTrilhaDetalheMock.mockResolvedValue({
+      success: true,
+      data: { trilha: trilhaCert, secoes: secoesBase, concluidas: new Set(['s1', 's2']) },
+    });
+    fetchTentativaRecenteMock.mockResolvedValue({ success: true, data: null });
+    renderPagina();
+    await screen.findByText('Avaliação final');
+    fireEvent.click(screen.getByText('Iniciar avaliação'));
+    expect(await screen.findByText('PROVA ABERTA')).toBeTruthy();
+  });
+
+  it('reprovado recente: mostra a data de liberacao, sem botao', async () => {
+    const futuro = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+    fetchAssinaturaMock.mockResolvedValue(ASSINATURA_PAGA);
+    fetchTrilhaDetalheMock.mockResolvedValue({
+      success: true,
+      data: { trilha: trilhaCert, secoes: secoesBase, concluidas: new Set(['s1', 's2']) },
+    });
+    fetchTentativaRecenteMock.mockResolvedValue({
+      success: true,
+      data: { finished_at: '2026-11-04T20:00:00Z', passed: false, score: 60, locked_until: futuro },
+    });
+    renderPagina();
+    await screen.findByText('Avaliação final');
+    expect(await screen.findByText(/Nova tentativa liberada em/)).toBeTruthy();
+    expect(screen.queryByText('Iniciar avaliação')).toBeNull();
+  });
+
+  it('aprovado: mostra a nota e a mensagem do certificado', async () => {
+    fetchAssinaturaMock.mockResolvedValue(ASSINATURA_PAGA);
+    fetchTrilhaDetalheMock.mockResolvedValue({
+      success: true,
+      data: { trilha: trilhaCert, secoes: secoesBase, concluidas: new Set(['s1', 's2']) },
+    });
+    fetchTentativaRecenteMock.mockResolvedValue({
+      success: true,
+      data: { finished_at: '2026-11-04T20:00:00Z', passed: true, score: 90, locked_until: null },
+    });
+    renderPagina();
+    await screen.findByText('Avaliação final');
+    expect(await screen.findByText(/Você foi aprovado com nota/)).toBeTruthy();
+    expect(screen.getByText(/certificado será emitido na sua área/)).toBeTruthy();
   });
 });

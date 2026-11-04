@@ -27,7 +27,8 @@
     "test:radar-capa": "node supabase/tests/radar_capa_policy.test.mjs",
     "test:atribuicao": "node supabase/tests/atribuicao_treinamento.test.mjs",
     "test:trilhas": "node supabase/tests/trilhas.test.mjs",
-    "test:trilhas-progresso": "node supabase/tests/trilhas_progresso.test.mjs"
+    "test:trilhas-progresso": "node supabase/tests/trilhas_progresso.test.mjs",
+    "test:trilhas-provas": "node supabase/tests/trilhas_provas.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",

@@ -26,6 +26,7 @@ import {
   uploadSecaoPdf,
 } from '../../services/trilhas';
 import { extrairYoutubeId } from '../../utils/youtube';
+import BancoQuestoesAdmin from '../../components/admin/BancoQuestoesAdmin';
 import { linkExternoValido } from '../../utils/linkExterno';
 
 const ROTULOS_PUBLICO: Record<TrainingAudience, string> = {
@@ -390,6 +391,10 @@ const TrilhasAdminBlock: React.FC = () => {
                     {salvandoSecao ? 'Salvando...' : 'Adicionar seção'}
                   </Button>
                 </div>
+
+                {t.kind === 'certified' && (
+                  <BancoQuestoesAdmin trilha={t} secoes={secoes} />
+                )}
               </div>
             )}
           </div>

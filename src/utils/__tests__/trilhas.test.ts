@@ -3,6 +3,8 @@ import {
   podeConcluirSecao,
   resumoProgresso,
   trilhaConcluida,
+  formatarDataLiberacao,
+  situacaoProva,
 } from '../trilhas';
 
 describe('resumoProgresso', () => {
@@ -44,5 +46,37 @@ describe('trilhaConcluida', () => {
   });
   it('trilha sem seções nunca está concluída', () => {
     expect(trilhaConcluida(0, 0)).toBe(false);
+  });
+});
+
+describe('situacaoProva', () => {
+  it('sem tentativa: livre', () => {
+    expect(situacaoProva(null)).toEqual({ tipo: 'livre' });
+  });
+  it('tentativa em andamento: livre (pode retomar)', () => {
+    expect(situacaoProva({ finished_at: null, passed: null, score: null, locked_until: null }))
+      .toEqual({ tipo: 'livre' });
+  });
+  it('aprovado guarda a nota', () => {
+    expect(situacaoProva({ finished_at: '2026-11-04T20:00:00Z', passed: true, score: 80, locked_until: null }))
+      .toEqual({ tipo: 'aprovado', score: 80 });
+  });
+  it('reprovado com cadeado no futuro: bloqueado', () => {
+    const futuro = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+    expect(situacaoProva({ finished_at: '2026-11-04T20:00:00Z', passed: false, score: 60, locked_until: futuro }))
+      .toEqual({ tipo: 'bloqueado', lockedUntil: futuro });
+  });
+  it('reprovado com cadeado vencido: livre de novo', () => {
+    const passado = new Date(Date.now() - 1000).toISOString();
+    expect(situacaoProva({ finished_at: '2026-10-28T20:00:00Z', passed: false, score: 60, locked_until: passado }))
+      .toEqual({ tipo: 'livre' });
+  });
+});
+
+describe('formatarDataLiberacao', () => {
+  it('formata dia e mes em pt-BR', () => {
+    const texto = formatarDataLiberacao('2026-11-12T12:00:00Z');
+    expect(texto).toContain('12');
+    expect(texto.toLowerCase()).toContain('novembro');
   });
 });

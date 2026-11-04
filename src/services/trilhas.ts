@@ -13,6 +13,8 @@ export interface Trilha {
   published: boolean;
   is_test: boolean;
   ordem: number;
+  exam_question_count: number;
+  exam_pass_score: number;
 }
 
 export interface SecaoTrilha {
@@ -41,7 +43,7 @@ export const fetchTrilhasMembro = async () => {
 
     const { data: trilhas, error } = await supabase
       .from('trails')
-      .select('id, titulo, descricao, audience, kind, published, ordem')
+      .select('id, titulo, descricao, audience, kind, published, ordem, exam_question_count, exam_pass_score')
       .order('ordem', { ascending: true })
       .order('titulo', { ascending: true });
     if (error) throw error;
@@ -98,7 +100,7 @@ export const fetchTrilhaDetalhe = async (trailId: string) => {
   try {
     const { data: trilha, error } = await supabase
       .from('trails')
-      .select('id, titulo, descricao, audience, kind, published, ordem')
+      .select('id, titulo, descricao, audience, kind, published, ordem, exam_question_count, exam_pass_score')
       .eq('id', trailId)
       .maybeSingle();
     if (error) throw error;
@@ -224,7 +226,7 @@ export const fetchTrilhasAdmin = async () => {
   try {
     const { data: trilhas, error } = await supabase
       .from('trails')
-      .select('id, titulo, descricao, audience, kind, published, is_test, ordem')
+      .select('id, titulo, descricao, audience, kind, published, is_test, ordem, exam_question_count, exam_pass_score')
       .order('ordem', { ascending: true })
       .order('titulo', { ascending: true });
     if (error) throw error;
@@ -365,6 +367,195 @@ export const uploadSecaoPdf = async (sectionId: string, file: File) => {
     return { success: true, path };
   } catch (error) {
     console.error('Erro ao enviar PDF da seção:', error);
+    return { success: false, error };
+  }
+};
+
+// ---------- Etapa 3: avaliacao (prova) das trilhas 'certified' ----------
+
+import type {
+  ErroInicioProva,
+  InicioProva,
+  ProvaQuestao,
+  ResultadoProva,
+} from '../utils/trilhas';
+
+// Ultima tentativa do membro na trilha (leitura da propria linha via RLS).
+export const fetchTentativaRecente = async (trailId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('exam_attempts')
+      .select('finished_at, passed, score, locked_until')
+      .eq('trail_id', trailId)
+      .order('attempt_number', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return { success: true, data: data as {
+      finished_at: string | null;
+      passed: boolean | null;
+      score: number | null;
+      locked_until: string | null;
+    } | null };
+  } catch (error) {
+    console.error('Erro ao carregar tentativa:', error);
+    return { success: false, data: null, error };
+  }
+};
+
+// Inicia (ou retoma) a prova. O servidor sorteia, embaralha e devolve as
+// questoes SEM gabarito; os bloqueios chegam como codigos de erro.
+export const iniciarProva = async (trailId: string) => {
+  try {
+    const { data, error } = await supabase.rpc('trail_exam_iniciar', { p_trail: trailId });
+    if (error) throw error;
+    const r = data as {
+      ok: boolean;
+      erro?: ErroInicioProva;
+      locked_until?: string;
+      attempt_id?: string;
+      questoes?: ProvaQuestao[];
+      pass_score?: number;
+      retomada?: boolean;
+    };
+    if (!r?.ok) {
+      return {
+        success: false,
+        erro: (r?.erro ?? 'desconhecido') as ErroInicioProva,
+        lockedUntil: r?.locked_until ?? null,
+      };
+    }
+    const inicio: InicioProva = {
+      attemptId: r.attempt_id!,
+      questoes: r.questoes ?? [],
+      passScore: r.pass_score ?? 70,
+      retomada: r.retomada ?? false,
+    };
+    return { success: true, data: inicio };
+  } catch (error) {
+    console.error('Erro ao iniciar avaliação:', error);
+    return { success: false, erro: 'desconhecido' as ErroInicioProva, lockedUntil: null, error };
+  }
+};
+
+// Envia as respostas; a correcao acontece no servidor e o gabarito nunca
+// volta. Reprovacao devolve data de liberacao e topicos para revisar.
+export const enviarProva = async (attemptId: string, respostas: (number | null)[]) => {
+  try {
+    const { data, error } = await supabase.rpc('trail_exam_enviar', {
+      p_attempt: attemptId,
+      p_respostas: respostas,
+    });
+    if (error) throw error;
+    const r = data as {
+      ok: boolean;
+      erro?: string;
+      passed?: boolean;
+      score?: number;
+      pass_score?: number;
+      locked_until?: string;
+      topicos?: string[];
+    };
+    if (!r?.ok) {
+      return { success: false, erro: r?.erro ?? 'desconhecido' };
+    }
+    const resultado: ResultadoProva = {
+      passed: r.passed ?? false,
+      score: r.score ?? 0,
+      passScore: r.pass_score ?? 70,
+      lockedUntil: r.locked_until ?? null,
+      topicos: r.topicos ?? [],
+    };
+    return { success: true, data: resultado };
+  } catch (error) {
+    console.error('Erro ao enviar avaliação:', error);
+    return { success: false, erro: 'desconhecido', error };
+  }
+};
+
+// ---------- Admin: banco de questoes ----------
+
+export interface QuestaoBanco {
+  id: string;
+  trail_id: string;
+  section_id: string | null;
+  enunciado: string;
+  opcoes: string[];
+  correta: number;
+  ativo: boolean;
+}
+
+interface QuestaoRow extends Omit<QuestaoBanco, 'opcoes'> {
+  opcoes: unknown;
+}
+
+const paraQuestao = (row: QuestaoRow): QuestaoBanco => ({
+  ...row,
+  opcoes: Array.isArray(row.opcoes) ? (row.opcoes as string[]) : [],
+});
+
+export const fetchQuestoesAdmin = async (trailId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('trail_questions')
+      .select('id, trail_id, section_id, enunciado, opcoes, correta, ativo')
+      .eq('trail_id', trailId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    return { success: true, data: ((data ?? []) as QuestaoRow[]).map(paraQuestao) };
+  } catch (error) {
+    console.error('Erro ao carregar questões:', error);
+    return { success: false, data: [] as QuestaoBanco[], error };
+  }
+};
+
+export const createQuestao = async (questao: {
+  trail_id: string;
+  section_id: string | null;
+  enunciado: string;
+  opcoes: string[];
+  correta: number;
+}) => {
+  try {
+    const { data, error } = await supabase
+      .from('trail_questions')
+      .insert(questao)
+      .select('id, trail_id, section_id, enunciado, opcoes, correta, ativo')
+      .single();
+    if (error) throw error;
+    return { success: true, data: paraQuestao(data as QuestaoRow) };
+  } catch (error) {
+    console.error('Erro ao criar questão:', error);
+    return { success: false, data: null, error };
+  }
+};
+
+export const updateQuestao = async (
+  id: string,
+  campos: Partial<Pick<QuestaoBanco, 'section_id' | 'enunciado' | 'opcoes' | 'correta' | 'ativo'>>,
+) => {
+  try {
+    const { data, error } = await supabase
+      .from('trail_questions')
+      .update(campos)
+      .eq('id', id)
+      .select('id, trail_id, section_id, enunciado, opcoes, correta, ativo')
+      .single();
+    if (error) throw error;
+    return { success: true, data: paraQuestao(data as QuestaoRow) };
+  } catch (error) {
+    console.error('Erro ao atualizar questão:', error);
+    return { success: false, data: null, error };
+  }
+};
+
+export const deleteQuestao = async (id: string) => {
+  try {
+    const { error } = await supabase.from('trail_questions').delete().eq('id', id);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Erro ao excluir questão:', error);
     return { success: false, error };
   }
 };

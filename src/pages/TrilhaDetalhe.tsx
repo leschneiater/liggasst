@@ -18,12 +18,21 @@ import { fetchAssinatura } from '../services/assinatura';
 import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
 import {
   concluirSecao,
+  fetchTentativaRecente,
   fetchTrilhaDetalhe,
   getSecaoTrilhaPdfUrl,
   SecaoTrilha,
   Trilha,
 } from '../services/trilhas';
-import { podeConcluirSecao, resumoProgresso, trilhaConcluida } from '../utils/trilhas';
+import {
+  formatarDataLiberacao,
+  podeConcluirSecao,
+  resumoProgresso,
+  SituacaoProva,
+  situacaoProva,
+  trilhaConcluida,
+} from '../utils/trilhas';
+import ProvaTrilha from '../components/ProvaTrilha';
 
 // Pagina da trilha (Etapa 2): conteudo aberto das secoes + botao "Concluir
 // secao", que so habilita depois de abrir o conteudo daquela secao nesta
@@ -42,6 +51,8 @@ const TrilhaDetalhe: React.FC = () => {
   const [pago, setPago] = useState<boolean | null>(null);
   const [abrindoPdf, setAbrindoPdf] = useState<string | null>(null);
   const [concluindo, setConcluindo] = useState<string | null>(null);
+  const [prova, setProva] = useState<SituacaoProva>({ tipo: 'livre' });
+  const [provaAberta, setProvaAberta] = useState(false);
 
   const userId = currentUser?.id;
   useEffect(() => {
@@ -68,6 +79,10 @@ const TrilhaDetalhe: React.FC = () => {
           setTrilha(r.data.trilha);
           setSecoes(r.data.secoes);
           setConcluidas(new Set(r.data.concluidas));
+          if (r.data.trilha.kind === 'certified') {
+            const tent = await fetchTentativaRecente(id);
+            if (vivo && tent.success) setProva(situacaoProva(tent.data));
+          }
         }
       } catch {
         if (vivo) setErro(true);
@@ -157,7 +172,7 @@ const TrilhaDetalhe: React.FC = () => {
               <p className="font-roboto text-gray-600">
                 {resumoProgresso(secoes.length, concluidas.size)}
               </p>
-              {trilhaConcluida(secoes.length, concluidas.size) && (
+              {trilha.kind === 'open' && trilhaConcluida(secoes.length, concluidas.size) && (
                 <span className="inline-flex items-center space-x-1 text-sm bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
                   <Award className="w-4 h-4" aria-hidden="true" />
                   <span>Selo conquistado</span>
@@ -241,9 +256,63 @@ const TrilhaDetalhe: React.FC = () => {
                 );
               })}
             </div>
+
+            {trilha.kind === 'certified' && (
+              <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <div className="flex items-center space-x-2 mb-2">
+                  <GraduationCap className="w-5 h-5 text-green-deep" aria-hidden="true" />
+                  <h2 className="font-poppins font-semibold text-gray-900">Avaliação final</h2>
+                </div>
+                {prova.tipo === 'aprovado' && (
+                  <p className="font-roboto text-gray-700">
+                    Você foi aprovado com nota <strong>{prova.score}%</strong>. Seu certificado
+                    será emitido na sua área.
+                  </p>
+                )}
+                {prova.tipo === 'bloqueado' && (
+                  <p className="font-roboto text-gray-700">
+                    Sua última tentativa não atingiu a nota mínima. Nova tentativa liberada em{' '}
+                    <strong>{formatarDataLiberacao(prova.lockedUntil)}</strong>.
+                  </p>
+                )}
+                {prova.tipo === 'livre' && !trilhaConcluida(secoes.length, concluidas.size) && (
+                  <p className="font-roboto text-gray-600">
+                    Conclua todas as seções para liberar a avaliação. Nota mínima:{' '}
+                    {trilha.exam_pass_score}%.
+                  </p>
+                )}
+                {prova.tipo === 'livre' && trilhaConcluida(secoes.length, concluidas.size) && (
+                  <>
+                    <p className="font-roboto text-gray-600 mb-4">
+                      {trilha.exam_question_count} questões. Nota mínima: {trilha.exam_pass_score}%.
+                    </p>
+                    <Button onClick={() => setProvaAberta(true)}>Iniciar avaliação</Button>
+                  </>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>
+
+      {provaAberta && trilha && (
+        <ProvaTrilha
+          trailId={trilha.id}
+          tituloTrilha={trilha.titulo}
+          onFechar={(resultado) => {
+            setProvaAberta(false);
+            if (resultado) {
+              setProva(
+                resultado.passed
+                  ? { tipo: 'aprovado', score: resultado.score }
+                  : resultado.lockedUntil
+                    ? { tipo: 'bloqueado', lockedUntil: resultado.lockedUntil }
+                    : { tipo: 'livre' },
+              );
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
