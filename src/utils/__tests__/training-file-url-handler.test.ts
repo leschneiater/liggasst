@@ -15,6 +15,7 @@ const mkDeps = (opts: {
   training?: { audience: string; status: string; pdf_path: string | null; is_test?: boolean } | null;
   secao?: { content_type: string; conteudo: string | null; trails: { kind: string; published: boolean; audience: string; is_test?: boolean } | null } | null;
   subscription?: SubOpts;
+  cortesia?: { valida_ate: string | null } | null;
   signedUrl?: string;
   authError?: boolean;
   acessoEquipe?: boolean;
@@ -24,15 +25,18 @@ const mkDeps = (opts: {
   const singleTraining = vi.fn().mockResolvedValue({ data: opts.training ?? null });
   const singleSecao = vi.fn().mockResolvedValue({ data: opts.secao ?? null });
   const maybeSingleSub = vi.fn().mockResolvedValue({ data: opts.subscription ?? null });
+  const maybeSingleCortesia = vi.fn().mockResolvedValue({ data: opts.cortesia ?? null });
   const client = {
     auth: { getUser: vi.fn().mockResolvedValue(opts.authError
       ? { data: { user: null }, error: new Error('bad token') }
       : { data: { user: opts.user ?? null }, error: null }) },
     from: vi.fn((t: string) => ({
       select: vi.fn(() => ({
-        eq: vi.fn(() => (t === 'subscriptions'
-          ? { single: singleProfile, maybeSingle: maybeSingleSub }
-          : { single: t === 'profiles' ? singleProfile : t === 'trail_sections' ? singleSecao : singleTraining, maybeSingle: maybeSingleSub })),
+        eq: vi.fn(() => (t === 'cortesias'
+          ? { single: maybeSingleCortesia, maybeSingle: maybeSingleCortesia, is: vi.fn(() => ({ maybeSingle: maybeSingleCortesia })) }
+          : t === 'subscriptions'
+            ? { single: singleProfile, maybeSingle: maybeSingleSub, is: vi.fn(() => ({ maybeSingle: maybeSingleSub })) }
+            : { single: t === 'profiles' ? singleProfile : t === 'trail_sections' ? singleSecao : singleTraining, maybeSingle: maybeSingleSub, is: vi.fn(() => ({ maybeSingle: maybeSingleSub })) })),
       })),
     })),
     storage: { from: vi.fn(() => ({ createSignedUrl })) },
@@ -296,5 +300,61 @@ describe('handler training-file-url: ramo trail_section_id (Etapa 2)', () => {
     });
     const r = await handleRequest(req({ training_id: 't1' }), deps);
     expect(r.status).toBe(200);
+  });
+});
+
+describe('cortesia ativa vale como plano pago (regressao: gate alinhado ao plano_da_conta)', () => {
+  const PERFIL = { role: 'professional', verification_status: 'approved' };
+  const TREINAMENTO = { audience: 'both', status: 'published', pdf_path: PDF };
+  const SECAO = {
+    content_type: 'pdf',
+    conteudo: '22222222-2222-2222-2222-222222222222.pdf',
+    trails: { kind: 'open', published: true, audience: 'professional' },
+  };
+  const CORTESIA_ATIVA = { valida_ate: '2999-01-01' };
+  const CORTESIA_VENCIDA = { valida_ate: '2000-01-01' };
+
+  it('200 no PDF de treinamento para cortesia ativa SEM assinatura paga', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' },
+      profile: PERFIL,
+      training: TREINAMENTO,
+      subscription: { plan: 'free', status: 'active', current_period_end: null, environment: 'production' },
+      cortesia: CORTESIA_ATIVA,
+    });
+    expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(200);
+  });
+
+  it('200 no PDF de secao de trilha para cortesia ativa SEM assinatura paga', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' },
+      profile: PERFIL,
+      secao: SECAO,
+      subscription: null,
+      cortesia: CORTESIA_ATIVA,
+    });
+    expect((await handleRequest(req({ trail_section_id: 's1' }), deps)).status).toBe(200);
+  });
+
+  it('403 para cortesia VENCIDA sem assinatura paga', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' },
+      profile: PERFIL,
+      training: TREINAMENTO,
+      subscription: null,
+      cortesia: CORTESIA_VENCIDA,
+    });
+    expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(403);
+  });
+
+  it('403 sem cortesia e sem assinatura paga (gratuito continua bloqueado)', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' },
+      profile: PERFIL,
+      secao: SECAO,
+      subscription: null,
+      cortesia: null,
+    });
+    expect((await handleRequest(req({ trail_section_id: 's1' }), deps)).status).toBe(403);
   });
 });

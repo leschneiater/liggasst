@@ -15,6 +15,9 @@ export interface SupabaseClientMin {
       eq: (col: string, value: string) => {
         single: () => Promise<{ data: unknown; error?: unknown }>;
         maybeSingle: () => Promise<{ data: unknown; error?: unknown }>;
+        is: (col: string, value: null) => {
+          maybeSingle: () => Promise<{ data: unknown; error?: unknown }>;
+        };
       };
     };
   };
@@ -46,6 +49,27 @@ const json = (body: Record<string, unknown>, status: number) =>
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+
+interface CortesiaRow {
+  valida_ate: string | null;
+}
+
+// Cortesia ativa vale como plano pago (mesma regra do helper
+// private.plano_da_conta): revogada_em nulo e valida_ate >= hoje.
+const temCortesiaAtiva = async (
+  admin: SupabaseClientMin,
+  profileId: string,
+  hoje: string,
+): Promise<boolean> => {
+  const { data } = await admin
+    .from('cortesias')
+    .select('valida_ate')
+    .eq('profile_id', profileId)
+    .is('revogada_em', null)
+    .maybeSingle();
+  const row = data as CortesiaRow | null;
+  return !!row?.valida_ate && row.valida_ate >= hoje;
+};
 
 export const handleRequest = async (req: Request, deps: Deps): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -106,10 +130,13 @@ export const handleRequest = async (req: Request, deps: Deps): Promise<Response>
       });
       acessoEquipe = data === true;
     }
+    const planoPago =
+      assinaturaPagaJanela(assinatura as AssinaturaRow | null, hoje) ||
+      (await temCortesiaAtiva(admin, user.id, hoje));
     const decisao = decidirAcessoPdf(
       profile as PerfilChamador | null,
       training as TreinamentoAlvo | null,
-      assinaturaPagaJanela(assinatura as AssinaturaRow | null, hoje),
+      planoPago,
       acessoEquipe,
     );
     if (!decisao.ok) return json({ error: decisao.erro }, decisao.status);
@@ -162,10 +189,13 @@ const handleSecaoTrilha = async (
       .maybeSingle();
 
     const hoje = new Date().toISOString().slice(0, 10);
+    const planoPago =
+      assinaturaPagaJanela(assinatura as AssinaturaRow | null, hoje) ||
+      (await temCortesiaAtiva(admin, user.id, hoje));
     const decisao = decidirAcessoSecaoTrilha(
       profile as PerfilChamador | null,
       secao as SecaoTrilhaAlvo | null,
-      assinaturaPagaJanela(assinatura as AssinaturaRow | null, hoje),
+      planoPago,
     );
     if (!decisao.ok) return json({ error: decisao.erro }, decisao.status);
 
