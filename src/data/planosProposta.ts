@@ -29,7 +29,10 @@ export const PROPOSTA_PROFISSIONAL: PropostaPublico = {
     nome: 'Gratuito',
     precoMensal: 0,
     recursos: ['Perfil completo, vitrine, busca, mensagens, contratos e avaliações, como hoje'],
-    limites: ['Até 5 certificados visíveis e 5 contatos novos por mês (' + TEXTO_LIMITES_NAO_APLICADOS + ')'],
+    limites: [
+      'Até 5 certificados visíveis e 5 contatos novos por mês (' + TEXTO_LIMITES_NAO_APLICADOS + ')',
+      'Com anúncios',
+    ],
   },
   pago: {
     id: 'profissional',
@@ -37,6 +40,9 @@ export const PROPOSTA_PROFISSIONAL: PropostaPublico = {
     precoMensal: 39.9,
     recursos: [
       'Contatos novos e certificados sem limite fixo (uso razoável, contra abuso e spam)',
+      'Radar TST: conteúdo exclusivo para assinantes',
+      'Capacitação em SST',
+      'Sem anúncios',
       'Perfil em destaque na busca (em implementação)',
     ],
     limites: [],
@@ -50,7 +56,10 @@ export const PROPOSTA_EMPRESA: PropostaPublico = {
     nome: 'Gratuito',
     precoMensal: 0,
     recursos: ['Perfil, busca de profissionais, mensagens, contratos e avaliações, como hoje'],
-    limites: ['Até 3 demandas ativas (' + TEXTO_LIMITES_NAO_APLICADOS + ')'],
+    limites: [
+      'Até 3 demandas ativas (' + TEXTO_LIMITES_NAO_APLICADOS + ')',
+      'Com anúncios',
+    ],
   },
   pago: {
     id: 'empresa',
@@ -58,6 +67,11 @@ export const PROPOSTA_EMPRESA: PropostaPublico = {
     precoMensal: 99.9,
     recursos: [
       'Demandas sem limite fixo (uso razoável)',
+      'Comparador de propostas lado a lado',
+      'Calendário de conformidade',
+      'Capacitação da equipe',
+      'Radar TST: conteúdo exclusivo para assinantes',
+      'Sem anúncios',
       'Empresa em destaque na vitrine (em implementação)',
     ],
     limites: [],

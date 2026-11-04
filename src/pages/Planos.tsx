@@ -165,7 +165,7 @@ const Planos: React.FC = () => {
                   Os planos pagos já estão disponíveis?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  Você pode assinar os planos pagos pela sua conta, com as condições da página Planos.
+                  Sim. Você pode assinar pela sua conta, com as condições desta página. Cancele quando quiser, sem multa e sem fidelidade.
                 </p>
               </div>
 
@@ -174,7 +174,16 @@ const Planos: React.FC = () => {
                   Haverá desconto para pagamento anual?
                 </h3>
                 <p className="font-roboto text-gray-600">
-                  Não há desconto anual aprovado. As condições comerciais só serão confirmadas no lançamento dos planos pagos.
+                  No momento não há desconto anual aprovado.
+                </p>
+              </div>
+
+              <div className="bg-neutral-gray p-6 rounded-xl">
+                <h3 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+                  Os planos têm anúncios?
+                </h3>
+                <p className="font-roboto text-gray-600">
+                  O plano gratuito exibe anúncios. Os planos pagos não exibem anúncios.
                 </p>
               </div>
 
