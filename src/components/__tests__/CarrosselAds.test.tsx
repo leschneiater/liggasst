@@ -3,7 +3,7 @@
 // clique conta via RPC e abre o link em nova aba; rotacao pelo
 // intervalo da config do admin.
 import React from 'react';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CarrosselAds from '../CarrosselAds';
 
