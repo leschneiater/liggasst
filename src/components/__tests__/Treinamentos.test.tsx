@@ -14,6 +14,11 @@ vi.mock('../../services/database', () => ({
   getTrainingPdfUrl: (...args: unknown[]) => getTrainingPdfUrlMock(...args),
 }));
 
+const fetchTrilhasMembroMock = vi.fn().mockResolvedValue({ success: true, data: [] });
+vi.mock('../../services/trilhas', () => ({
+  fetchTrilhasMembro: (...args: unknown[]) => fetchTrilhasMembroMock(...args),
+}));
+
 const fetchAssinaturaMock = vi.fn();
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...args: unknown[]) => fetchAssinaturaMock(...args),

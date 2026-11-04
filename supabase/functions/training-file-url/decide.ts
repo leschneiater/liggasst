@@ -88,3 +88,49 @@ export const decidirAcessoPdf = (
   }
   return { ok: true };
 };
+
+// ---------------------------------------------------------------------------
+// Secao de trilha (Etapa 2): PDF de uma secao de trilha 'open'.
+// Mesma regra paga dos treinamentos; so trilhas abertas publicadas entregam
+// conteudo nesta etapa (trilhas certified ganham prova/certificado depois).
+// Funcionario nao acessa trilhas (elas sao do membro assinante).
+// ---------------------------------------------------------------------------
+export interface SecaoTrilhaAlvo {
+  content_type: string;
+  conteudo: string | null;
+  trails: {
+    kind: string;
+    published: boolean;
+    audience: string;
+    is_test?: boolean;
+  } | null;
+}
+
+export const decidirAcessoSecaoTrilha = (
+  perfil: PerfilChamador | null,
+  secao: SecaoTrilhaAlvo | null,
+  planoPago: boolean,
+): DecisaoAcesso => {
+  if (!perfil || perfil.verification_status !== 'approved') {
+    return { ok: false, status: 403, erro: 'conta nao aprovada' };
+  }
+  const trilha = secao?.trails ?? null;
+  if (!secao || !trilha || secao.content_type !== 'pdf' || !secao.conteudo) {
+    return { ok: false, status: 404, erro: 'arquivo nao encontrado' };
+  }
+  const isAdmin = perfil.role === 'admin';
+  if (!isAdmin && !planoPago) {
+    return { ok: false, status: 403, erro: 'conteudo exclusivo para assinantes' };
+  }
+  if (!isAdmin && trilha.is_test && !perfil.is_test) {
+    return { ok: false, status: 404, erro: 'arquivo nao encontrado' };
+  }
+  const papelCobre =
+    trilha.audience === 'both' ||
+    (trilha.audience === 'company' && perfil.role === 'company') ||
+    (trilha.audience === 'professional' && perfil.role === 'professional');
+  if (!isAdmin && (!trilha.published || trilha.kind !== 'open' || !papelCobre)) {
+    return { ok: false, status: 403, erro: 'trilha nao disponivel para este usuario' };
+  }
+  return { ok: true };
+};

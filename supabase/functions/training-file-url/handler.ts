@@ -1,8 +1,8 @@
 // Handler da Edge Function training-file-url, com dependencias injetadas
 // para teste de integracao em vitest (sem Deno nem rede). Usa apenas a Fetch
 // API padrao (Request/Response), disponivel em Deno e Node 18+.
-import { assinaturaPagaJanela, decidirAcessoPdf } from './decide.ts';
-import type { AssinaturaRow, PerfilChamador, TreinamentoAlvo } from './decide.ts';
+import { assinaturaPagaJanela, decidirAcessoPdf, decidirAcessoSecaoTrilha } from './decide.ts';
+import type { AssinaturaRow, PerfilChamador, SecaoTrilhaAlvo, TreinamentoAlvo } from './decide.ts';
 
 // Recorte minimo do cliente supabase-js usado aqui (sem `any`); o createClient
 // real e os mocks de teste satisfazem esta interface estruturalmente.
@@ -54,13 +54,17 @@ export const handleRequest = async (req: Request, deps: Deps): Promise<Response>
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) return json({ error: 'autenticacao necessaria' }, 401);
 
-    let body: { training_id?: unknown };
+    let body: { training_id?: unknown; trail_section_id?: unknown };
     try {
       body = await req.json();
     } catch {
       return json({ error: 'training_id obrigatorio' }, 400);
     }
     const trainingId = body.training_id;
+    const secaoId = body.trail_section_id;
+    if (typeof secaoId === 'string' && secaoId) {
+      return handleSecaoTrilha(secaoId, authHeader, deps);
+    }
     if (!trainingId || typeof trainingId !== 'string') {
       return json({ error: 'training_id obrigatorio' }, 400);
     }
@@ -111,6 +115,61 @@ export const handleRequest = async (req: Request, deps: Deps): Promise<Response>
     if (!decisao.ok) return json({ error: decisao.erro }, decisao.status);
 
     const pdfPath = (training as TreinamentoAlvo).pdf_path;
+    if (!pdfPath) return json({ error: 'arquivo indisponivel' }, 404);
+
+    const { data, error } = await admin.storage
+      .from('trainings')
+      .createSignedUrl(pdfPath, TTL_SEGUNDOS);
+    if (error || !data?.signedUrl) return json({ error: 'falha ao gerar link' }, 500);
+
+    return json({ signedUrl: data.signedUrl, expiresIn: TTL_SEGUNDOS }, 200);
+  } catch {
+    return json({ error: 'erro interno' }, 500);
+  }
+};
+
+// Ramo da Etapa 2: PDF de secao de trilha 'open'. O PDF da secao vive no
+// mesmo bucket privado 'trainings', com path <uuid da secao>.pdf (a coluna
+// trail_sections.conteudo guarda esse path para content_type 'pdf').
+const handleSecaoTrilha = async (
+  secaoId: string,
+  authHeader: string,
+  deps: Deps,
+): Promise<Response> => {
+  try {
+    const admin = deps.createClient(deps.supabaseUrl, deps.serviceRoleKey);
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await admin.auth.getUser(token);
+    if (authError || !user) return json({ error: 'autenticacao necessaria' }, 401);
+
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('role, verification_status, is_test')
+      .eq('id', user.id)
+      .single();
+
+    const { data: secao } = await admin
+      .from('trail_sections')
+      .select('content_type, conteudo, trails(kind, published, audience, is_test)')
+      .eq('id', secaoId)
+      .single();
+
+    const { data: assinatura } = await admin
+      .from('subscriptions')
+      .select('plan, status, current_period_end, environment')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+
+    const hoje = new Date().toISOString().slice(0, 10);
+    const decisao = decidirAcessoSecaoTrilha(
+      profile as PerfilChamador | null,
+      secao as SecaoTrilhaAlvo | null,
+      assinaturaPagaJanela(assinatura as AssinaturaRow | null, hoje),
+    );
+    if (!decisao.ok) return json({ error: decisao.erro }, decisao.status);
+
+    const pdfPath = (secao as SecaoTrilhaAlvo).conteudo;
     if (!pdfPath) return json({ error: 'arquivo indisponivel' }, 404);
 
     const { data, error } = await admin.storage

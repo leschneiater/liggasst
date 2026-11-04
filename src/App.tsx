@@ -63,6 +63,7 @@ const AdsAdmin = lazy(() => import('./pages/admin/AdsAdmin'));
 const AcessosAdmin = lazy(() => import('./pages/admin/AcessosAdmin'));
 const RadarTst = lazy(() => import('./pages/RadarTst'));
 const Treinamentos = lazy(() => import('./pages/Treinamentos'));
+const TrilhaDetalhe = lazy(() => import('./pages/TrilhaDetalhe'));
 const MinhaCapacitacao = lazy(() => import('./pages/MinhaCapacitacao'));
 const CapacitacaoEquipe = lazy(() => import('./pages/company/CapacitacaoEquipe'));
 
@@ -203,6 +204,11 @@ function App() {
                     <Layout><Treinamentos /></Layout>
                   </ProtectedRoute>
                 } />
+                <Route path="/treinamentos-profissional/trilha/:id" element={
+                  <ProtectedRoute userType="professional">
+                    <Layout><TrilhaDetalhe /></Layout>
+                  </ProtectedRoute>
+                } />
 
                 {/* Company Protected Routes */}
                 <Route path="/dashboard-empresa" element={
@@ -273,6 +279,11 @@ function App() {
                 <Route path="/treinamentos-empresa" element={
                   <ProtectedRoute userType="company">
                     <Layout><Treinamentos /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/treinamentos-empresa/trilha/:id" element={
+                  <ProtectedRoute userType="company">
+                    <Layout><TrilhaDetalhe /></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/radar-tst-profissional" element={

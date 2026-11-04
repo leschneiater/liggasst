@@ -13,6 +13,7 @@ const mkDeps = (opts: {
   user?: { id: string } | null;
   profile?: { role: string; verification_status: string; is_test?: boolean } | null;
   training?: { audience: string; status: string; pdf_path: string | null; is_test?: boolean } | null;
+  secao?: { content_type: string; conteudo: string | null; trails: { kind: string; published: boolean; audience: string; is_test?: boolean } | null } | null;
   subscription?: SubOpts;
   signedUrl?: string;
   authError?: boolean;
@@ -21,6 +22,7 @@ const mkDeps = (opts: {
   const createSignedUrl = vi.fn().mockResolvedValue({ data: { signedUrl: opts.signedUrl ?? 'https://assinada.example/x.pdf' }, error: null });
   const singleProfile = vi.fn().mockResolvedValue({ data: opts.profile ?? null });
   const singleTraining = vi.fn().mockResolvedValue({ data: opts.training ?? null });
+  const singleSecao = vi.fn().mockResolvedValue({ data: opts.secao ?? null });
   const maybeSingleSub = vi.fn().mockResolvedValue({ data: opts.subscription ?? null });
   const client = {
     auth: { getUser: vi.fn().mockResolvedValue(opts.authError
@@ -30,7 +32,7 @@ const mkDeps = (opts: {
       select: vi.fn(() => ({
         eq: vi.fn(() => (t === 'subscriptions'
           ? { single: singleProfile, maybeSingle: maybeSingleSub }
-          : { single: t === 'profiles' ? singleProfile : singleTraining, maybeSingle: maybeSingleSub })),
+          : { single: t === 'profiles' ? singleProfile : t === 'trail_sections' ? singleSecao : singleTraining, maybeSingle: maybeSingleSub })),
       })),
     })),
     storage: { from: vi.fn(() => ({ createSignedUrl })) },
@@ -38,7 +40,7 @@ const mkDeps = (opts: {
   };
   return {
     deps: { supabaseUrl: 'https://proj.example', serviceRoleKey: 'k', createClient: () => client },
-    espioes: { createSignedUrl, singleProfile, singleTraining, maybeSingleSub, getUser: client.auth.getUser },
+    espioes: { createSignedUrl, singleProfile, singleTraining, singleSecao, maybeSingleSub, getUser: client.auth.getUser },
   };
 };
 
@@ -209,5 +211,90 @@ describe('handler training-file-url (integracao com deps simuladas)', () => {
       acessoEquipe: false,
     });
     expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(403);
+  });
+});
+
+describe('handler training-file-url: ramo trail_section_id (Etapa 2)', () => {
+  const PERFIL_OK = { role: 'professional', verification_status: 'approved', is_test: false };
+  const SECAO_OK = {
+    content_type: 'pdf',
+    conteudo: '22222222-2222-2222-2222-222222222222.pdf',
+    trails: { kind: 'open', published: true, audience: 'professional', is_test: false },
+  };
+
+  it('pagante abre PDF de secao de trilha open publicada', async () => {
+    const { deps } = mkDeps({ user: { id: 'u1' }, profile: PERFIL_OK, secao: SECAO_OK, subscription: PAGA });
+    const r = await handleRequest(req({ trail_section_id: 's1' }), deps);
+    expect(r.status).toBe(200);
+    const corpo = await r.json();
+    expect(corpo.signedUrl).toContain('https://');
+  });
+
+  it('conta gratuita recebe 403', async () => {
+    const { deps } = mkDeps({ user: { id: 'u1' }, profile: PERFIL_OK, secao: SECAO_OK, subscription: null });
+    const r = await handleRequest(req({ trail_section_id: 's1' }), deps);
+    expect(r.status).toBe(403);
+  });
+
+  it('trilha certified ainda nao entrega conteudo (etapa futura)', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' }, profile: PERFIL_OK, subscription: PAGA,
+      secao: { ...SECAO_OK, trails: { ...SECAO_OK.trails!, kind: 'certified' } },
+    });
+    const r = await handleRequest(req({ trail_section_id: 's1' }), deps);
+    expect(r.status).toBe(403);
+  });
+
+  it('rascunho de trilha nao entrega para membro', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' }, profile: PERFIL_OK, subscription: PAGA,
+      secao: { ...SECAO_OK, trails: { ...SECAO_OK.trails!, published: false } },
+    });
+    const r = await handleRequest(req({ trail_section_id: 's1' }), deps);
+    expect(r.status).toBe(403);
+  });
+
+  it('trilha de teste responde 404 para membro real', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' }, profile: PERFIL_OK, subscription: PAGA,
+      secao: { ...SECAO_OK, trails: { ...SECAO_OK.trails!, is_test: true } },
+    });
+    const r = await handleRequest(req({ trail_section_id: 's1' }), deps);
+    expect(r.status).toBe(404);
+  });
+
+  it('secao youtube nao tem PDF para assinar', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' }, profile: PERFIL_OK, subscription: PAGA,
+      secao: { content_type: 'youtube', conteudo: 'https://www.youtube.com/watch?v=x', trails: SECAO_OK.trails },
+    });
+    const r = await handleRequest(req({ trail_section_id: 's1' }), deps);
+    expect(r.status).toBe(404);
+  });
+
+  it('admin abre PDF de rascunho (gestao)', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'adm' },
+      profile: { role: 'admin', verification_status: 'approved' },
+      subscription: null,
+      secao: { ...SECAO_OK, trails: { ...SECAO_OK.trails!, published: false } },
+    });
+    const r = await handleRequest(req({ trail_section_id: 's1' }), deps);
+    expect(r.status).toBe(200);
+  });
+
+  it('secao inexistente responde 404', async () => {
+    const { deps } = mkDeps({ user: { id: 'u1' }, profile: PERFIL_OK, subscription: PAGA, secao: null });
+    const r = await handleRequest(req({ trail_section_id: 'sX' }), deps);
+    expect(r.status).toBe(404);
+  });
+
+  it('ramo de treinamento continua funcionando (regressao)', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' }, profile: PERFIL_OK, subscription: PAGA,
+      training: { audience: 'professional', status: 'published', pdf_path: PDF, is_test: false },
+    });
+    const r = await handleRequest(req({ training_id: 't1' }), deps);
+    expect(r.status).toBe(200);
   });
 });

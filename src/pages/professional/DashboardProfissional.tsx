@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   User, 
@@ -6,18 +6,33 @@ import {
   MessageSquare, 
   Upload,
   Crown,
-  CheckCircle
+  CheckCircle,
+  Award
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import Button from '../../components/ui/Button';
 import CartaoAvisos from '../../components/ui/CartaoAvisos';
 import CarrosselAds from '../../components/CarrosselAds';
+import { fetchMeusSelos, SeloPerfil } from '../../services/trilhas';
 
 const DashboardProfissional: React.FC = () => {
   const { userData } = useAuth();
   const { disponivel: msgDisponivel } = useMessagingDisponivel();
   const [currentPlan] = useState('gratuito');
+  const [selos, setSelos] = useState<SeloPerfil[]>([]);
+
+  // Meus selos de trilhas concluidas. Falha silenciosa: o painel nao quebra
+  // por causa dos selos.
+  useEffect(() => {
+    let vivo = true;
+    fetchMeusSelos().then((r) => {
+      if (vivo && r.success) setSelos(r.data);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-neutral-gray py-8">
@@ -106,6 +121,28 @@ const DashboardProfissional: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Coluna Principal */}
           <div className="lg:col-span-2 space-y-8">
+            {selos.length > 0 && (
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 className="font-poppins font-semibold text-xl text-soft-black mb-4">
+                  Meus selos de capacitação
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {selos.map((selo) => (
+                    <span
+                      key={selo.trail_id}
+                      className="inline-flex items-center space-x-1 px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full font-roboto"
+                      title={`Concluído em ${new Date(selo.earned_at).toLocaleDateString('pt-BR')}`}
+                    >
+                      <Award size={16} aria-hidden="true" />
+                      <span>{selo.trail_titulo}</span>
+                    </span>
+                  ))}
+                </div>
+                <p className="font-roboto text-xs text-gray-500 mt-2">
+                  Conquiste selos concluindo as trilhas da Capacitação. Eles aparecem no seu perfil público.
+                </p>
+              </div>
+            )}
             {/* Meu Status na Plataforma */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <h2 className="font-poppins font-semibold text-xl text-soft-black mb-6">

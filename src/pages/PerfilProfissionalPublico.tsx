@@ -20,6 +20,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMessagingDisponivel } from '../hooks/useMessagingDisponivel';
 import toast from 'react-hot-toast';
 import { getProfessionalPublic, ProfessionalSearchItem, fetchSharedCertificates, getSharedCertificateUrl, SharedCertificate } from '../services/database';
+import { fetchSelosPerfilPublico, SeloPerfil } from '../services/trilhas';
 import AvaliacoesPerfil from '../components/avaliacoes/AvaliacoesPerfil';
 
 const iniciaisNome = (nome: string): string => {
@@ -39,6 +40,7 @@ const PerfilProfissionalPublico: React.FC = () => {
   const [activeTab, setActiveTab] = useState('sobre');
   const { currentUser, userType } = useAuth();
   const [certificados, setCertificados] = useState<SharedCertificate[] | null>(null);
+  const [selos, setSelos] = useState<SeloPerfil[]>([]);
   const [certificadosErro, setCertificadosErro] = useState(false);
   const [abrindoCertId, setAbrindoCertId] = useState<string | null>(null);
   const { disponivel: msgDisponivel } = useMessagingDisponivel();
@@ -64,6 +66,20 @@ const PerfilProfissionalPublico: React.FC = () => {
   useEffect(() => {
     loadProfessional();
   }, [id]);
+
+  // Selos de trilhas concluidas: leitura publica (RPC); perfis de teste
+  // nunca retornam selos aqui. Falha silenciosa: a vitrine nao quebra por
+  // causa dos selos.
+  useEffect(() => {
+    if (!professional) return;
+    let vivo = true;
+    fetchSelosPerfilPublico(professional.id).then((r) => {
+      if (vivo && r.success) setSelos(r.data);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [professional]);
 
   const carregarCertificados = async (professionalId: string) => {
     setCertificadosErro(false);
@@ -293,6 +309,29 @@ const PerfilProfissionalPublico: React.FC = () => {
                     {professional.descricao || 'Este profissional ainda não adicionou uma descrição.'}
                   </p>
                 </div>
+
+                {selos.length > 0 && (
+                  <div>
+                    <h3 className="font-poppins font-semibold text-lg text-soft-black mb-3">
+                      Selos de capacitação
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selos.map((selo) => (
+                        <span
+                          key={selo.trail_id}
+                          className="inline-flex items-center space-x-1 px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full font-roboto"
+                          title={`Concluído em ${new Date(selo.earned_at).toLocaleDateString('pt-BR')}`}
+                        >
+                          <Award className="w-4 h-4" aria-hidden="true" />
+                          <span>{selo.trail_titulo}</span>
+                        </span>
+                      ))}
+                    </div>
+                    <p className="font-roboto text-xs text-gray-500 mt-2">
+                      Selos das trilhas de capacitação concluídas no Ligga SST.
+                    </p>
+                  </div>
+                )}
 
                 {professional.disponibilidade.length > 0 && (
                   <div>

@@ -7,47 +7,16 @@ import { useAuth } from '../contexts/AuthContext';
 import { fetchAssinatura } from '../services/assinatura';
 import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
 import { fetchTrainingsMembro, getTrainingPdfUrl, TrainingRow } from '../services/database';
+import { fetchTrilhasMembro, TrilhaComProgresso } from '../services/trilhas';
 import { treinamentoVisivelPara } from '../utils/treinamentos';
-import { extrairYoutubeId, urlEmbedYoutube, urlAssistirYoutube } from '../utils/youtube';
-
-const VideoYoutube: React.FC<{ youtubeUrl: string; titulo: string }> = ({ youtubeUrl, titulo }) => {
-  const id = extrairYoutubeId(youtubeUrl);
-  if (!id) return null;
-  return (
-    <div>
-      <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-        <iframe
-          title={titulo}
-          src={urlEmbedYoutube(id)}
-          className="absolute inset-0 w-full h-full rounded-lg"
-          loading="lazy"
-          // Sem autoplay. Sem referrerPolicy no-referrer: o YouTube exige o
-          // Referer para o embed (erro 153 caso contrario).
-          referrerPolicy="strict-origin-when-cross-origin"
-          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-      </div>
-      {/* Fallback: se o autor desativou a incorporacao, o player mostra erro;
-          o link direto sempre abre no YouTube. Links externos podem ser
-          repassados por quem tiver acesso. */}
-      <a
-        href={urlAssistirYoutube(id)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2 inline-flex items-center space-x-1 text-sm text-green-deep hover:underline"
-      >
-        <ExternalLink className="w-4 h-4" aria-hidden="true" />
-        <span>Abrir no YouTube</span>
-      </a>
-    </div>
-  );
-};
+import { resumoProgresso } from '../utils/trilhas';
+import VideoYoutube from '../components/VideoYoutube';
 
 const Treinamentos: React.FC = () => {
   const { currentUser, userType } = useAuth();
   const role = userType === 'company' ? 'company' : 'professional';
   const [treinamentos, setTreinamentos] = useState<TrainingRow[]>([]);
+  const [trilhas, setTrilhas] = useState<TrilhaComProgresso[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(false);
   const [pago, setPago] = useState<boolean | null>(null);
@@ -80,6 +49,13 @@ const Treinamentos: React.FC = () => {
         } else {
           // RLS ja filtra; o filtro local e defesa em profundidade.
           setTreinamentos(r.data.filter((t) => treinamentoVisivelPara(t, role)));
+        }
+        const rt = await fetchTrilhasMembro();
+        if (!vivo) return;
+        if (rt.success) {
+          // Nesta etapa so trilhas abertas tem conteudo para o membro; as
+          // trilhas com certificado chegam nas proximas etapas.
+          setTrilhas(rt.data.filter((t) => t.kind === 'open'));
         }
       } catch {
         if (vivo) setErro(true);
@@ -135,10 +111,35 @@ const Treinamentos: React.FC = () => {
           </div>
         )}
 
-        {!loading && !erro && pago === true && treinamentos.length === 0 && (
+        {!loading && !erro && pago === true && treinamentos.length === 0 && trilhas.length === 0 && (
           <p className="font-roboto text-gray-600">
             Nenhuma capacitação disponível no momento.
           </p>
+        )}
+
+        {pago === true && trilhas.length > 0 && (
+          <div className="mb-8">
+            <h2 className="font-poppins text-lg font-semibold text-gray-900 mb-3">Trilhas</h2>
+            <div className="space-y-3">
+              {trilhas.map((t) => (
+                <Link
+                  key={t.id}
+                  to={`${role === 'company' ? '/treinamentos-empresa' : '/treinamentos-profissional'}/trilha/${t.id}`}
+                  className="block bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-green-deep transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-poppins font-semibold text-gray-900">{t.titulo}</h3>
+                    <span className="text-sm text-gray-500">
+                      {resumoProgresso(t.totalSecoes, t.secoesConcluidas)}
+                    </span>
+                  </div>
+                  {t.descricao && (
+                    <p className="font-roboto text-sm text-gray-600 mt-1 line-clamp-2">{t.descricao}</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
 
         {pago === true && (
