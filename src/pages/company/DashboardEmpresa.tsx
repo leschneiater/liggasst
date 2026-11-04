@@ -16,6 +16,8 @@ import { deleteDemandRascunho, fetchDemands, updateDemand } from '../../services
 import { fetchAssinatura } from '../../services/assinatura';
 import { assinaturaPagaAtiva } from '../../utils/assinaturaAcesso';
 import { demandasAtivasMinhas } from '../../services/limites';
+import { fetchContagemPropostasPorDemanda } from '../../services/propostas';
+import { textoLinkPropostas } from '../../utils/propostasComparador';
 import { bloquearNovaDemandaAtiva, MSG_LIMITE_DEMANDAS } from '../../utils/limitesPlano';
 import {
   DemandaGestaoRow,
@@ -34,6 +36,7 @@ const DashboardEmpresa: React.FC = () => {
   const { disponivel: msgDisponivel } = useMessagingDisponivel();
   const [demands, setDemands] = useState<DemandaGestaoRow[]>([]);
   const [demandsLoading, setDemandsLoading] = useState(true);
+  const [contagemPropostas, setContagemPropostas] = useState<Record<string, number>>({});
   const [confirmacao, setConfirmacao] = useState<{ id: string; acao: 'concluir' | 'cancelar' | 'publicar' | 'descartar' } | null>(null);
   const [acaoLoading, setAcaoLoading] = useState(false);
 
@@ -43,7 +46,11 @@ const DashboardEmpresa: React.FC = () => {
     fetchDemands({ company_id: currentUser.id })
       .then((result) => {
         if (result.success && Array.isArray(result.data)) {
-          setDemands(result.data as DemandaGestaoRow[]);
+          const lista = result.data as DemandaGestaoRow[];
+          setDemands(lista);
+          fetchContagemPropostasPorDemanda(lista.map((d) => d.id)).then((r) => {
+            if (r.success && r.data) setContagemPropostas(r.data);
+          });
         }
       })
       .finally(() => setDemandsLoading(false));
@@ -165,6 +172,15 @@ const DashboardEmpresa: React.FC = () => {
                           .filter(Boolean)
                           .join(' • ')}
                       </p>
+                      {(contagemPropostas[demanda.id] ?? 0) > 0 && (
+                        <Link
+                          to={`/demandas/${demanda.id}/propostas`}
+                          className="font-roboto text-sm text-green-deep font-medium underline"
+                          data-testid={`link-propostas-${demanda.id}`}
+                        >
+                          {textoLinkPropostas(contagemPropostas[demanda.id])}
+                        </Link>
+                      )}
                     </div>
                     <div className="text-right shrink-0">
                       <span className="inline-block px-2 py-1 text-xs font-roboto rounded-full bg-green-light text-green-deep">

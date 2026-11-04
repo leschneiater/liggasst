@@ -10,6 +10,8 @@ import TreinamentosAdmin from '../../pages/admin/TreinamentosAdmin';
 import CertificadosProfissional from '../../pages/professional/CertificadosProfissional';
 import BuscaEmpresas from '../../pages/professional/BuscaEmpresas';
 import PubliqueDemanda from '../../pages/PubliqueDemanda';
+import ComparadorPropostas from '../../pages/company/ComparadorPropostas';
+import DemandasDisponiveis from '../../pages/professional/DemandasDisponiveis';
 import Treinamentos from '../../pages/Treinamentos';
 import Layout from '../Layout/Layout';
 
@@ -50,6 +52,10 @@ vi.mock('../../services/database', () => ({
   ] }),
   fetchOwnCompany: vi.fn().mockResolvedValue({ success: true, data: { razao_social: 'Empresa Teste', responsible_name: 'Fulana', responsible_phone: '11999990000' } }),
   publishDemand: vi.fn(), updateCompany: vi.fn(),
+  fetchDemands: (...a: unknown[]) => fetchDemandsMock(...a),
+  fetchProfileNames: vi.fn().mockResolvedValue({ success: true, data: { 'prof-1': 'Maria Silva', 'prof-2': 'João Costa' } }),
+  fetchSharedCertificates: vi.fn().mockResolvedValue({ success: true, data: [{ id: 'c1' }, { id: 'c2' }] }),
+  avaliacoesResumo: vi.fn().mockResolvedValue({ media: 4.5, total: 3 }),
 }));
 // CertificadosProfissional importa o cliente direto; stub minimo (as
 // interacoes reais passam pelos servicos ja mockados).
@@ -70,6 +76,24 @@ vi.mock('../../contexts/AuthContext', () => ({
 }));
 // Gate pago da Capacitacao: pagante por padrao; o estado de bloqueio do
 // membro gratuito tem seu proprio snapshot abaixo.
+const demandaFixture = {
+  id: 'd1', company_id: 'emp-1', title: 'PGR para fábrica em São Paulo', description: 'Elaboração do PGR completo.',
+  service_type: 'PGR', city: 'São Paulo', state: 'SP', budget: 8000, deadline: '2026-12-15',
+  status: 'active', created_at: '2026-11-01T10:00:00Z',
+};
+const fetchDemandsMock = vi.fn().mockResolvedValue({ success: true, data: [demandaFixture] });
+const propostasFixture = [
+  { id: 'p1', demand_id: 'd1', professional_id: 'prof-1', amount: 4500, deadline_days: 15, message: 'Executo o PGR completo com visita técnica e entrega em 15 dias.', status: 'pending', created_at: '2026-11-02T10:00:00Z' },
+  { id: 'p2', demand_id: 'd1', professional_id: 'prof-2', amount: null, deadline_days: 20, message: 'Valor a combinar conforme escopo; incluo treinamento da equipe.', status: 'pending', created_at: '2026-11-02T11:00:00Z' },
+];
+const fetchPropostasMock = vi.fn().mockResolvedValue({ success: true, data: propostasFixture });
+vi.mock('../../services/propostas', () => ({
+  fetchPropostasDaDemanda: (...a: unknown[]) => fetchPropostasMock(...a),
+  fetchMinhasPropostas: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  enviarProposta: vi.fn(),
+  atualizarStatusProposta: vi.fn(),
+}));
+
 const fetchAssinaturaMock = vi.fn().mockResolvedValue({
   plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production',
 });
@@ -134,6 +158,41 @@ describe('snapshots visuais', () => {
     await pub.findByTestId('aviso-limite-demandas');
     salvar('empresa-publique-demanda-aviso-limite', pub.container.innerHTML);
     pub.unmount();
+
+    // Comparador de propostas (plano Empresa): pago ve os cartoes lado a
+    // lado; free ve contagem + aviso, sem os cartoes.
+    (window as unknown as { __role?: string }).__role = 'company';
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'pro_company', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const { Route, Routes } = await import('react-router-dom');
+    const rotas = (el: React.ReactNode) => (
+      <MemoryRouter initialEntries={['/demandas/d1/propostas']}>
+        <Routes><Route path="/demandas/:id/propostas" element={el} /></Routes>
+      </MemoryRouter>
+    );
+    const compPago = render(rotas(<ComparadorPropostas />));
+    await compPago.findByTestId('comparador-propostas');
+    await compPago.findByText('Maria Silva');
+    salvar('empresa-comparador-propostas-pago', compPago.container.innerHTML);
+    compPago.unmount();
+
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'free', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const compFree = render(rotas(<ComparadorPropostas />));
+    await compFree.findByTestId('aviso-limite-comparador');
+    salvar('empresa-comparador-propostas-gratuito', compFree.container.innerHTML);
+    compFree.unmount();
+
+    // Formulario de proposta do profissional na lista de demandas.
+    (window as unknown as { __role?: string }).__role = 'professional';
+    const listaDemandas = render(<MemoryRouter initialEntries={['/demandas-disponiveis']}><DemandasDisponiveis /></MemoryRouter>);
+    const botao = await listaDemandas.findByText('Enviar Proposta');
+    botao.click();
+    await listaDemandas.findByTestId('form-proposta-d1');
+    salvar('profissional-form-proposta', listaDemandas.container.innerHTML);
+    listaDemandas.unmount();
 
     const empresa = render(
       <MemoryRouter initialEntries={['/dashboard-empresa']}>

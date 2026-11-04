@@ -41,6 +41,8 @@ export const AVISO_LIMITES = {
     'Plano gratuito: até 5 contatos novos por mês. Responder mensagens continua livre. Com um plano pago, contatos sem limite fixo.',
   demandas:
     'Plano gratuito: até 3 demandas ativas por vez. Concluir ou cancelar uma demanda libera espaço. Com um plano pago, demandas sem limite fixo.',
+  comparador:
+    'Suas demandas já podem receber propostas e o chat continua livre. Comparar preço, prazo, certificados e avaliações lado a lado é recurso do plano Empresa.',
 } as const;
 
 export const MSG_LIMITE_CONTATOS =

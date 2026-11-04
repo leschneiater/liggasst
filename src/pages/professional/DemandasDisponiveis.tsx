@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, DollarSign, MessageSquare } from 'lucide-react';
+import { MapPin, Calendar, DollarSign, MessageSquare, Send } from 'lucide-react';
+import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import { fetchDemands, fetchCompanies } from '../../services/database';
+import { enviarProposta, fetchMinhasPropostas } from '../../services/propostas';
+import { validarProposta } from '../../utils/propostasComparador';
 
 interface Demanda {
   id: string;
@@ -26,6 +29,14 @@ const DemandasDisponiveis: React.FC = () => {
   const [empresas, setEmpresas] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  // Proposta por demanda: formulario aberto, rascunho e demandas ja com
+  // proposta enviada (uma por profissional, unique no banco).
+  const [formAberto, setFormAberto] = useState<string | null>(null);
+  const [valor, setValor] = useState('');
+  const [prazo, setPrazo] = useState('');
+  const [mensagem, setMensagem] = useState('');
+  const [enviando, setEnviando] = useState(false);
+  const [enviadas, setEnviadas] = useState<Record<string, boolean>>({});
 
   const carregar = async () => {
     setLoading(true);
@@ -40,6 +51,13 @@ const DemandasDisponiveis: React.FC = () => {
       return;
     }
     setDemandas(rDemandas.data as Demanda[]);
+    fetchMinhasPropostas().then((r) => {
+      if (r.success && Array.isArray(r.data)) {
+        const mapa: Record<string, boolean> = {};
+        for (const p of r.data) mapa[p.demand_id] = true;
+        setEnviadas(mapa);
+      }
+    });
     if (rEmpresas.success && Array.isArray(rEmpresas.data)) {
       const mapa: Record<string, string> = {};
       for (const e of rEmpresas.data as { id: string; display_name: string }[]) {
@@ -56,6 +74,41 @@ const DemandasDisponiveis: React.FC = () => {
     navigate(`/mensagens-profissional?para=${d.company_id}`, {
       state: { nome: empresas[d.company_id] || 'Empresa' }
     });
+  };
+
+  const abrirForm = (d: Demanda) => {
+    setFormAberto(d.id);
+    setValor('');
+    setPrazo('');
+    setMensagem('');
+  };
+
+  const submeterProposta = async (d: Demanda) => {
+    const amount = valor.trim() === '' ? null : Number(valor.replace(',', '.'));
+    const deadlineDays = prazo.trim() === '' ? null : Number(prazo);
+    const erros = validarProposta({ amount, deadlineDays, message: mensagem });
+    if (erros.length > 0) {
+      toast.error(erros[0]);
+      return;
+    }
+    setEnviando(true);
+    const result = await enviarProposta({ demandId: d.id, amount, deadlineDays, message: mensagem });
+    setEnviando(false);
+    if (!result.success) {
+      toast.error(
+        result.duplicada
+          ? 'Você já enviou uma proposta para esta demanda.'
+          : 'Não foi possível enviar a proposta. Tente novamente.',
+      );
+      if (result.duplicada) {
+        setEnviadas((prev) => ({ ...prev, [d.id]: true }));
+        setFormAberto(null);
+      }
+      return;
+    }
+    toast.success('Proposta enviada. A empresa pode responder pelo chat.');
+    setEnviadas((prev) => ({ ...prev, [d.id]: true }));
+    setFormAberto(null);
   };
 
   return (
@@ -117,17 +170,82 @@ const DemandasDisponiveis: React.FC = () => {
                       {d.service_type && <span>{d.service_type}</span>}
                     </div>
                   </div>
-                  {msgDisponivel && (
-                  <Button
-                      onClick={() => enviarMensagem(d)}
-                      icon={MessageSquare}
-                      size="sm"
-                      className="flex-shrink-0"
-                    >
-                      Enviar Mensagem
-                    </Button>
-                  )}
+                  <div className="flex flex-col gap-2 flex-shrink-0">
+                    {msgDisponivel && (
+                      <Button
+                        onClick={() => enviarMensagem(d)}
+                        icon={MessageSquare}
+                        size="sm"
+                      >
+                        Enviar Mensagem
+                      </Button>
+                    )}
+                    {enviadas[d.id] ? (
+                      <span className="font-roboto text-sm text-green-deep" data-testid={`proposta-enviada-${d.id}`}>
+                        Proposta enviada
+                      </span>
+                    ) : (
+                      <Button
+                        onClick={() => abrirForm(d)}
+                        icon={Send}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Enviar Proposta
+                      </Button>
+                    )}
+                  </div>
                 </div>
+                {formAberto === d.id && (
+                  <div className="mt-4 bg-neutral-gray rounded-lg p-4" data-testid={`form-proposta-${d.id}`}>
+                    <p className="font-roboto text-sm text-soft-black mb-3">
+                      Sua proposta para esta demanda (o chat continua livre para conversar).
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                      <label className="font-roboto text-sm text-gray-700">
+                        Valor (R$, opcional)
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={valor}
+                          onChange={(e) => setValor(e.target.value)}
+                          placeholder="A combinar"
+                          className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 font-roboto text-sm"
+                        />
+                      </label>
+                      <label className="font-roboto text-sm text-gray-700">
+                        Prazo (dias, opcional)
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={prazo}
+                          onChange={(e) => setPrazo(e.target.value)}
+                          placeholder="Ex.: 15"
+                          className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 font-roboto text-sm"
+                        />
+                      </label>
+                    </div>
+                    <label className="font-roboto text-sm text-gray-700 block mb-3">
+                      Descrição da proposta
+                      <textarea
+                        value={mensagem}
+                        onChange={(e) => setMensagem(e.target.value)}
+                        rows={3}
+                        maxLength={2000}
+                        placeholder="O que você entrega, experiência e condições"
+                        className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 font-roboto text-sm"
+                      />
+                    </label>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => submeterProposta(d)} loading={enviando}>
+                        Enviar
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setFormAberto(null)} disabled={enviando}>
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

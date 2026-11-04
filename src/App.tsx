@@ -71,6 +71,7 @@ const MensagensEmpresa = lazy(() => import('./pages/company/MensagensEmpresa'));
 const AssinaturaEmpresa = lazy(() => import('./pages/company/AssinaturaEmpresa'));
 const RelatoriosEmpresa = lazy(() => import('./pages/company/RelatoriosEmpresa'));
 const EditarDemanda = lazy(() => import('./pages/company/EditarDemanda'));
+const ComparadorPropostas = lazy(() => import('./pages/company/ComparadorPropostas'));
 const ProporContrato = lazy(() => import('./pages/company/ProporContrato'));
 
 // Admin Pages
@@ -237,6 +238,11 @@ function App() {
                 <Route path="/editar-demanda/:id" element={
                   <ProtectedRoute userType="company">
                     <Layout><EditarDemanda /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/demandas/:id/propostas" element={
+                  <ProtectedRoute userType="company">
+                    <Layout><ComparadorPropostas /></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/propor-contrato/:profissionalId" element={

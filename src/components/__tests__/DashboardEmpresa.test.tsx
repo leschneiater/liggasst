@@ -24,6 +24,10 @@ vi.mock('../../services/assinatura', () => ({
 vi.mock('../../services/limites', () => ({
   demandasAtivasMinhas: (...a: unknown[]) => demandasAtivasMock(...a),
 }));
+const contagemPropostasMock = vi.fn();
+vi.mock('../../services/propostas', () => ({
+  fetchContagemPropostasPorDemanda: (...a: unknown[]) => contagemPropostasMock(...a),
+}));
 vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },
 }));
@@ -41,6 +45,7 @@ describe('DashboardEmpresa', () => {
     fetchDemandsMock.mockReset().mockResolvedValue({ success: true, data: [] });
     fetchAssinaturaMock.mockReset().mockResolvedValue(null);
     demandasAtivasMock.mockReset().mockResolvedValue(0);
+    contagemPropostasMock.mockReset().mockResolvedValue({ success: true, data: {} });
     updateDemandMock.mockReset().mockResolvedValue({ success: true, data: {} });
     deleteRascunhoMock.mockReset().mockResolvedValue({ success: true });
     useAuthMock.mockReset().mockReturnValue({
