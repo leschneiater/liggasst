@@ -12,6 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import Button from '../../components/ui/Button';
 import CartaoAvisos from '../../components/ui/CartaoAvisos';
+import CarrosselAds from '../../components/CarrosselAds';
 
 const DashboardProfissional: React.FC = () => {
   const { userData } = useAuth();
@@ -50,6 +51,8 @@ const DashboardProfissional: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <CarrosselAds />
 
         <CartaoAvisos rotaMensagens="/mensagens-profissional" rotaContratos="/contratos-profissional" mensagensDisponivel={msgDisponivel} />
 

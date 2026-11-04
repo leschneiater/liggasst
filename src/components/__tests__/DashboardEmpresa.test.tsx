@@ -10,6 +10,7 @@ const deleteRascunhoMock = vi.fn();
 const useAuthMock = vi.fn();
 const useMessagingDisponivelMock = vi.fn();
 
+vi.mock('../../components/CarrosselAds', () => ({ default: () => null }));
 vi.mock('../../services/database', () => ({
   fetchDemands: (...args: unknown[]) => fetchDemandsMock(...args),
   updateDemand: (...args: unknown[]) => updateDemandMock(...args),

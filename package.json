@@ -21,7 +21,8 @@
     "test:demands-isolation": "node supabase/tests/demands_isolamento_teste.test.mjs",
     "test:equiv-prod": "node supabase/tests/equivalente_producao_regressao.test.mjs",
     "test:companies-contato": "node supabase/tests/companies_contato_razao_social.test.mjs",
-    "test:avaliacoes": "node supabase/tests/avaliacoes_policy.test.mjs"
+    "test:avaliacoes": "node supabase/tests/avaliacoes_policy.test.mjs",
+    "test:ads": "node supabase/tests/ads_policy.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",

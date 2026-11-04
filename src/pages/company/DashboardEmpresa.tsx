@@ -33,6 +33,7 @@ import {
 } from './demandaGestao';
 import Button from '../../components/ui/Button';
 import CartaoAvisos from '../../components/ui/CartaoAvisos';
+import CarrosselAds from '../../components/CarrosselAds';
 import toast from 'react-hot-toast';
 
 const DashboardEmpresa: React.FC = () => {
@@ -166,6 +167,8 @@ const DashboardEmpresa: React.FC = () => {
             Gerencie o perfil da sua empresa e acompanhe suas demandas de SST.
           </p>
         </div>
+
+        <CarrosselAds />
 
         <CartaoAvisos rotaMensagens="/mensagens-empresa" rotaContratos="/contratos-empresa" mensagensDisponivel={msgDisponivel} />
 

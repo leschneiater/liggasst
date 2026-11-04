@@ -59,6 +59,7 @@ const ContatosAdmin = lazy(() => import('./pages/admin/ContatosAdmin'));
 const RadarAdmin = lazy(() => import('./pages/admin/RadarAdmin'));
 const TreinamentosAdmin = lazy(() => import('./pages/admin/TreinamentosAdmin'));
 const ReembolsosAdmin = lazy(() => import('./pages/admin/ReembolsosAdmin'));
+const AdsAdmin = lazy(() => import('./pages/admin/AdsAdmin'));
 const RadarTst = lazy(() => import('./pages/RadarTst'));
 const Treinamentos = lazy(() => import('./pages/Treinamentos'));
 const MinhaCapacitacao = lazy(() => import('./pages/MinhaCapacitacao'));
@@ -313,6 +314,11 @@ function App() {
                 <Route path="/admin/reembolsos" element={
                   <ProtectedRoute userType="admin">
                     <Layout><ReembolsosAdmin /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/publicidade" element={
+                  <ProtectedRoute userType="admin">
+                    <Layout><AdsAdmin /></Layout>
                   </ProtectedRoute>
                 } />
 
