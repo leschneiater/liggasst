@@ -1,8 +1,8 @@
 // Handler da Edge Function training-file-url, com dependencias injetadas
 // para teste de integracao em vitest (sem Deno nem rede). Usa apenas a Fetch
 // API padrao (Request/Response), disponivel em Deno e Node 18+.
-import { decidirAcessoPdf } from './decide.ts';
-import type { PerfilChamador, TreinamentoAlvo } from './decide.ts';
+import { assinaturaPagaJanela, decidirAcessoPdf } from './decide.ts';
+import type { AssinaturaRow, PerfilChamador, TreinamentoAlvo } from './decide.ts';
 
 // Recorte minimo do cliente supabase-js usado aqui (sem `any`); o createClient
 // real e os mocks de teste satisfazem esta interface estruturalmente.
@@ -12,7 +12,10 @@ export interface SupabaseClientMin {
   };
   from: (table: string) => {
     select: (cols: string) => {
-      eq: (col: string, value: string) => { single: () => Promise<{ data: unknown; error?: unknown }> };
+      eq: (col: string, value: string) => {
+        single: () => Promise<{ data: unknown; error?: unknown }>;
+        maybeSingle: () => Promise<{ data: unknown; error?: unknown }>;
+      };
     };
   };
   storage: {
@@ -78,9 +81,19 @@ export const handleRequest = async (req: Request, deps: Deps): Promise<Response>
       .eq('id', trainingId)
       .single();
 
+    // Gate pago da Capacitacao (decisao da dona 03/11/2026): sem linha em
+    // subscriptions (conta gratuita) maybeSingle devolve null -> 'free'.
+    const { data: assinatura } = await admin
+      .from('subscriptions')
+      .select('plan, status, current_period_end, environment')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+
+    const hoje = new Date().toISOString().slice(0, 10);
     const decisao = decidirAcessoPdf(
       profile as PerfilChamador | null,
       training as TreinamentoAlvo | null,
+      assinaturaPagaJanela(assinatura as AssinaturaRow | null, hoje),
     );
     if (!decisao.ok) return json({ error: decisao.erro }, decisao.status);
 

@@ -43,6 +43,14 @@ vi.mock('../../services/database', () => ({
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ userType: (window as unknown as { __role?: string }).__role ?? 'professional', currentUser: { id: 'u1', verified: true }, loading: false }),
 }));
+// Gate pago da Capacitacao: pagante por padrao; o estado de bloqueio do
+// membro gratuito tem seu proprio snapshot abaixo.
+const fetchAssinaturaMock = vi.fn().mockResolvedValue({
+  plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production',
+});
+vi.mock('../../services/assinatura', () => ({
+  fetchAssinatura: (...a: unknown[]) => fetchAssinaturaMock(...a),
+}));
 vi.mock('../../hooks/useMessagingDisponivel', () => ({ useMessagingDisponivel: () => ({ disponivel: true }) }));
 vi.mock('../Layout/Header', () => ({ default: () => <div className="h-16 bg-white border-b flex items-center px-6 font-poppins font-bold text-green-deep">LiggaSST</div> }));
 vi.mock('../Layout/Footer', () => ({ default: () => <div className="h-12 bg-gray-100" /> }));
@@ -73,6 +81,13 @@ describe('snapshots visuais', () => {
     const membro = render(<MemoryRouter initialEntries={['/treinamentos-profissional']}><Treinamentos /></MemoryRouter>);
     await membro.findByText('NR-35 - Trabalho em altura');
     salvar('membro-treinamentos', membro.container.innerHTML);
+
+    fetchAssinaturaMock.mockResolvedValueOnce({
+      plan: 'free', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const gratuito = render(<MemoryRouter initialEntries={['/treinamentos-profissional']}><Treinamentos /></MemoryRouter>);
+    await gratuito.findByText('Conteúdo exclusivo para assinantes');
+    salvar('membro-treinamentos-bloqueado', gratuito.container.innerHTML);
 
     const empresa = render(
       <MemoryRouter initialEntries={['/dashboard-empresa']}>

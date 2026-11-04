@@ -14,6 +14,11 @@ vi.mock('../../services/database', () => ({
   getTrainingPdfUrl: (...args: unknown[]) => getTrainingPdfUrlMock(...args),
 }));
 
+const fetchAssinaturaMock = vi.fn();
+vi.mock('../../services/assinatura', () => ({
+  fetchAssinatura: (...args: unknown[]) => fetchAssinaturaMock(...args),
+}));
+
 let roleAtual: 'professional' | 'company' = 'professional';
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ userType: roleAtual, currentUser: { id: 'u1', verified: true }, loading: false }),
@@ -61,6 +66,34 @@ describe('Pagina Treinamentos (membro)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     roleAtual = 'professional';
+    // Padrao: membro pagante (pro ativo em producao). Os testes de gate
+    // abaixo sobrescrevem com gratuito/erro.
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'pro_professional',
+      status: 'active',
+      current_period_end: null,
+      environment: 'production',
+    });
+  });
+
+  it('membro GRATUITO ve bloqueio com CTA e nao busca treinamentos', async () => {
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'free',
+      status: 'active',
+      current_period_end: null,
+      environment: 'production',
+    });
+    render(<MemoryRouter><Treinamentos /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Conteúdo exclusivo para assinantes')).toBeInTheDocument());
+    expect(screen.getByText('Ver planos')).toBeInTheDocument();
+    expect(fetchTrainingsMembroMock).not.toHaveBeenCalled();
+  });
+
+  it('falha ao verificar o plano mostra erro, nao a lista', async () => {
+    fetchAssinaturaMock.mockRejectedValue(new Error('rede'));
+    render(<MemoryRouter><Treinamentos /></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText('Não foi possível carregar. Tente novamente mais tarde.')).toBeInTheDocument());
+    expect(screen.queryByText('Nenhuma capacitação disponível no momento.')).not.toBeInTheDocument();
   });
 
   it('mostra so treinamentos do publico do membro', async () => {

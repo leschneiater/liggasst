@@ -7,30 +7,42 @@ import { handleRequest } from '../../../supabase/functions/training-file-url/han
 
 const PDF = '11111111-1111-1111-1111-111111111111.pdf';
 
+type SubOpts = { plan: string; status: string; current_period_end: string | null; environment: string } | null;
+
 const mkDeps = (opts: {
   user?: { id: string } | null;
   profile?: { role: string; verification_status: string; is_test?: boolean } | null;
   training?: { audience: string; status: string; pdf_path: string | null; is_test?: boolean } | null;
+  subscription?: SubOpts;
   signedUrl?: string;
   authError?: boolean;
 }) => {
   const createSignedUrl = vi.fn().mockResolvedValue({ data: { signedUrl: opts.signedUrl ?? 'https://assinada.example/x.pdf' }, error: null });
   const singleProfile = vi.fn().mockResolvedValue({ data: opts.profile ?? null });
   const singleTraining = vi.fn().mockResolvedValue({ data: opts.training ?? null });
+  const maybeSingleSub = vi.fn().mockResolvedValue({ data: opts.subscription ?? null });
   const client = {
     auth: { getUser: vi.fn().mockResolvedValue(opts.authError
       ? { data: { user: null }, error: new Error('bad token') }
       : { data: { user: opts.user ?? null }, error: null }) },
     from: vi.fn((t: string) => ({
-      select: vi.fn(() => ({ eq: vi.fn(() => ({ single: t === 'profiles' ? singleProfile : singleTraining })) })),
+      select: vi.fn(() => ({
+        eq: vi.fn(() => (t === 'subscriptions'
+          ? { single: singleProfile, maybeSingle: maybeSingleSub }
+          : { single: t === 'profiles' ? singleProfile : singleTraining, maybeSingle: maybeSingleSub })),
+      })),
     })),
     storage: { from: vi.fn(() => ({ createSignedUrl })) },
   };
   return {
     deps: { supabaseUrl: 'https://proj.example', serviceRoleKey: 'k', createClient: () => client },
-    espioes: { createSignedUrl, singleProfile, singleTraining, getUser: client.auth.getUser },
+    espioes: { createSignedUrl, singleProfile, singleTraining, maybeSingleSub, getUser: client.auth.getUser },
   };
 };
+
+// Assinatura paga valida (pro ativo em producao) para os cenarios de membro
+// que esperam 200: sem ela o gate da Capacitacao nega acesso.
+const PAGA: SubOpts = { plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production' };
 
 const req = (body: unknown, comAuth = true) =>
   new Request('https://fn.example/training-file-url', {
@@ -86,11 +98,12 @@ describe('handler training-file-url (integracao com deps simuladas)', () => {
     const d2 = mkDeps({ user: { id: 'u1' }, profile: { role: 'professional', verification_status: 'approved' }, training: null });
     expect((await handleRequest(req({ training_id: 'inexistente' }), d2.deps)).status).toBe(404);
   });
-  it('200 assina bucket trainings, path da linha e TTL 300 para membro no publico', async () => {
+  it('200 assina bucket trainings, path da linha e TTL 300 para membro PAGANTE no publico', async () => {
     const { deps, espioes } = mkDeps({
       user: { id: 'u1' },
       profile: { role: 'professional', verification_status: 'approved' },
       training: { audience: 'both', status: 'published', pdf_path: PDF },
+      subscription: PAGA,
       signedUrl: 'https://assinada.example/ok.pdf',
     });
     const r = await handleRequest(req({ training_id: 't1' }), deps);
@@ -109,19 +122,21 @@ describe('handler training-file-url (integracao com deps simuladas)', () => {
     });
     expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(200);
   });
-  it('404 para membro real pedindo PDF de treinamento de teste', async () => {
+  it('404 para membro real PAGANTE pedindo PDF de treinamento de teste', async () => {
     const { deps } = mkDeps({
       user: { id: 'u1' },
       profile: { role: 'professional', verification_status: 'approved' },
       training: { audience: 'both', status: 'published', pdf_path: PDF, is_test: true },
+      subscription: PAGA,
     });
     expect((await handleRequest(req({ training_id: 't-teste' }), deps)).status).toBe(404);
   });
-  it('200 para membro DE TESTE pedindo PDF de treinamento de teste', async () => {
+  it('200 para membro DE TESTE pagante pedindo PDF de treinamento de teste', async () => {
     const { deps, espioes } = mkDeps({
       user: { id: 'u-t' },
       profile: { role: 'professional', verification_status: 'approved', is_test: true },
       training: { audience: 'both', status: 'published', pdf_path: PDF, is_test: true },
+      subscription: PAGA,
     });
     const r = await handleRequest(req({ training_id: 't-teste' }), deps);
     expect(r.status).toBe(200);
@@ -134,5 +149,43 @@ describe('handler training-file-url (integracao com deps simuladas)', () => {
       training: { audience: 'company', status: 'draft', pdf_path: PDF, is_test: true },
     });
     expect((await handleRequest(req({ training_id: 't-teste' }), deps)).status).toBe(200);
+  });
+  it('403 para membro GRATUITO (sem assinatura) pedindo PDF', async () => {
+    const { deps, espioes } = mkDeps({
+      user: { id: 'u1' },
+      profile: { role: 'professional', verification_status: 'approved' },
+      training: { audience: 'both', status: 'published', pdf_path: PDF },
+    });
+    const r = await handleRequest(req({ training_id: 't1' }), deps);
+    expect(r.status).toBe(403);
+    expect(espioes.createSignedUrl).not.toHaveBeenCalled();
+  });
+  it('403 para assinatura paga de SANDBOX (nao libera acesso real)', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'u1' },
+      profile: { role: 'professional', verification_status: 'approved' },
+      training: { audience: 'both', status: 'published', pdf_path: PDF },
+      subscription: { plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'sandbox' },
+    });
+    expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(403);
+  });
+  it('403 para cancelado FORA do periodo pago e 200 dentro dele', async () => {
+    const base = {
+      user: { id: 'u1' },
+      profile: { role: 'professional', verification_status: 'approved' },
+      training: { audience: 'both' as const, status: 'published' as const, pdf_path: PDF },
+    };
+    const fora = mkDeps({ ...base, subscription: { plan: 'pro_professional', status: 'canceled', current_period_end: '2020-01-01', environment: 'production' } });
+    expect((await handleRequest(req({ training_id: 't1' }), fora.deps)).status).toBe(403);
+    const dentro = mkDeps({ ...base, subscription: { plan: 'pro_professional', status: 'canceled', current_period_end: '2999-01-01', environment: 'production' } });
+    expect((await handleRequest(req({ training_id: 't1' }), dentro.deps)).status).toBe(200);
+  });
+  it('200 para ADMIN sem plano pago (gerencia o conteudo)', async () => {
+    const { deps } = mkDeps({
+      user: { id: 'adm' },
+      profile: { role: 'admin', verification_status: 'approved' },
+      training: { audience: 'both', status: 'published', pdf_path: PDF },
+    });
+    expect((await handleRequest(req({ training_id: 't1' }), deps)).status).toBe(200);
   });
 });

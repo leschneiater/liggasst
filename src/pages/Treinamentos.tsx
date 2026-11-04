@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { GraduationCap, FileText, ExternalLink, Link2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { GraduationCap, FileText, ExternalLink, Link2, Lock, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
+import { fetchAssinatura } from '../services/assinatura';
+import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
 import { fetchTrainingsMembro, getTrainingPdfUrl, TrainingRow } from '../services/database';
 import { treinamentoVisivelPara } from '../utils/treinamentos';
 import { extrairYoutubeId, urlEmbedYoutube, urlAssistirYoutube } from '../utils/youtube';
@@ -42,28 +45,53 @@ const VideoYoutube: React.FC<{ youtubeUrl: string; titulo: string }> = ({ youtub
 };
 
 const Treinamentos: React.FC = () => {
-  const { userType } = useAuth();
+  const { currentUser, userType } = useAuth();
   const role = userType === 'company' ? 'company' : 'professional';
   const [treinamentos, setTreinamentos] = useState<TrainingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(false);
+  const [pago, setPago] = useState<boolean | null>(null);
   const [abrindoPdf, setAbrindoPdf] = useState<string | null>(null);
 
+  // Gate de cliente: Capacitacao e exclusiva de assinantes pagos (mesma
+  // regra do Radar TST). A regra de verdade fica na RLS e na Edge Function;
+  // aqui e experiencia (bloqueio com CTA em vez de lista vazia).
+  const userId = currentUser?.id;
   useEffect(() => {
+    if (!userId) return;
+    let vivo = true;
     const carregar = async () => {
       setLoading(true);
       setErro(false);
-      const r = await fetchTrainingsMembro();
-      if (!r.success) {
-        setErro(true);
-      } else {
-        // RLS ja filtra; o filtro local e defesa em profundidade.
-        setTreinamentos(r.data.filter((t) => treinamentoVisivelPara(t, role)));
+      try {
+        const a = await fetchAssinatura(userId);
+        if (!assinaturaPagaAtiva(a)) {
+          if (vivo) {
+            setPago(false);
+            setLoading(false);
+          }
+          return;
+        }
+        if (vivo) setPago(true);
+        const r = await fetchTrainingsMembro();
+        if (!vivo) return;
+        if (!r.success) {
+          setErro(true);
+        } else {
+          // RLS ja filtra; o filtro local e defesa em profundidade.
+          setTreinamentos(r.data.filter((t) => treinamentoVisivelPara(t, role)));
+        }
+      } catch {
+        if (vivo) setErro(true);
+      } finally {
+        if (vivo) setLoading(false);
       }
-      setLoading(false);
     };
     carregar();
-  }, [role]);
+    return () => {
+      vivo = false;
+    };
+  }, [userId, role]);
 
   const abrirPdf = async (t: TrainingRow) => {
     setAbrindoPdf(t.id);
@@ -85,17 +113,35 @@ const Treinamentos: React.FC = () => {
         </div>
 
         {loading && <p className="font-roboto text-gray-600">Carregando...</p>}
-        {erro && (
-          <p className="font-roboto text-red-600">
-            Não foi possível carregar os treinamentos. Tente novamente mais tarde.
-          </p>
+
+        {erro && !loading && (
+          <div className="flex items-center space-x-2 text-red-600 font-roboto">
+            <AlertTriangle size={18} aria-hidden="true" />
+            <p>Não foi possível carregar. Tente novamente mais tarde.</p>
+          </div>
         )}
-        {!loading && !erro && treinamentos.length === 0 && (
+
+        {!loading && !erro && pago === false && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <Lock className="w-10 h-10 text-green-deep mx-auto mb-4" aria-hidden="true" />
+            <h2 className="font-poppins font-semibold text-lg text-soft-black mb-2">
+              Conteúdo exclusivo para assinantes
+            </h2>
+            <p className="font-roboto text-gray-600 mb-6">
+              A Capacitação reúne treinamentos para quem assina o plano pago,
+              profissional ou empresa.
+            </p>
+            <Button as={Link} to="/planos">Ver planos</Button>
+          </div>
+        )}
+
+        {!loading && !erro && pago === true && treinamentos.length === 0 && (
           <p className="font-roboto text-gray-600">
             Nenhuma capacitação disponível no momento.
           </p>
         )}
 
+        {pago === true && (
         <div className="space-y-6">
           {treinamentos.map((t) => (
             <div key={t.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
@@ -136,6 +182,7 @@ const Treinamentos: React.FC = () => {
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
