@@ -22,9 +22,11 @@ vi.mock('../../services/acessos', () => ({
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 
 const css = (() => {
-  const dir = path.join(process.cwd(), 'dist', 'assets');
-  const arquivo = readdirSync(dir).find((f) => f.endsWith('.css'));
-  return arquivo ? readFileSync(path.join(dir, arquivo), 'utf8') : '';
+  try {
+    const dir = path.join(process.cwd(), 'dist', 'assets');
+    const arquivo = readdirSync(dir).find((f) => f.endsWith('.css'));
+    return arquivo ? readFileSync(path.join(dir, arquivo), 'utf8') : '';
+  } catch { return ''; }
 })();
 const salvar = (nome: string, html: string) => {
   const doc = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><style>${css}</style></head><body>${html}</body></html>`;
