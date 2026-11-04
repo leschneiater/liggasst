@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { registrarAcessoDia } from '../../services/database';
 
 const upsertMock = vi.fn();
-const fromMock = vi.fn((_t: string) => ({ upsert: upsertMock }));
+const fromMock = vi.fn((t: string) => { void t; return { upsert: upsertMock }; });
 vi.mock('../../lib/supabase', () => ({ supabase: { from: (t: string) => fromMock(t) } }));
 
 describe('registrarAcessoDia', () => {
