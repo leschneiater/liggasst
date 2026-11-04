@@ -99,6 +99,7 @@ ids.empresaSP = await criarUsuario('sp@teste.local', { role: 'company', display_
 ids.empresaPend = await criarUsuario('pend@teste.local', { role: 'company', display_name: 'Empresa Pendente' });
 ids.empresaTeste = await criarUsuario('istest@teste.local', { role: 'company', display_name: 'Empresa IsTest' });
 ids.empresaRJ = await criarUsuario('rj@teste.local', { role: 'company', display_name: 'Empresa RJ Teste' });
+ids.empresaAA = await criarUsuario('aa@teste.local', { role: 'company', display_name: 'Empresa AA' });
 ids.admin = await criarUsuario('admin@teste.local', { role: 'admin', display_name: 'Admin Com Empresa' });
 ids.viewer = await criarUsuario('viewer@teste.local', { role: 'professional', display_name: 'Prof Viewer' });
 ids.gate = await criarUsuario('gate@teste.local', { role: 'professional', display_name: 'Prof Gate' });
@@ -160,9 +161,37 @@ const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 ok(uuidRe.test(row.id), 'id e uuid (vai para /mensagens-profissional?para=)');
 ok(row.id === ids.empresaSP, 'id da linha e o profile_id da empresa (mesmo id usado como destinatario)');
 const campos = Object.keys(row).sort();
-const esperado = ['avatar_path', 'city', 'description', 'display_name', 'employee_count', 'id', 'needs', 'segment', 'state', 'verification_status'];
+const esperado = ['avatar_path', 'city', 'description', 'destaque', 'display_name', 'employee_count', 'id', 'needs', 'segment', 'state', 'verification_status'];
 ok(JSON.stringify(campos) === JSON.stringify(esperado), 'shape tem exatamente os campos esperados, sem email/telefone/cnpj');
 ok(Array.isArray(row.needs) || row.needs === null, 'needs e array');
+
+// ---------- ordenacao: dias ativos (30d) dentro do grupo, desempate nome ----------
+// Pedido dela 04/11: dentro do mesmo grupo de destaque, quem mais entra na
+// plataforma vem primeiro. Janela de 30 dias; acesso mais antigo nao conta.
+await db.query(`insert into public.acesso_diario (user_id, dia)
+  select $1::uuid, current_date - g from generate_series(1, 5) g`, [ids.empresaRJ]);
+await db.query(`insert into public.acesso_diario (user_id, dia)
+  values ($1, current_date - 40)`, [ids.empresaSP]);
+r = await buscar(ids.viewer);
+ok(r[0].display_name === 'Empresa RJ Teste', 'quem mais entra (5 dias em 30d) vem primeiro no mesmo grupo de destaque');
+ok(r.findIndex((x) => x.display_name === 'Empresa AA') < r.findIndex((x) => x.display_name === 'Empresa SP Teste'),
+  'acesso ha 40d fica fora da janela: empata em 0 dia e desempata por nome');
+
+// ---------- RLS da tabela nova ----------
+await db.query('begin');
+await db.query(`set local role authenticated`);
+await db.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub: ids.viewer })]);
+let erroOutro = false;
+await db.query('savepoint sp_rls');
+try {
+  await db.query(`insert into public.acesso_diario (user_id, dia) values ($1, current_date)`, [ids.empresaRJ]);
+} catch { erroOutro = true; await db.query('rollback to savepoint sp_rls'); }
+ok(erroOutro, 'RLS: usuario NAO grava acesso de outro');
+await db.query(`insert into public.acesso_diario (user_id, dia) values ($1, current_date)`, [ids.viewer]);
+ok(true, 'RLS: usuario grava o proprio acesso do dia (upsert 1x/dia)');
+const proprias = (await db.query(`select count(*)::int n from public.acesso_diario`)).rows[0].n;
+ok(proprias === 1, 'RLS: usuario so le as proprias linhas de acesso');
+await db.query('rollback');
 
 // ---------- permissao: anon nao executa ----------
 let anonNegado = false;

@@ -28,6 +28,22 @@ const fetchTodasPaginas = async <T>(
   }
 };
 
+
+// Ordenacao premium por frequencia de acesso (pedido dela 04/11):
+// grava 1 linha por dia em public.acesso_diario ao carregar a sessao.
+// Silencioso de proposito: falha aqui nunca pode quebrar o login.
+export const registrarAcessoDia = async (userId: string) => {
+  try {
+    const dia = new Date().toLocaleDateString('en-CA'); // yyyy-mm-dd local
+    const { error } = await supabase
+      .from('acesso_diario')
+      .upsert({ user_id: userId, dia }, { onConflict: 'user_id,dia', ignoreDuplicates: true });
+    if (error) console.warn('Acesso do dia não registrado:', error.message ?? error);
+  } catch (e) {
+    console.warn('Acesso do dia não registrado:', e);
+  }
+};
+
 export const fetchProfessionals = async (filters: Filters = {}) => {
   try {
     const { data, error } = await supabase.rpc('search_professionals', {

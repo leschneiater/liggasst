@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
+import { registrarAcessoDia } from '../services/database';
 
 export type UserRole = 'professional' | 'company' | 'admin' | 'employee';
 
@@ -267,6 +268,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setSession(data.session);
       if (data.session?.user) {
+        void registrarAcessoDia(data.session.user.id);
         try {
           await loadUser(data.session.user);
         } catch (loadError) {
@@ -289,6 +291,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
+      void registrarAcessoDia(nextSession.user.id);
       setLoading(true);
       setTimeout(() => {
         void loadUserComRetry(nextSession.user)

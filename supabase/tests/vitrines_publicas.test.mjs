@@ -143,7 +143,7 @@ if (res.rows) {
   ok(!nomes(res.rows).includes('Empresa IsTest'), 'vitrine NAO mostra is_test (anon fora do gate)');
   ok(!nomes(res.rows).includes('Admin Com Empresa'), 'vitrine NAO mostra conta admin com linha em companies');
   const campos = Object.keys(res.rows[0]).sort();
-  const esperado = ['city', 'description', 'display_name', 'employee_count', 'id', 'segment', 'state'];
+  const esperado = ['city', 'description', 'destaque', 'display_name', 'employee_count', 'id', 'segment', 'state'];
   ok(JSON.stringify(campos) === JSON.stringify(esperado),
     'shape da vitrine: sem needs, sem contato, sem avatar/verification_status');
 }
