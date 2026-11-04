@@ -24,7 +24,8 @@
     "test:avaliacoes": "node supabase/tests/avaliacoes_policy.test.mjs",
     "test:ads": "node supabase/tests/ads_policy.test.mjs",
     "test:cortesia": "node supabase/tests/cortesias_policy.test.mjs",
-    "test:radar-capa": "node supabase/tests/radar_capa_policy.test.mjs"
+    "test:radar-capa": "node supabase/tests/radar_capa_policy.test.mjs",
+    "test:atribuicao": "node supabase/tests/atribuicao_treinamento.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",
