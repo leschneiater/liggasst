@@ -40,6 +40,15 @@ vi.mock('../../hooks/useMessagingDisponivel', () => ({
   useMessagingDisponivel: () => useMessagingDisponivelMock(),
 }));
 
+const planoPagoMock = vi.fn();
+vi.mock('../../hooks/usePlanoPago', () => ({
+  usePlanoPago: () => planoPagoMock(),
+}));
+const fetchItensConformidadeMock = vi.fn();
+vi.mock('../../services/conformidade', () => ({
+  fetchItensConformidade: (...a: unknown[]) => fetchItensConformidadeMock(...a),
+}));
+
 describe('DashboardEmpresa', () => {
   beforeEach(() => {
     fetchDemandsMock.mockReset().mockResolvedValue({ success: true, data: [] });
@@ -55,6 +64,8 @@ describe('DashboardEmpresa', () => {
       loading: false,
     });
     useMessagingDisponivelMock.mockReset().mockReturnValue(false);
+    planoPagoMock.mockReset().mockReturnValue(true);
+    fetchItensConformidadeMock.mockReset().mockResolvedValue({ success: true, data: [] });
   });
 
   it('leva da acao rapida para a busca de profissionais da area da empresa', async () => {
@@ -213,5 +224,64 @@ describe('DashboardEmpresa', () => {
     );
     await waitFor(() => expect(fetchDemandsMock).toHaveBeenCalled());
     expect(screen.queryByRole('link', { name: /downloads/i })).not.toBeInTheDocument();
+  });
+});
+
+describe('alerta do calendario de conformidade', () => {
+  beforeEach(() => {
+    fetchDemandsMock.mockReset().mockResolvedValue({ success: true, data: [] });
+    contagemPropostasMock.mockReset().mockResolvedValue({ success: true, data: {} });
+    planoPagoMock.mockReset().mockReturnValue(true);
+    fetchItensConformidadeMock.mockReset().mockResolvedValue({ success: true, data: [] });
+    useAuthMock.mockReset().mockReturnValue({
+      currentUser: { id: 'empresa-1' },
+      userType: 'company',
+      userData: { nomeEmpresa: 'Construtora Teste' },
+      loading: false,
+    });
+    useMessagingDisponivelMock.mockReset().mockReturnValue(false);
+  });
+
+  it('empresa pagante com documentos vencendo ve o banner com link', async () => {
+    const amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
+    fetchItensConformidadeMock.mockResolvedValue({
+      success: true,
+      data: [{
+        id: 'i1', company_id: 'empresa-1', titulo: 'PGR', tipo: 'PGR',
+        validade: amanha.toISOString().slice(0, 10), responsavel: null, observacoes: null,
+        created_at: '', updated_at: '',
+      }],
+    });
+    render(
+      <MemoryRouter>
+        <DashboardEmpresa />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByTestId('alerta-conformidade')).toBeTruthy());
+    expect(screen.getByText(/1 documento vence em até 30 dias/)).toBeTruthy();
+    expect(screen.getByText('Abrir calendário').closest('a')!.getAttribute('href')).toBe('/calendario-conformidade');
+  });
+
+  it('empresa free nao consulta nem mostra o banner', async () => {
+    planoPagoMock.mockReturnValue(false);
+    render(
+      <MemoryRouter>
+        <DashboardEmpresa />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByText(/Nenhuma demanda ainda/)).toBeTruthy());
+    expect(fetchItensConformidadeMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('alerta-conformidade')).toBeNull();
+  });
+
+  it('empresa pagante sem alertas nao mostra o banner', async () => {
+    render(
+      <MemoryRouter>
+        <DashboardEmpresa />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(fetchItensConformidadeMock).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByText(/Nenhuma demanda ainda/)).toBeTruthy());
+    expect(screen.queryByTestId('alerta-conformidade')).toBeNull();
   });
 });

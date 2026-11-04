@@ -6,6 +6,7 @@ import {
   FileText,
   BarChart3,
   GraduationCap, Radar,
+  CalendarClock,
   Building2,
   Crown
 } from 'lucide-react';
@@ -24,6 +25,7 @@ export const companyMenuItems: CompanyMenuItem[] = [
   { path: '/relatorios', label: 'Relatórios', icon: BarChart3 },
   { path: '/treinamentos-empresa', label: 'Capacitação', icon: GraduationCap },
   { path: '/radar-tst-empresa', label: 'Radar TST', icon: Radar },
+  { path: '/calendario-conformidade', label: 'Conformidade', icon: CalendarClock },
   { path: '/perfil-empresa', label: 'Perfil', icon: Building2 },
   { path: '/assinatura-empresa', label: 'Assinatura', icon: Crown },
 ];

@@ -8,7 +8,8 @@ import {
   BarChart3,
   GraduationCap,
   MessageSquare,
-  FileText
+  FileText,
+  CalendarClock
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
@@ -18,6 +19,9 @@ import { assinaturaPagaAtiva } from '../../utils/assinaturaAcesso';
 import { demandasAtivasMinhas } from '../../services/limites';
 import { fetchContagemPropostasPorDemanda } from '../../services/propostas';
 import { textoLinkPropostas } from '../../utils/propostasComparador';
+import { usePlanoPago } from '../../hooks/usePlanoPago';
+import { fetchItensConformidade } from '../../services/conformidade';
+import { ItemConformidade, resumoSaude, textoAlertaConformidade } from '../../utils/calendarioConformidade';
 import { bloquearNovaDemandaAtiva, MSG_LIMITE_DEMANDAS } from '../../utils/limitesPlano';
 import {
   DemandaGestaoRow,
@@ -34,6 +38,8 @@ import toast from 'react-hot-toast';
 const DashboardEmpresa: React.FC = () => {
   const { userData, currentUser } = useAuth();
   const { disponivel: msgDisponivel } = useMessagingDisponivel();
+  const planoPago = usePlanoPago();
+  const [alertaConformidade, setAlertaConformidade] = useState<string | null>(null);
   const [demands, setDemands] = useState<DemandaGestaoRow[]>([]);
   const [demandsLoading, setDemandsLoading] = useState(true);
   const [contagemPropostas, setContagemPropostas] = useState<Record<string, number>>({});
@@ -60,6 +66,27 @@ const DashboardEmpresa: React.FC = () => {
     carregarDemandas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
+
+  // Alerta in-app do calendario de conformidade (recurso pago): conta free
+  // nem consulta - o gate do recurso fica na pagina propria. Falha de
+  // leitura fica quieta (o painel continua usando os demais dados).
+  useEffect(() => {
+    if (!planoPago || !currentUser) {
+      setAlertaConformidade(null);
+      return;
+    }
+    let vivo = true;
+    fetchItensConformidade()
+      .then((r) => {
+        if (!vivo || !r.success) return;
+        const resumo = resumoSaude((r.data ?? []) as ItemConformidade[], new Date());
+        setAlertaConformidade(
+          resumo.vencidos > 0 || resumo.aVencer > 0 ? textoAlertaConformidade(resumo) : null,
+        );
+      })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, [planoPago, currentUser]);
 
   const executarAcao = async () => {
     if (!confirmacao) return;
@@ -141,6 +168,18 @@ const DashboardEmpresa: React.FC = () => {
         </div>
 
         <CartaoAvisos rotaMensagens="/mensagens-empresa" rotaContratos="/contratos-empresa" mensagensDisponivel={msgDisponivel} />
+
+        {alertaConformidade && (
+          <div data-testid="alerta-conformidade" className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+            <CalendarClock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="font-roboto text-sm text-amber-900">
+              {alertaConformidade}{' '}
+              <Link to="/calendario-conformidade" className="font-semibold underline hover:text-amber-950">
+                Abrir calendário
+              </Link>
+            </p>
+          </div>
+        )}
 
         {/* Minhas Demandas (dados reais) */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">

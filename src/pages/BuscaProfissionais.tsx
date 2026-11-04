@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   Search, 
   MapPin, 
@@ -42,7 +42,11 @@ const BuscaProfissionais: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  // Sugestao vinda de outra tela (ex.: calendario de conformidade sugere
+  // profissionais para renovar um documento): preenche a busca via ?q=.
+  const [searchParams] = useSearchParams();
+  const termoInicial = searchParams.get('q') ?? '';
+  const [searchTerm, setSearchTerm] = useState(termoInicial);
   const [filters, setFilters] = useState({
     estado: '',
     formacao: '',
@@ -150,10 +154,14 @@ const BuscaProfissionais: React.FC = () => {
   ];
 
   const filteredProfessionals = professionals.filter(professional => {
+    // Especializacoes entram na busca por texto: a sugestao do calendario
+    // de conformidade preenche o tipo do documento (ex.: PGR) aqui.
     const matchesSearch = professional.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          professional.formacao.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          professional.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         professional.estado.toLowerCase().includes(searchTerm.toLowerCase());
+                         professional.estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (professional.especializacoes ?? []).some((e) =>
+                           e.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesEstado = !filters.estado || professional.estado === filters.estado;
     const matchesFormacao = !filters.formacao || professional.formacao === filters.formacao;

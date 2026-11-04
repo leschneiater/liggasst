@@ -11,6 +11,7 @@ import CertificadosProfissional from '../../pages/professional/CertificadosProfi
 import BuscaEmpresas from '../../pages/professional/BuscaEmpresas';
 import PubliqueDemanda from '../../pages/PubliqueDemanda';
 import ComparadorPropostas from '../../pages/company/ComparadorPropostas';
+import CalendarioConformidade from '../../pages/company/CalendarioConformidade';
 import DemandasDisponiveis from '../../pages/professional/DemandasDisponiveis';
 import Treinamentos from '../../pages/Treinamentos';
 import Layout from '../Layout/Layout';
@@ -93,6 +94,25 @@ vi.mock('../../services/propostas', () => ({
   enviarProposta: vi.fn(),
   atualizarStatusProposta: vi.fn(),
 }));
+vi.mock('../../services/conformidade', () => {
+  // Fixture dentro da factory: vi.mock e içado para o topo do arquivo.
+  const daquiA = (dias: number): string => {
+    const d = new Date();
+    d.setDate(d.getDate() + dias);
+    return d.toISOString().slice(0, 10);
+  };
+  const itensConformidadeFixture = [
+    { id: 'i1', company_id: 'emp-1', titulo: 'PGR da matriz', tipo: 'PGR', validade: daquiA(-12), responsavel: 'Eng. de segurança', observacoes: 'Renovação já solicitada à consultoria.', created_at: '2026-01-10T00:00:00Z', updated_at: '2026-01-10T00:00:00Z' },
+    { id: 'i2', company_id: 'emp-1', titulo: 'Treinamento NR-35 da equipe de obras', tipo: 'Treinamento NR', validade: daquiA(18), responsavel: null, observacoes: null, created_at: '2026-03-01T00:00:00Z', updated_at: '2026-03-01T00:00:00Z' },
+    { id: 'i3', company_id: 'emp-1', titulo: 'PCMSO 2026', tipo: 'PCMSO', validade: daquiA(140), responsavel: 'Dr. Silva', observacoes: null, created_at: '2026-05-01T00:00:00Z', updated_at: '2026-05-01T00:00:00Z' },
+  ];
+  return {
+    fetchItensConformidade: vi.fn().mockResolvedValue({ success: true, data: itensConformidadeFixture }),
+    criarItemConformidade: vi.fn(),
+    atualizarItemConformidade: vi.fn(),
+    excluirItemConformidade: vi.fn(),
+  };
+});
 
 const fetchAssinaturaMock = vi.fn().mockResolvedValue({
   plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production',
@@ -193,6 +213,34 @@ describe('snapshots visuais', () => {
     await listaDemandas.findByTestId('form-proposta-d1');
     salvar('profissional-form-proposta', listaDemandas.container.innerHTML);
     listaDemandas.unmount();
+
+    // Calendario de conformidade (plano Empresa): pago ve resumo + lista
+    // ordenada por alerta; free ve o aviso com caminho para /planos.
+    (window as unknown as { __role?: string }).__role = 'company';
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'pro_company', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const calPago = render(
+      <MemoryRouter initialEntries={['/calendario-conformidade']}>
+        <CalendarioConformidade />
+      </MemoryRouter>,
+    );
+    await calPago.findByTestId('lista-conformidade');
+    await calPago.findByText('PGR da matriz');
+    salvar('empresa-calendario-conformidade-pago', calPago.container.innerHTML);
+    calPago.unmount();
+
+    fetchAssinaturaMock.mockResolvedValue({
+      plan: 'free', status: 'active', current_period_end: null, environment: 'production',
+    });
+    const calFree = render(
+      <MemoryRouter initialEntries={['/calendario-conformidade']}>
+        <CalendarioConformidade />
+      </MemoryRouter>,
+    );
+    await calFree.findByTestId('aviso-limite-calendario');
+    salvar('empresa-calendario-conformidade-gratuito', calFree.container.innerHTML);
+    calFree.unmount();
 
     const empresa = render(
       <MemoryRouter initialEntries={['/dashboard-empresa']}>
