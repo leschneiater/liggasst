@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Check, X, Star, Crown } from 'lucide-react';
 import Button from '../components/ui/Button';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 import CadastroProfissionalModal from '../components/CadastroProfissionalModal';
 import { PROPOSTA_PROFISSIONAL, PROPOSTA_EMPRESA, type PropostaPublico } from '../data/planosProposta';
+import { useAuth } from '../contexts/AuthContext';
 
 const Planos: React.FC = () => {
+  const navigate = useNavigate();
+  const { currentUser, userType: contaRole } = useAuth();
   const [userType, setUserType] = useState<'professional' | 'company'>('professional');
   const [isCadastroEmpresaOpen, setIsCadastroEmpresaOpen] = useState(false);
   const [isCadastroProfissionalOpen, setIsCadastroProfissionalOpen] = useState(false);
@@ -20,20 +23,33 @@ const Planos: React.FC = () => {
   ];
 
   const handlePlanAction = (planName: string, price: string) => {
-    if (price === 'R$ 0') {
-      // Plano gratuito - abrir modal de cadastro
-      if (userType === 'professional') {
-        setIsCadastroProfissionalOpen(true);
+    // Conta logada nunca ve o modal de cadastro (bug: o botao Assinar pedia
+    // login de novo para quem ja estava logada). Plano pago leva para a
+    // pagina de assinatura do proprio papel, onde fica o checkout real;
+    // "Comecar Gratis" de quem ja tem conta leva para o painel.
+    if (currentUser) {
+      if (price !== 'R$ 0') {
+        if (contaRole === 'company') navigate('/assinatura-empresa');
+        else if (contaRole === 'professional') navigate('/assinatura-profissional');
+        else if (contaRole === 'admin') navigate('/admin');
+        else navigate('/minha-capacitacao');
+      } else if (contaRole === 'company') {
+        navigate('/dashboard-empresa');
+      } else if (contaRole === 'admin') {
+        navigate('/admin');
+      } else if (contaRole === 'employee') {
+        navigate('/minha-capacitacao');
       } else {
-        setIsCadastroEmpresaOpen(true);
+        navigate('/dashboard-profissional');
       }
+      return;
+    }
+    // Visitante: modal de cadastro (mesmo para plano pago - a conta e
+    // necessaria antes de assinar).
+    if (userType === 'professional') {
+      setIsCadastroProfissionalOpen(true);
     } else {
-      // Planos pagos - abrir modal de cadastro
-      if (userType === 'professional') {
-        setIsCadastroProfissionalOpen(true);
-      } else {
-        setIsCadastroEmpresaOpen(true);
-      }
+      setIsCadastroEmpresaOpen(true);
     }
   };
 
