@@ -12,12 +12,14 @@ import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Search, SlidersHorizontal, MapPin, Building2, Users, RefreshCw, LogIn } from 'lucide-react';
 import Button from '../components/ui/Button';
+import SeloPremium from '../components/ui/SeloPremium';
 import { fetchCompaniesPublic } from '../services/database';
 import { useAuth } from '../contexts/AuthContext';
 
 interface PublicCompany {
   id: string;
   display_name: string;
+  destaque?: boolean | null;
   city: string | null;
   state: string | null;
   segment: string | null;
@@ -283,9 +285,12 @@ const VitrineEmpresas: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-poppins font-semibold text-lg text-soft-black break-words">
-                      {company.display_name}
-                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-poppins font-semibold text-lg text-soft-black break-words">
+                        {company.display_name}
+                      </h3>
+                      {company.destaque && <SeloPremium />}
+                    </div>
                     {company.segment && (
                       <p className="font-roboto text-sm text-green-deep font-medium">
                         {company.segment}

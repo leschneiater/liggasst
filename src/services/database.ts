@@ -58,6 +58,7 @@ export interface ProfessionalSearchRow {
   availability: string[] | null;
   avatar_path: string | null;
   linkedin_url: string | null;
+  destaque: boolean | null;
 }
 
 export interface ProfessionalSearchItem {
@@ -73,6 +74,7 @@ export interface ProfessionalSearchItem {
   disponibilidade: string[];
   descricao: string;
   linkedinUrl: string | null;
+  destaque: boolean;
 }
 
 const parseLeadingInt = (value: string | null): number | null => {
@@ -96,7 +98,8 @@ export const mapProfessionalSearchRow = (row: ProfessionalSearchRow): Profession
     .filter(item => item.length > 0),
   disponibilidade: row.availability ?? [],
   descricao: row.description || '',
-  linkedinUrl: row.linkedin_url ?? null
+  linkedinUrl: row.linkedin_url ?? null,
+  destaque: row.destaque ?? false
 });
 
 export const searchProfessionals = async (params: {

@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { searchProfessionals } from '../services/database';
 import Button from '../components/ui/Button';
+import SeloPremium from '../components/ui/SeloPremium';
 import CadastroEmpresaModal from '../components/CadastroEmpresaModal';
 
 interface Professional {
@@ -27,6 +28,7 @@ interface Professional {
   especializacoes: string[];
   disponibilidade: string[];
   descricao: string;
+  destaque: boolean;
 }
 
 const iniciaisNome = (nome: string): string => {
@@ -203,6 +205,9 @@ const BuscaProfissionais: React.FC = () => {
   });
 
   const sortedProfessionals = [...filteredProfessionals].sort((a, b) => {
+    // Assinante pago (selo Premium) sempre primeiro, mesmo com ordenacao
+    // escolhida pelo usuario — a ordenacao vale dentro de cada grupo.
+    if (a.destaque !== b.destaque) return a.destaque ? -1 : 1;
     if (sortBy === 'experiencia') return (b.experiencia ?? -1) - (a.experiencia ?? -1);
     if (sortBy === 'valor') return (a.valorHora ?? Infinity) - (b.valorHora ?? Infinity);
     return 0;
@@ -436,6 +441,7 @@ const BuscaProfissionais: React.FC = () => {
                         <h3 className="font-poppins font-semibold text-lg text-soft-black truncate">
                           {professional.nome}
                         </h3>
+                        {professional.destaque && <SeloPremium />}
                       </div>
                       <p className="font-roboto text-sm text-gray-600 mb-2">
                         {professional.formacao}

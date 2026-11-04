@@ -3,6 +3,7 @@ import AvaliacoesPerfil from '../../components/avaliacoes/AvaliacoesPerfil';
 import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, MapPin, Building2, MessageSquare, Users, RefreshCw } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import SeloPremium from '../../components/ui/SeloPremium';
 import { useMessagingDisponivel } from '../../hooks/useMessagingDisponivel';
 import { fetchCompanies } from '../../services/database';
 import { usePlanoPago } from '../../hooks/usePlanoPago';
@@ -17,6 +18,7 @@ interface Company {
   employee_count: string | null;
   description: string | null;
   needs: string[] | null;
+  destaque?: boolean | null;
 }
 
 const estados = [
@@ -284,9 +286,12 @@ const BuscaEmpresas: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-poppins font-semibold text-lg text-soft-black break-words">
-                      {company.display_name}
-                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-poppins font-semibold text-lg text-soft-black break-words">
+                        {company.display_name}
+                      </h3>
+                      {company.destaque && <SeloPremium />}
+                    </div>
                     {company.segment && (
                       <p className="font-roboto text-sm text-green-deep font-medium">
                         {company.segment}
