@@ -91,7 +91,7 @@ describe('preview visual da capa do Radar TST', () => {
     const tela = render(<MemoryRouter><RadarTst /></MemoryRouter>);
     const card = await tela.findByText('NR-1 atualizada: o que muda na pratica');
     fireEvent.click(card);
-    const joia = await tela.findByLabelText('Marcar artigo como relevante (joia)');
+    const joia = await tela.findByLabelText('Marcar artigo como relevante (sim)');
     fireEvent.click(joia);
     await tela.findByText(/Obrigada! Seu voto ajuda/);
     salvar('radar-artigo-votado', tela.container.innerHTML);
@@ -99,7 +99,7 @@ describe('preview visual da capa do Radar TST', () => {
 
   it('gera HTML da lista do admin com o resumo de votos', async () => {
     const tela = render(<MemoryRouter><RadarAdmin /></MemoryRouter>);
-    await tela.findByText('3 joia');
+    await tela.findByText('3 sim');
     salvar('radar-admin-votos', tela.container.innerHTML);
   });
 });

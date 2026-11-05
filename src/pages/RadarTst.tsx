@@ -168,7 +168,7 @@ const RadarTst: React.FC = () => {
                   onClick={() => clicarVoto('joia')}
                   disabled={votando}
                   aria-pressed={voto === 'joia'}
-                  aria-label="Marcar artigo como relevante (joia)"
+                  aria-label="Marcar artigo como relevante (sim)"
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg border font-roboto text-sm transition-colors disabled:opacity-50 ${
                     voto === 'joia'
                       ? 'bg-green-deep text-white border-green-deep'
@@ -176,14 +176,14 @@ const RadarTst: React.FC = () => {
                   }`}
                 >
                   <ThumbsUp size={18} aria-hidden="true" fill={voto === 'joia' ? 'currentColor' : 'none'} />
-                  <span>Joia</span>
+                  <span>Sim</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => clicarVoto('nao_joia')}
                   disabled={votando}
                   aria-pressed={voto === 'nao_joia'}
-                  aria-label="Marcar artigo como não relevante (não joia)"
+                  aria-label="Marcar artigo como não relevante (não)"
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg border font-roboto text-sm transition-colors disabled:opacity-50 ${
                     voto === 'nao_joia'
                       ? 'bg-red-600 text-white border-red-600'
@@ -191,7 +191,7 @@ const RadarTst: React.FC = () => {
                   }`}
                 >
                   <ThumbsDown size={18} aria-hidden="true" fill={voto === 'nao_joia' ? 'currentColor' : 'none'} />
-                  <span>Não joia</span>
+                  <span>Não</span>
                 </button>
               </div>
               {voto !== null && !erroVoto && (

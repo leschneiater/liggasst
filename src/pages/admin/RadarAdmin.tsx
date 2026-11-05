@@ -184,11 +184,11 @@ const RadarAdmin: React.FC = () => {
               <p className="flex items-center gap-3 font-roboto text-sm text-gray-600 mt-2" data-testid="radar-votos-resumo">
                 <span className="inline-flex items-center gap-1">
                   <ThumbsUp size={14} aria-hidden="true" className="text-green-deep" />
-                  {votos[p.id]?.joia ?? 0} joia
+                  {votos[p.id]?.joia ?? 0} sim
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <ThumbsDown size={14} aria-hidden="true" className="text-red-600" />
-                  {votos[p.id]?.nao_joia ?? 0} não joia
+                  {votos[p.id]?.nao_joia ?? 0} não
                 </span>
               </p>
               <div className="flex flex-wrap gap-2 mt-4">
