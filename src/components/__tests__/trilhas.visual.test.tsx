@@ -113,6 +113,7 @@ const css = (() => {
 })();
 const salvar = (nome: string, html: string) => {
   const doc = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><style>${css}</style></head><body>${html}</body></html>`;
+  mkdirSync('/tmp/shots', { recursive: true });
   writeFileSync(`/tmp/shots/${nome}.html`, doc);
 };
 
