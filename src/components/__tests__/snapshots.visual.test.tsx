@@ -122,6 +122,8 @@ const fetchAssinaturaMock = vi.fn().mockResolvedValue({
 });
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...a: unknown[]) => fetchAssinaturaMock(...a),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 vi.mock('../../services/capacitacaoEquipe', () => {
   const treinamento = (id: string, title: string, extra: Record<string, unknown> = {}) => ({

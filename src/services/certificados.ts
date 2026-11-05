@@ -1,4 +1,4 @@
-// Etapa 5 das trilhas: certificado de conclusao (pedido dela 05/11).
+// Etapa 5 das trilhas: certificado de conclusao (desde 05/11).
 // Emissao so pela RPC trail_certificado_emitir (valida aprovacao no servidor,
 // idempotente por perfil+trilha). Verificacao publica pela RPC
 // trail_certificado_verificar, que devolve apenas os campos impressos no

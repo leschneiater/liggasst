@@ -28,6 +28,8 @@ vi.mock('../../components/ProvaTrilha', () => ({
 const fetchAssinaturaMock = vi.fn();
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...args: unknown[]) => fetchAssinaturaMock(...args),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 
 vi.mock('../../contexts/AuthContext', () => ({

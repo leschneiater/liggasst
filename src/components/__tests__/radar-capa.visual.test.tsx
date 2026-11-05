@@ -29,6 +29,8 @@ vi.mock('../../services/radarAdmin', () => ({
 
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: vi.fn().mockResolvedValue({ plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production' }),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 vi.mock('../../services/radarVotos', () => ({
   meuVoto: vi.fn().mockResolvedValue(null),

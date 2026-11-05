@@ -107,6 +107,11 @@ const esperaErro = async (uid, sql, params = [], role = 'authenticated') => {
 const perfil = async (uid) => (await db.query(
   `select role, verification_status, display_name from public.profiles where id = $1`, [uid])).rows[0];
 
+// Dados de faturamento validos usados nas chamadas da RPC (nova assinatura
+// desde 05/11): CPF 11 digitos / CNPJ 14, CEP 8, celular com DDD.
+const FAT_PROF = `'professional', 'Prof OAuth', '12345678900', '11987654321', '01310100', 'Av. Paulista', '1000', 'Bela Vista'`;
+const FAT_EMP = (nome) => `'company', '${nome}', '12345678000190', '11987654321', '01310100', 'Av. Paulista', '1000', 'Bela Vista'`;
+
 // Usuarios: oauth sem papel, oauth que escolhe empresa, oauth com atividade
 // simulada, legacy pendente, profissional aprovado normal, empresa normal.
 const oauthProf = await criarUsuario('oauthprof@teste.local', { full_name: 'Prof OAuth' });
@@ -149,7 +154,7 @@ ok(await esperaErro(oauthProf,
   'awaiting NAO envia mensagem (gate approved)');
 
 // ---------- conclusao feliz: empresa ----------
-await comoUsuario(oauthEmp, `select public.completar_cadastro('company', 'Empresa OAuth LTDA')`);
+await comoUsuario(oauthEmp, `select public.completar_cadastro(${FAT_EMP('Empresa OAuth LTDA')})`);
 {
   const p = await perfil(oauthEmp);
   ok(p.role === 'company' && p.verification_status === 'approved' && p.display_name === 'Empresa OAuth LTDA',
@@ -160,13 +165,13 @@ await comoUsuario(oauthEmp, `select public.completar_cadastro('company', 'Empres
 }
 
 // ---------- recusas ----------
-ok(await esperaErro(oauthEmp, `select public.completar_cadastro('company', 'De novo')`),
+ok(await esperaErro(oauthEmp, `select public.completar_cadastro(${FAT_EMP('De novo')})`),
   'segunda conclusao rejeitada');
-ok(await esperaErro(oauthProf, `select public.completar_cadastro('admin', 'X')`),
+ok(await esperaErro(oauthProf, `select public.completar_cadastro('admin', 'X', '12345678900', '11987654321', '01310100', 'Av. Paulista', '1000', 'Bela Vista')`),
   'papel admin rejeitado na RPC');
-ok(await esperaErro(oauthProf, `select public.completar_cadastro('professional', '   ')`),
+ok(await esperaErro(oauthProf, `select public.completar_cadastro('professional', '   ', '12345678900', '11987654321', '01310100', 'Av. Paulista', '1000', 'Bela Vista')`),
   'nome vazio rejeitado');
-ok(await esperaErro(legacy, `select public.completar_cadastro('professional', 'Legacy')`),
+ok(await esperaErro(legacy, `select public.completar_cadastro('professional', 'Legacy', '12345678900', '11987654321', '01310100', 'Av. Paulista', '1000', 'Bela Vista')`),
   'legacy PENDING nao conclui por conta propria (RPC)');
 ok(await esperaErro(legacy,
   `update public.profiles set verification_status = 'approved' where id = $1`, [legacy]),
@@ -183,7 +188,7 @@ ok(await esperaErro(oauthProf,
   'update direto de verification_status negado: RPC e o UNICO caminho (grant de coluna)');
 
 // ---------- caminho RPC valido: professional ----------
-await comoUsuario(oauthProf, `select public.completar_cadastro('professional', 'Prof OAuth')`);
+await comoUsuario(oauthProf, `select public.completar_cadastro(${FAT_PROF})`);
 {
   const p = await perfil(oauthProf);
   ok(p.verification_status === 'approved' && p.role === 'professional' && p.display_name === 'Prof OAuth',
@@ -199,7 +204,7 @@ await comoUsuario(oauthProf, `select public.completar_cadastro('professional', '
     `insert into public.messages (sender_id, receiver_id, content) values ($1, $2, 'historico')`,
     [empOk, oauthAtivo]);
 }
-ok(await esperaErro(oauthAtivo, `select public.completar_cadastro('company', 'Empresa Ativa')`),
+ok(await esperaErro(oauthAtivo, `select public.completar_cadastro(${FAT_EMP('Empresa Ativa')})`),
   'conta com atividade NAO conclui nem troca papel (RPC)');
 ok(await esperaErro(oauthAtivo,
   `update public.profiles set verification_status = 'approved' where id = $1`, [oauthAtivo]),
@@ -254,7 +259,7 @@ await comoUsuario(profOk,
   ok(r2.rows.length === 1 && r2.rows[0].linkedin_url === null,
     'anon abre perfil publico com linkedin_url NULL');
 }
-ok(await esperaErro(null, `select public.completar_cadastro('company', 'X')`, [], 'anon'),
+ok(await esperaErro(null, `select public.completar_cadastro(${FAT_EMP('X')})`, [], 'anon'),
   'anon NAO executa completar_cadastro');
 
 console.log(`\n${pass} ok, ${fail} falhas`);

@@ -7,6 +7,8 @@ import type { Assinatura } from '../../services/assinatura';
 const fetchAssinaturaMock = vi.fn();
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...args: unknown[]) => fetchAssinaturaMock(...args),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 
 const authValue = { currentUser: { id: 'u1', verified: true }, loading: false };

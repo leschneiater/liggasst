@@ -1,4 +1,4 @@
-// Etapa 5: tela do certificado de conclusao da trilha (pedido dela 05/11).
+// Etapa 5: tela do certificado de conclusao da trilha (desde 05/11).
 // A emissao acontece no servidor ao abrir a tela (idempotente): quem nao
 // passou na avaliacao recebe erro, nunca um certificado.
 import React, { useEffect, useState } from 'react';

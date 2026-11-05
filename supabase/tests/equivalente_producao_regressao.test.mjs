@@ -136,12 +136,12 @@ ok(await erra(null, `select * from public.search_companies(null,null,null)`, [],
 const soc = await criarUsuario('s@t.local', { full_name: 'Social' });
 ok((await perfil(soc)).verification_status === 'awaiting_completion', 'login social novo nasce awaiting_completion');
 ok(!(await como(null, `select id from public.search_professionals(null,null,null)`, [], 'anon')).rows.some(x => x.id === soc), 'social incompleto fora da busca');
-await como(soc, `select public.completar_cadastro('company','Empresa Social')`);
+await como(soc, `select public.completar_cadastro('company','Empresa Social','12345678000190','11987654321','01310100','Av. Paulista','1000','Bela Vista')`);
 ok((await perfil(soc)).role === 'company' && (await perfil(soc)).verification_status === 'approved', 'conclusao social vira empresa approved');
-ok(await erra(soc, `select public.completar_cadastro('professional','Outra')`), 'conclusao so uma vez');
+ok(await erra(soc, `select public.completar_cadastro('professional','Outra','12345678900','11987654321','01310100','Av. Paulista','1000','Bela Vista')`), 'conclusao so uma vez');
 const pend = await criarUsuario('p@t.local', { role: 'professional', display_name: 'Pend' });
 await db.query(`update public.profiles set verification_status='pending' where id=$1`, [pend]);
-ok(await erra(pend, `select public.completar_cadastro('company','X')`), 'pending administrativo nao usa a conclusao');
+ok(await erra(pend, `select public.completar_cadastro('company','X','12345678000190','11987654321','01310100','Av. Paulista','1000','Bela Vista')`), 'pending administrativo nao usa a conclusao');
 // DIFF de funcoes: so o esperado muda
 const defsDepois = await defs();
 const mA = new Map(defsAntes.map(x => [x.k, x.h]));

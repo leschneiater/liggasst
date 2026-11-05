@@ -13,6 +13,8 @@ vi.mock('../../../services/assinatura', () => ({
   fetchAssinatura: vi.fn(async () => livre),
   criarCheckoutTeste: () => criarCheckout(),
   cancelarAssinatura: vi.fn(),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 vi.mock('../../../services/reembolsos', () => ({
   solicitarReembolso: vi.fn(),

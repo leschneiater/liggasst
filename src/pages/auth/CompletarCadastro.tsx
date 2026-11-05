@@ -4,11 +4,14 @@ import { User, Building2, GraduationCap, UserCheck } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { digitos, validarCpfCnpj, validarCep, validarCelular } from '../../utils/dadosFaturamento';
 
 // Tela de conclusao de cadastro para contas criadas via login social
 // (Google). Essas contas nascem com status 'awaiting_completion'
-// e sem papel definido: a pessoa escolhe aqui se e empresa ou profissional
-// e confirma o nome de exibicao. A RPC completar_cadastro aprova a conta;
+// e sem papel definido: a pessoa escolhe aqui se e empresa ou profissional,
+// confirma o nome de exibicao e informa os dados de cobranca (CPF/CNPJ,
+// celular e endereco, desde 05/11 — funcionario nao preenche, pois
+// nao assina plano). A RPC completar_cadastro valida e aprova a conta;
 // ate la ela nao aparece em buscas nem usa mensagens/demandas/contratos.
 const CompletarCadastro: React.FC = () => {
   const { currentUser, userData, completarCadastro } = useAuth();
@@ -18,6 +21,9 @@ const CompletarCadastro: React.FC = () => {
   );
   const [erro, setErro] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [faturamento, setFaturamento] = useState({
+    cpfCnpj: '', phone: '', postalCode: '', address: '', addressNumber: '', province: '',
+  });
 
   if (!currentUser) return null;
   if (currentUser.statusVerificacao !== 'awaiting_completion') {
@@ -34,10 +40,23 @@ const CompletarCadastro: React.FC = () => {
       setErro('Informe o nome que aparecerá na plataforma.');
       return;
     }
+    if (role !== 'employee') {
+      const doc = validarCpfCnpj(faturamento.cpfCnpj, role === 'company' ? 'company' : 'professional');
+      if (doc) { setErro(doc); return; }
+      const fone = validarCelular(faturamento.phone);
+      if (fone) { setErro(fone); return; }
+      const cep = validarCep(faturamento.postalCode);
+      if (cep) { setErro(cep); return; }
+      if (!faturamento.address.trim() || !faturamento.addressNumber.trim() || !faturamento.province.trim()) {
+        setErro('Informe endereço, número e bairro completos.');
+        return;
+      }
+      if (digitos(faturamento.cpfCnpj).length === 0) { setErro('Documento é obrigatório.'); return; }
+    }
     setErro(null);
     setLoading(true);
     try {
-      await completarCadastro(role, displayName.trim());
+      await completarCadastro(role, displayName.trim(), faturamento);
       // Redirecionamento é feito no contexto de autenticação
     } catch {
       // Erro já exibido no contexto
@@ -120,6 +139,53 @@ const CompletarCadastro: React.FC = () => {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
             />
+
+            {role && role !== 'employee' && (
+              <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                <p className="font-roboto text-xs text-gray-500">
+                  Dados de cobrança: usados apenas se você assinar um plano pago,
+                  para a tela de assinatura já vir preenchida.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    label={role === 'company' ? 'CNPJ' : 'CPF'}
+                    placeholder={role === 'company' ? '00.000.000/0000-00' : '000.000.000-00'}
+                    value={faturamento.cpfCnpj}
+                    onChange={(e) => setFaturamento({ ...faturamento, cpfCnpj: e.target.value })}
+                  />
+                  <Input
+                    label="Celular"
+                    placeholder="(11) 99999-0000"
+                    value={faturamento.phone}
+                    onChange={(e) => setFaturamento({ ...faturamento, phone: e.target.value })}
+                  />
+                  <Input
+                    label="CEP"
+                    placeholder="00000-000"
+                    value={faturamento.postalCode}
+                    onChange={(e) => setFaturamento({ ...faturamento, postalCode: e.target.value })}
+                  />
+                  <Input
+                    label="Bairro"
+                    placeholder="Seu bairro"
+                    value={faturamento.province}
+                    onChange={(e) => setFaturamento({ ...faturamento, province: e.target.value })}
+                  />
+                  <Input
+                    label="Endereço"
+                    placeholder="Rua, avenida..."
+                    value={faturamento.address}
+                    onChange={(e) => setFaturamento({ ...faturamento, address: e.target.value })}
+                  />
+                  <Input
+                    label="Número"
+                    placeholder="123"
+                    value={faturamento.addressNumber}
+                    onChange={(e) => setFaturamento({ ...faturamento, addressNumber: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
 
             {erro && (
               <p className="font-roboto text-sm text-red-600" role="alert">

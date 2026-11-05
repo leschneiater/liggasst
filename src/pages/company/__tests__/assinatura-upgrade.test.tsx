@@ -17,6 +17,8 @@ vi.mock('../../../services/assinatura', () => ({
   fetchAssinatura: vi.fn().mockResolvedValue({ plan: 'free', status: 'active', current_period_end: null }),
   criarCheckoutTeste: vi.fn(),
   cancelarAssinatura: vi.fn(),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 vi.mock('../../../services/reembolsos', () => ({
   fetchMeusPedidosReembolso: vi.fn().mockResolvedValue([]),

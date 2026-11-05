@@ -907,7 +907,7 @@ export const fetchTrainingsMembro = async () => {
   }
 };
 
-// Uma capacitacao publicada por id, para a pagina da aula (pedido dela 05/11).
+// Uma capacitacao publicada por id, para a pagina da aula (desde 05/11).
 // RLS garante que so membro com acesso le; o filtro de publico fica na pagina.
 export const fetchTrainingMembro = async (id: string) => {
   try {

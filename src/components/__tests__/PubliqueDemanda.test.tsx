@@ -16,6 +16,8 @@ const fetchAssinaturaMock = vi.fn();
 const demandasAtivasMock = vi.fn();
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...a: unknown[]) => fetchAssinaturaMock(...a),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 vi.mock('../../services/limites', () => ({
   demandasAtivasMinhas: (...a: unknown[]) => demandasAtivasMock(...a),

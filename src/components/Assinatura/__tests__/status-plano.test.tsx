@@ -34,6 +34,8 @@ vi.mock('../../../contexts/AuthContext', () => ({
 vi.mock('../../../services/assinatura', () => ({
   fetchAssinatura: vi.fn(async () => assinaturaRealRecuperada),
   criarCheckoutTeste: vi.fn(),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 
 vi.mock('../../../services/reembolsos', () => ({

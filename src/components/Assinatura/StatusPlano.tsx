@@ -4,8 +4,10 @@
 // Regras:
 // - fora do modo de teste (VITE_BILLING_TEST_MODE) e fora da allowlist de
 //   contas de teste (VITE_BILLING_TEST_ACCOUNTS), o cartao so EXIBE o plano;
-// - "Assinar (teste)" abre o formulario de dados de cobranca (o Asaas exige
-//   CPF/CNPJ + endereco completo — o perfil do Ligga nao coleta isso hoje) e
+// - "Assinar (teste)" abre o formulario de dados de cobranca. Desde 05/11
+//   (desde 05/11) esses dados sao coletados no cadastro e o formulario vem
+//   pre-preenchido com o que esta na conta; correcoes feitas aqui sao
+//   gravadas de volta na conta quando o checkout abre com sucesso. O submit
 //   chama a edge function asaas-checkout, que devolve a pagina hospedada de
 //   pagamento de TESTE (sandbox, sem cobranca real);
 // - cancelamento pelo app: botao atras de VITE_BILLING_CANCEL_ENABLED (OFF);
@@ -13,7 +15,8 @@
 import React, { useEffect, useState } from 'react';
 import { Star, Zap, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { fetchAssinatura, criarCheckoutTeste, cancelarAssinatura } from '../../services/assinatura';
+import { fetchAssinatura, criarCheckoutTeste, cancelarAssinatura, fetchDadosFaturamento, salvarDadosFaturamento } from '../../services/assinatura';
+import { preencherFormFaturamento } from '../../utils/dadosFaturamento';
 import { solicitarReembolso, fetchMeusPedidosReembolso, ROTULO_STATUS_REEMBOLSO, PedidoReembolso } from '../../services/reembolsos';
 import type { Assinatura } from '../../services/assinatura';
 import Button from '../ui/Button';
@@ -111,8 +114,13 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
     fetchMeusPedidosReembolso()
       .then((p) => { if (vivo) setPedidosReembolso(p); })
       .catch(() => { /* lista best-effort */ });
+    // Pre-preenche o formulario de cobranca com os dados da conta (coletados
+    // no cadastro desde 05/11). Campos ja digitados nunca sao sobrescritos.
+    fetchDadosFaturamento(currentUser.id, papel)
+      .then((d) => { if (vivo && d) setForm((f) => preencherFormFaturamento(f, d)); })
+      .catch(() => { /* pre-preenchimento best-effort */ });
     return () => { vivo = false; };
-  }, [currentUser]);
+  }, [currentUser, papel]);
 
   const exibida: Assinatura = assinatura ?? { plan: 'free', status: 'active', current_period_end: null };
   const Icone = exibida.plan === 'free' ? Star : Zap;
@@ -122,7 +130,12 @@ const StatusPlano: React.FC<Props> = ({ papel }) => {
     setAbrindoCheckout(true);
     try {
       const { url } = await criarCheckoutTeste({ profileId: currentUser.id, papel, faturamento: form });
-      if (url) window.open(url, '_blank', 'noopener');
+      if (url) {
+        // Checkout abriu: grava na conta as correcoes feitas no formulario
+        // (best-effort; falha aqui nao desfaz o checkout).
+        salvarDadosFaturamento(currentUser.id, papel, form).catch(() => { /* best-effort */ });
+        window.open(url, '_blank', 'noopener');
+      }
       else toast.error(contratoAtivo() ? 'Checkout criado, mas sem URL retornada' : 'Checkout de teste criado, mas sem URL retornada');
     } catch {
       toast.error(contratoAtivo() ? 'Nao foi possivel abrir o checkout' : 'Nao foi possivel abrir o checkout de teste');

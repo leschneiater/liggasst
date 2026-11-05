@@ -43,7 +43,11 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithOAuth: (provider: 'google' | 'azure') => Promise<void>;
-  completarCadastro: (role: 'professional' | 'company' | 'employee', displayName: string) => Promise<void>;
+  completarCadastro: (
+    role: 'professional' | 'company' | 'employee',
+    displayName: string,
+    faturamento: FaturamentoConclusao
+  ) => Promise<void>;
   signup: (
     email: string,
     password: string,
@@ -91,6 +95,17 @@ const redirectForRole = (role: UserRole) => {
   return '/dashboard-profissional';
 };
 
+// Dados de faturamento exigidos na conclusao de cadastro de conta social
+// (profissional e empresa; funcionario nao assina plano, desde 05/11).
+export interface FaturamentoConclusao {
+  cpfCnpj: string;
+  phone: string;
+  postalCode: string;
+  address: string;
+  addressNumber: string;
+  province: string;
+}
+
 const metadataForSignup = (
   data: Record<string, unknown>,
   role: 'professional' | 'company' | 'employee'
@@ -102,6 +117,8 @@ const metadataForSignup = (
   city: data.cidade,
   state: data.estado,
   address: data.endereco,
+  address_number: data.numero,
+  province: data.bairro,
   ...(role === 'professional'
     ? {
         cpf: data.cpf,
@@ -353,11 +370,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Conclusao de cadastro para contas OAuth: a RPC completar_cadastro e o
   // unico caminho que aprova (grants de coluna + guard no banco impedem
   // atualizacao direta de role/verification_status).
-  const completarCadastro = async (role: 'professional' | 'company' | 'employee', displayName: string) => {
+  const completarCadastro = async (
+    role: 'professional' | 'company' | 'employee',
+    displayName: string,
+    faturamento: FaturamentoConclusao
+  ) => {
     if (!currentUser) throw new Error('Usuário não autenticado.');
     const { error } = await supabase.rpc('completar_cadastro', {
       p_role: role,
       p_display_name: displayName,
+      p_cpf_cnpj: faturamento.cpfCnpj,
+      p_phone: faturamento.phone,
+      p_postal_code: faturamento.postalCode,
+      p_address: faturamento.address,
+      p_address_number: faturamento.addressNumber,
+      p_province: faturamento.province,
     });
     if (error) {
       toast.error(error.message || 'Não foi possível concluir o cadastro.');

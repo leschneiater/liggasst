@@ -1,4 +1,4 @@
-// Pagina da aula (pedido dela 05/11): gate de assinante, video com nocookie,
+// Pagina da aula (desde 05/11): gate de assinante, video com nocookie,
 // PDF via URL assinada e estado de "nao encontrado".
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -17,6 +17,8 @@ vi.mock('../../services/database', () => ({
 const fetchAssinaturaMock = vi.fn();
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...args: unknown[]) => fetchAssinaturaMock(...args),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 
 let roleAtual: 'professional' | 'company' = 'professional';

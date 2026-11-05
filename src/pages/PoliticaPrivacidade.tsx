@@ -12,7 +12,7 @@ const PoliticaPrivacidade: React.FC = () => {
             Política de Privacidade
           </h1>
           <p className="font-roboto text-xl text-green-light">
-            Última atualização: 2 de novembro de 2026
+            Última atualização: 5 de novembro de 2026
           </p>
         </div>
       </section>
@@ -49,7 +49,7 @@ const PoliticaPrivacidade: React.FC = () => {
                     2.1 Dados Fornecidos Diretamente
                   </h3>
                   <ul className="list-disc list-inside space-y-2 font-roboto text-gray-700">
-                    <li>Informações de cadastro (nome, e-mail, telefone, CPF/CNPJ)</li>
+                    <li>Informações de cadastro (nome, e-mail, telefone, CPF/CNPJ e endereço)</li>
                     <li>Dados profissionais (formação, certificações, experiência)</li>
                     <li>Informações empresariais (razão social, segmento, localização)</li>
                     <li>Documentos e certificados enviados</li>
@@ -131,7 +131,7 @@ const PoliticaPrivacidade: React.FC = () => {
                     2.4 Dados de assinatura e pagamento
                   </h3>
                   <p className="font-roboto text-gray-700">
-                    Ao contratar um plano pago, você informa nome, e-mail, CPF ou CNPJ, celular e endereço de cobrança (CEP, rua, número e bairro). A LiggaSST envia esses dados ao Asaas, que processa o pagamento, para criar o cliente e a cobrança. Os dados do cartão são informados diretamente na página de pagamento do Asaas. Recebemos do Asaas informações sobre a assinatura e os pagamentos, como status, datas e identificadores, para ativar, manter e cancelar o plano.
+                    No cadastro, profissionais e empresas informam nome, e-mail, CPF ou CNPJ, celular e endereço (CEP, rua, número e bairro). Esses dados ficam guardados na sua conta e você pode corrigi-los a qualquer momento. Ao contratar um plano pago, a LiggaSST envia esses dados ao Asaas, que processa o pagamento, para criar o cliente e a cobrança. Os dados do cartão são informados diretamente na página de pagamento do Asaas. Recebemos do Asaas informações sobre a assinatura e os pagamentos, como status, datas e identificadores, para ativar, manter e cancelar o plano.
                   </p>
                   <p className="font-roboto text-gray-700" style={{ marginTop: "0.75rem" }}>
                     Também guardamos o registro dos avisos (eventos) que o Asaas nos envia sobre assinaturas e pagamentos, no formato em que são recebidos, para não processar o mesmo aviso duas vezes e para ter histórico de auditoria. O prazo para eliminar esses registros está descrito no item 7.

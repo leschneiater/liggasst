@@ -5,6 +5,7 @@ import { Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { validarCpfCnpj, validarCep, validarCelular } from '../../utils/dadosFaturamento';
 import toast from 'react-hot-toast';
 
 interface RegisterFormData {
@@ -13,6 +14,12 @@ interface RegisterFormData {
   confirmPassword: string;
   userType: 'professional' | 'company' | 'employee';
   name: string;
+  documento: string;
+  telefone: string;
+  cep: string;
+  bairro: string;
+  endereco: string;
+  numero: string;
 }
 
 const Register: React.FC = () => {
@@ -35,11 +42,23 @@ const Register: React.FC = () => {
     }
 
     try {
-      const userData = {
+      const userData: Record<string, unknown> = {
         name: data.name,
         type: data.userType
       };
-      
+      // Dados de cobranca: coletados desde o cadastro de profissional e
+      // empresa (desde 05/11) para a tela de assinatura vir completa.
+      // Funcionario nao assina plano, entao nao preenche.
+      if (data.userType !== 'employee') {
+        if (data.userType === 'company') userData.cnpj = data.documento;
+        else userData.cpf = data.documento;
+        userData.telefone = data.telefone;
+        userData.cep = data.cep;
+        userData.endereco = data.endereco;
+        userData.numero = data.numero;
+        userData.bairro = data.bairro;
+      }
+
       await signup(data.email, data.password, userData, data.userType);
     } catch {
       // Erro já tratado no contexto
@@ -124,6 +143,69 @@ const Register: React.FC = () => {
                 }
               })}
             />
+
+            {watchUserType !== 'employee' && (
+              <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                <p className="font-roboto text-xs text-gray-500">
+                  Dados de cobrança: usados apenas se você assinar um plano pago,
+                  para a tela de assinatura já vir preenchida.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label={watchUserType === 'company' ? 'CNPJ' : 'CPF'}
+                    placeholder={watchUserType === 'company' ? '00.000.000/0000-00' : '000.000.000-00'}
+                    error={errors.documento?.message}
+                    {...register('documento', {
+                      required: 'Documento é obrigatório',
+                      validate: (value) =>
+                        watchUserType === 'employee' ||
+                        validarCpfCnpj(value, watchUserType === 'company' ? 'company' : 'professional') ||
+                        true as const,
+                    })}
+                  />
+                  <Input
+                    label="Celular"
+                    placeholder="(11) 99999-0000"
+                    error={errors.telefone?.message}
+                    {...register('telefone', {
+                      required: 'Celular é obrigatório',
+                      validate: (value) => validarCelular(value) ?? true,
+                    })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="CEP"
+                    placeholder="00000-000"
+                    error={errors.cep?.message}
+                    {...register('cep', {
+                      required: 'CEP é obrigatório',
+                      validate: (value) => validarCep(value) ?? true,
+                    })}
+                  />
+                  <Input
+                    label="Bairro"
+                    placeholder="Seu bairro"
+                    error={errors.bairro?.message}
+                    {...register('bairro', { required: 'Bairro é obrigatório' })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="Endereço"
+                    placeholder="Rua, avenida..."
+                    error={errors.endereco?.message}
+                    {...register('endereco', { required: 'Endereço é obrigatório' })}
+                  />
+                  <Input
+                    label="Número"
+                    placeholder="123"
+                    error={errors.numero?.message}
+                    {...register('numero', { required: 'Número é obrigatório' })}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="relative">
               <Input

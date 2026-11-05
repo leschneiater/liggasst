@@ -1,4 +1,4 @@
-// Gera o PDF do certificado de conclusao (Etapa 5, pedido dela 05/11).
+// Gera o PDF do certificado de conclusao (Etapa 5, desde 05/11).
 // Sem assinatura nem registro de curador: so a plataforma emite, com codigo
 // de autenticidade e link publico de verificacao.
 import { jsPDF } from 'jspdf';

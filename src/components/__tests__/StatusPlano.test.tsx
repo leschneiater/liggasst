@@ -11,6 +11,9 @@ const criarCheckoutTesteMock = vi.fn();
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: (...args: unknown[]) => fetchAssinaturaMock(...args),
   criarCheckoutTeste: (...args: unknown[]) => criarCheckoutTesteMock(...args),
+  cancelarAssinatura: vi.fn(),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 
 let contaAtual: { id: string } | null = { id: 'u-teste' };

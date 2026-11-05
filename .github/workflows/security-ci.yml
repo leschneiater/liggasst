@@ -33,6 +33,7 @@ jobs:
       - run: npm run test:contracts
       - run: npm run test:demands-isolation
       - run: npm run test:equiv-prod
+      - run: npm run test:faturamento
       - run: npm run test:trilhas
       - run: npm run test:trilhas-progresso
       - run: npm run test:trilhas-provas

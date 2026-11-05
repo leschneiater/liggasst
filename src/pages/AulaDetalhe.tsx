@@ -1,4 +1,4 @@
-// Pagina da aula: conteudo completo de uma capacitacao (pedido dela 05/11).
+// Pagina da aula: conteudo completo de uma capacitacao (desde 05/11).
 // O card da grade mostra so titulo e chamada; o video/material mora aqui.
 // Mesmo gate de assinante da lista (experiencia); a regra de verdade e a RLS.
 import React, { useEffect, useState } from 'react';
@@ -60,7 +60,7 @@ const AulaDetalhe: React.FC = () => {
     };
   }, [userId, id, role]);
 
-  // PDF a vista (pedido dela 05/11): busca a URL assinada ao abrir a aula e
+  // PDF a vista (desde 05/11): busca a URL assinada ao abrir a aula e
   // embute o documento; o link "Abrir em nova aba" fica para quem nao renderiza
   // PDF embutido (ex.: Chrome do celular).
   const treinamentoId = treinamento?.id;

@@ -1,4 +1,4 @@
-// Etapa 5: verificacao publica do certificado pelo codigo (pedido dela 05/11).
+// Etapa 5: verificacao publica do certificado pelo codigo (desde 05/11).
 // Pagina aberta (sem login): qualquer pessoa confirma a autenticidade pelos
 // campos que o proprio certificado imprime. A RPC nao devolve IDs internos.
 import React, { useEffect, useState } from 'react';

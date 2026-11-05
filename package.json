@@ -30,7 +30,8 @@
     "test:trilhas-progresso": "node supabase/tests/trilhas_progresso.test.mjs",
     "test:trilhas-provas": "node supabase/tests/trilhas_provas.test.mjs",
     "test:trilhas-ebook": "node supabase/tests/trilhas_ebook.test.mjs",
-    "test:certificado": "node supabase/tests/trilhas_certificado.test.mjs"
+    "test:certificado": "node supabase/tests/trilhas_certificado.test.mjs",
+    "test:faturamento": "node supabase/tests/dados_faturamento_cadastro.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.115.0",

@@ -12,6 +12,8 @@ import ProvaTrilha from '../ProvaTrilha';
 
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: vi.fn().mockResolvedValue({ plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production' }),
+  fetchDadosFaturamento: vi.fn(async () => null),
+  salvarDadosFaturamento: vi.fn(async () => {}),
 }));
 vi.mock('../../services/database', () => ({
   fetchTrainingsMembro: vi.fn().mockResolvedValue({ success: true, data: [] }),

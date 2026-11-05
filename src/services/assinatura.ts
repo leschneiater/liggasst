@@ -65,6 +65,74 @@ export async function criarCheckoutTeste(payload: CheckoutTestePayload): Promise
   return data as { url: string | null };
 }
 
+export interface DadosFaturamentoConta {
+  nome: string;
+  email: string;
+  cpfCnpj: string;
+  phone: string;
+  postalCode: string;
+  address: string;
+  addressNumber: string;
+  province: string;
+}
+
+// Le os dados de faturamento guardados na conta (profiles + tabela do papel)
+// para a tela de assinatura vir preenchida (desde 05/11).
+export async function fetchDadosFaturamento(
+  profileId: string,
+  papel: 'professional' | 'company'
+): Promise<DadosFaturamentoConta | null> {
+  const { data: perfil, error } = await supabase
+    .from('profiles')
+    .select('display_name, email, phone, postal_code, address, address_number, province')
+    .eq('id', profileId)
+    .single();
+  if (error || !perfil) return null;
+  let doc: string | null = null;
+  if (papel === 'professional') {
+    const { data } = await supabase.from('professionals').select('cpf').eq('profile_id', profileId).single();
+    doc = data?.cpf ?? null;
+  } else {
+    const { data } = await supabase.from('companies').select('cnpj').eq('profile_id', profileId).single();
+    doc = data?.cnpj ?? null;
+  }
+  return {
+    nome: perfil.display_name ?? '',
+    email: perfil.email ?? '',
+    cpfCnpj: doc ?? '',
+    phone: perfil.phone ?? '',
+    postalCode: perfil.postal_code ?? '',
+    address: perfil.address ?? '',
+    addressNumber: perfil.address_number ?? '',
+    province: perfil.province ?? '',
+  };
+}
+
+// Grava de volta na conta as correcoes feitas na tela de assinatura (o dono
+// edita as proprias colunas de faturamento; grants por coluna).
+export async function salvarDadosFaturamento(
+  profileId: string,
+  papel: 'professional' | 'company',
+  form: CheckoutTestePayload['faturamento']
+): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      phone: form.phone,
+      postal_code: form.postalCode,
+      address: form.address,
+      address_number: form.addressNumber,
+      province: form.province,
+    })
+    .eq('id', profileId);
+  if (error) throw error;
+  if (papel === 'professional') {
+    await supabase.from('professionals').update({ cpf: form.cpfCnpj }).eq('profile_id', profileId);
+  } else {
+    await supabase.from('companies').update({ cnpj: form.cpfCnpj }).eq('profile_id', profileId);
+  }
+}
+
 // Cancelamento pela propria conta (edge function asaas-cancelar). O servidor
 // confere o JWT, o customer no Asaas e so marca cancelada depois que o Asaas
 // confirma; o acesso segue ate o fim do periodo ja pago.
