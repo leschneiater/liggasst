@@ -110,6 +110,17 @@ await db.query(`update public.profiles set verification_status = 'pending' where
 // O trigger de cadastro nao promove role admin a partir do metadata; ajuste
 // direto de fixture (mesmo estado de producao, onde o admin foi promovido).
 await db.query(`update public.profiles set role = 'admin' where id = $1`, [ids.admin]);
+ids.free = await criarUsuario('free@teste.local', { role: 'professional', display_name: 'Prof Gratuito' });
+// Membros pagantes: assinatura pro ativa em production (a Capacitacao virou
+// paga em 20261104010000; conta gratuita nao le mais treinamentos).
+const pagar = async (uid, plano) => db.query(
+  `update public.subscriptions
+   set plan = $2, status = 'active', current_period_end = current_date + 30, environment = 'production'
+   where profile_id = $1`,
+  [uid, plano]);
+await pagar(ids.prof, 'pro_professional');
+await pagar(ids.empresa, 'pro_company');
+await pagar(ids.profTeste, 'pro_professional');
 
 // Leituras e tentativas de escrita negadas usam rollback; mutacoes legitimas
 // do admin que os proximos passos precisam enxergar usam commit.
@@ -161,6 +172,9 @@ ok(!idsEmp.includes(idRascunho), 'empresa NAO ve rascunho');
 
 r = await listar(ids.pendente);
 ok(r.rows.length === 0, 'membro NAO aprovado nao ve nada');
+
+r = await listar(ids.free);
+ok(r.rows.length === 0, 'membro aprovado GRATUITO nao ve nada (Capacitacao paga)');
 
 // acesso direto por ID (adivinhando o uuid) tambem passa pela RLS
 r = await comoUsuario(ids.prof, 'select id from public.trainings where id = $1', [idEmpresa]);
@@ -246,5 +260,6 @@ ok(r.rows.map((x) => x.id).includes(idTeste), 'membro DE TESTE ve publicado de t
 ok(r.rows.map((x) => x.id).includes(idAmbos), 'membro de teste tambem ve conteudo real do seu publico');
 
 console.log(`\n${pass} ok, ${fail} falhas`);
+process.exit(fail ? 1 : 0);
 await db.close();
 

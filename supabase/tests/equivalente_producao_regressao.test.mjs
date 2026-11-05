@@ -76,7 +76,7 @@ const novas = todos.filter((f) => f > PROD_ATE);
 for (const arq of baseProd) await aplicar(readFileSync(path.join(dirMigrations, arq), 'utf8'));
 // Producao auditada: search_professionals e get_professional_public tem EXECUTE para anon (a cadeia do repo nao tem; os grants divergiram).
 await db.exec(`grant execute on function public.search_professionals(text,text,text) to anon; grant execute on function public.get_professional_public(uuid) to anon;`);
-ok(novas.length === 5, `estado equivalente a producao auditada (${baseProd.length} migracoes) + 5 pendentes`);
+ok(novas.length >= 5 && baseProd.length > 0, `estado equivalente a producao auditada (${baseProd.length} migracoes) + ${novas.length} posteriores (a regressao cobre a cadeia inteira desde o ponto auditado)`);
 
 const criarUsuario = async (email, meta) => (await db.query(
   `insert into auth.users (email, raw_user_meta_data) values ($1,$2) returning id`, [email, JSON.stringify(meta)])).rows[0].id;

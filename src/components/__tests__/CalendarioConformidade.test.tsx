@@ -28,7 +28,11 @@ const hoje = new Date();
 const isoDaquiA = (dias: number): string => {
   const d = new Date(hoje);
   d.setDate(d.getDate() + dias);
-  return d.toISOString().slice(0, 10);
+  // Componentes LOCAIS da data (nao toISOString, que devolve o dia em UTC e
+  // desloca 1 dia entre 21h e meia-noite em UTC-3): o app calcula os chips
+  // pela meia-noite local, entao a fixture precisa seguir o mesmo relogio.
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 };
 
 const itemFixture = {
