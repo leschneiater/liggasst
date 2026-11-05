@@ -140,6 +140,12 @@ const Footer: React.FC = () => {
                   Contato
                 </Link>
               </li>
+              <li>
+                <Link to="/verificar-certificado" className="text-green-light hover:text-white transition-colors duration-200 flex items-center group">
+                  <span className="w-1 h-1 bg-green-light rounded-full mr-2 group-hover:bg-white transition-colors duration-200"></span>
+                  Verificar certificado
+                </Link>
+              </li>
             </ul>
           </div>
 
