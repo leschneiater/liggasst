@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { GraduationCap, FileText, Link2, Lock, AlertTriangle } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
+import { GraduationCap, Play, Lock, AlertTriangle } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchAssinatura } from '../services/assinatura';
 import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
-import { fetchTrainingsMembro, getTrainingPdfUrl, TrainingRow } from '../services/database';
+import { fetchTrainingsMembro, TrainingRow } from '../services/database';
 import { fetchTrilhasMembro, TrilhaComProgresso } from '../services/trilhas';
 import { treinamentoVisivelPara } from '../utils/treinamentos';
 import { resumoProgresso } from '../utils/trilhas';
-import VideoYoutube from '../components/VideoYoutube';
 
 const Treinamentos: React.FC = () => {
   const { currentUser, userType } = useAuth();
@@ -20,7 +18,7 @@ const Treinamentos: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(false);
   const [pago, setPago] = useState<boolean | null>(null);
-  const [abrindoPdf, setAbrindoPdf] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Gate de cliente: Capacitacao e exclusiva de assinantes pagos (mesma
   // regra do Radar TST). A regra de verdade fica na RLS e na Edge Function;
@@ -68,17 +66,6 @@ const Treinamentos: React.FC = () => {
       vivo = false;
     };
   }, [userId, role]);
-
-  const abrirPdf = async (t: TrainingRow) => {
-    setAbrindoPdf(t.id);
-    const r = await getTrainingPdfUrl(t.id);
-    setAbrindoPdf(null);
-    if (r.success && r.signedUrl) {
-      window.open(r.signedUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      toast.error('Não foi possível abrir o PDF. Tente novamente.');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-neutral-gray py-8">
@@ -144,45 +131,34 @@ const Treinamentos: React.FC = () => {
 
         {pago === true && (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {treinamentos.map((t) => (
-            <div key={t.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-5">
-              <h2 className="font-poppins text-base sm:text-lg font-semibold text-gray-900">{t.title}</h2>
-              {t.description && (
-                <p className="font-roboto text-gray-600 mt-1 whitespace-pre-line">{t.description}</p>
-              )}
-              {t.youtube_url && (
-                <div className="mt-4">
-                  <VideoYoutube youtubeUrl={t.youtube_url} titulo={t.title} />
-                </div>
-              )}
-              {t.link_url && (
-                <div className="mt-4">
-                  <a
-                    href={t.link_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-2 text-sm font-medium text-green-deep hover:underline"
-                  >
-                    <Link2 className="w-4 h-4" aria-hidden="true" />
-                    <span>Acessar material externo</span>
-                  </a>
-                </div>
-              )}
-              {t.pdf_path && (
-                <div className="mt-4">
+          {treinamentos.map((t) => {
+            const aulaPath = `${role === 'company' ? '/treinamentos-empresa' : '/treinamentos-profissional'}/aula/${t.id}`;
+            return (
+              <div
+                key={t.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(aulaPath)}
+                onKeyDown={(e) => { if (e.key === 'Enter') navigate(aulaPath); }}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-5 cursor-pointer hover:border-green-deep transition-colors flex flex-col"
+              >
+                <h2 className="font-poppins text-base sm:text-lg font-semibold text-gray-900">{t.title}</h2>
+                {t.description && (
+                  <p className="font-roboto text-sm text-gray-600 mt-1 line-clamp-2">{t.description}</p>
+                )}
+                <div className="mt-auto pt-3">
                   <Button
-                    variant="secondary"
-                    onClick={() => abrirPdf(t)}
-                    disabled={abrindoPdf === t.id}
+                    variant="primary"
+                    icon={Play}
                     className="w-full text-sm sm:text-base px-2 sm:px-4"
+                    onClick={(e) => { e.stopPropagation(); navigate(aulaPath); }}
                   >
-                    <FileText className="w-4 h-4 mr-2" aria-hidden="true" />
-                    {abrindoPdf === t.id ? 'Abrindo...' : 'Abrir material em PDF'}
+                    {t.youtube_url ? 'Assistir aula' : 'Ver material'}
                   </Button>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
         )}
       </div>

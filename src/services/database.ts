@@ -907,6 +907,24 @@ export const fetchTrainingsMembro = async () => {
   }
 };
 
+// Uma capacitacao publicada por id, para a pagina da aula (pedido dela 05/11).
+// RLS garante que so membro com acesso le; o filtro de publico fica na pagina.
+export const fetchTrainingMembro = async (id: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('trainings')
+      .select('*')
+      .eq('id', id)
+      .eq('status', 'published')
+      .maybeSingle();
+    if (error) throw error;
+    return { success: true, data: (data ?? null) as TrainingRow | null };
+  } catch (error) {
+    console.error('Erro ao buscar treinamento:', error);
+    return { success: false, data: null as TrainingRow | null, error };
+  }
+};
+
 export const createTraining = async (treinamento: {
   title: string;
   description?: string;

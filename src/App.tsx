@@ -59,6 +59,7 @@ const ContatosAdmin = lazy(() => import('./pages/admin/ContatosAdmin'));
 const RadarAdmin = lazy(() => import('./pages/admin/RadarAdmin'));
 const TreinamentosAdmin = lazy(() => import('./pages/admin/TreinamentosAdmin'));
 const CertificadoTrilha = lazy(() => import('./pages/CertificadoTrilha'));
+const AulaDetalhe = lazy(() => import('./pages/AulaDetalhe'));
 const VerificarCertificado = lazy(() => import('./pages/VerificarCertificado'));
 const ReembolsosAdmin = lazy(() => import('./pages/admin/ReembolsosAdmin'));
 const AdsAdmin = lazy(() => import('./pages/admin/AdsAdmin'));
@@ -213,6 +214,11 @@ function App() {
                     <Layout><TrilhaDetalhe /></Layout>
                   </ProtectedRoute>
                 } />
+                <Route path="/treinamentos-profissional/aula/:id" element={
+                  <ProtectedRoute userType="professional">
+                    <Layout><AulaDetalhe /></Layout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/treinamentos-profissional/certificado/:trailId" element={
                   <ProtectedRoute userType="professional">
                     <Layout><CertificadoTrilha /></Layout>
@@ -288,6 +294,11 @@ function App() {
                 <Route path="/treinamentos-empresa" element={
                   <ProtectedRoute userType="company">
                     <Layout><Treinamentos /></Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/treinamentos-empresa/aula/:id" element={
+                  <ProtectedRoute userType="company">
+                    <Layout><AulaDetalhe /></Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/treinamentos-empresa/trilha/:id" element={

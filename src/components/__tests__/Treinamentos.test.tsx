@@ -116,33 +116,21 @@ describe('Pagina Treinamentos (membro)', () => {
     expect(screen.getByText('Treinamento 3')).toBeInTheDocument();
   });
 
-  it('incorpora video com youtube-nocookie, sem autoplay e com fallback', async () => {
+  it('card mostra so titulo e chamada, com botao para a pagina da aula', async () => {
     fetchTrainingsMembroMock.mockResolvedValue({
       success: true,
-      data: [treinamento('1', 'both', { youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' })],
+      data: [
+        treinamento('1', 'both', { youtube_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }),
+        treinamento('4', 'both', { pdf_path: '1.pdf', title: 'Apostila NR-1' }),
+      ],
     });
     render(<MemoryRouter><Treinamentos /></MemoryRouter>);
-    await waitFor(() => expect(screen.getByTitle('Treinamento 1')).toBeInTheDocument());
-    const iframe = screen.getByTitle('Treinamento 1') as HTMLIFrameElement;
-    expect(iframe.src).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
-    expect(iframe.src).not.toContain('autoplay');
-    expect(iframe.getAttribute('referrerpolicy')).toBe('strict-origin-when-cross-origin');
-    expect(screen.getByText('Abrir no YouTube')).toBeInTheDocument();
-  });
-
-  it('abre PDF via funcao de URL assinada', async () => {
-    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-    fetchTrainingsMembroMock.mockResolvedValue({
-      success: true,
-      data: [treinamento('1', 'both', { pdf_path: '1.pdf' })],
-    });
-    getTrainingPdfUrlMock.mockResolvedValue({ success: true, signedUrl: 'https://assinada.example/1.pdf' });
-    render(<MemoryRouter><Treinamentos /></MemoryRouter>);
-    const botao = await screen.findByText('Abrir material em PDF');
-    fireEvent.click(botao);
-    await waitFor(() => expect(getTrainingPdfUrlMock).toHaveBeenCalledWith('1'));
-    await waitFor(() => expect(openSpy).toHaveBeenCalledWith('https://assinada.example/1.pdf', '_blank', 'noopener,noreferrer'));
-    openSpy.mockRestore();
+    await waitFor(() => expect(screen.getByText('Treinamento 1')).toBeInTheDocument());
+    // Conteudo NAO fica mais no card: nada de iframe nem de botao de PDF aqui.
+    expect(document.querySelector('iframe')).toBeNull();
+    expect(screen.queryByText('Abrir material em PDF')).not.toBeInTheDocument();
+    expect(screen.getByText('Assistir aula')).toBeInTheDocument();
+    expect(screen.getByText('Ver material')).toBeInTheDocument();
   });
 
   it('mostra estado vazio quando nao ha treinamentos do publico', async () => {
