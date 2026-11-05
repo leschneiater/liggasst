@@ -2,7 +2,7 @@
 // restrito (h2/h3/h4, negrito, italico, paragrafos e listas): a colagem passa
 // pelo sanitizador antes de entrar, e o valor salvo e sempre o HTML interno.
 import React, { useEffect, useRef } from 'react';
-import { sanitizarHtmlRadar } from '../services/radarHtml';
+import { colagemParaHtml } from '../services/radarHtml';
 
 interface Props {
   id: string;
@@ -30,11 +30,12 @@ const RadarEditor: React.FC<Props> = ({ id, value, onChange, rotulo }) => {
 
   const colar = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const html = e.clipboardData.getData('text/html');
-    const texto = e.clipboardData.getData('text/plain');
-    const seguro = html
-      ? sanitizarHtmlRadar(html)
-      : sanitizarHtmlRadar(`<p>${texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`);
+    // ChatGPT web chega em text/html; app no celular chega em texto puro,
+    // as vezes com markdown. A conversao preserva paragrafos e formatos.
+    const seguro = colagemParaHtml({
+      html: e.clipboardData.getData('text/html'),
+      texto: e.clipboardData.getData('text/plain'),
+    });
     document.execCommand('insertHTML', false, seguro);
     if (ref.current) onChange(ref.current.innerHTML);
   };
