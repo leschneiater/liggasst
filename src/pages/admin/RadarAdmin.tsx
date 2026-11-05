@@ -8,6 +8,8 @@ import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
 import { RADAR_CAPA_IDEAL, dimensoesArte, erroProporcaoCapa } from '../../services/adsFormat';
 import { prepararCapa, motivoFalhaCapa } from '../../services/capaImagem';
+import RadarEditor from '../../components/RadarEditor';
+import { sanitizarHtmlRadar, htmlParaTexto } from '../../services/radarHtml';
 import { publicStorageUrl } from '../../services/publicUrl';
 
 const radarCapaUrl = (p: string | null) => (p ? publicStorageUrl('radar-covers', p) : null);
@@ -36,13 +38,13 @@ const RadarAdmin: React.FC = () => {
   };
   useEffect(() => { carregar(); }, []);
 
-  const valido = form.titulo.trim().length >= 3 && form.resumo.trim().length >= 3 && form.conteudo.trim().length >= 10;
+  const valido = form.titulo.trim().length >= 3 && form.resumo.trim().length >= 3 && htmlParaTexto(form.conteudo).length >= 10;
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!valido) { toast.error('Preencha título, headline e conteúdo.'); return; }
     setSalvando(true);
-    const campos = { titulo: form.titulo.trim(), resumo: form.resumo.trim(), conteudo: form.conteudo.trim() };
+    const campos = { titulo: form.titulo.trim(), resumo: form.resumo.trim(), conteudo: sanitizarHtmlRadar(form.conteudo) };
     let artigoId: string | null = null;
     if (editando) {
       if (await adminEditarRadar(editando, campos)) artigoId = editando;
@@ -110,8 +112,8 @@ const RadarAdmin: React.FC = () => {
           </div>
           <div>
             <label htmlFor="radar-conteudo" className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
-            <textarea id="radar-conteudo" rows={10} className={campo} value={form.conteudo} onChange={(e) => setForm({ ...form, conteudo: e.target.value })} />
-            <p className="text-xs text-gray-500 mt-1">Texto simples. Use linha em branco para separar parágrafos.</p>
+            <RadarEditor id="radar-conteudo" rotulo="Conteúdo" value={form.conteudo} onChange={(html) => setForm({ ...form, conteudo: html })} />
+            <p className="text-xs text-gray-500 mt-1">Títulos em 3 níveis, negrito e itálico. Texto colado mantém a formatação permitida.</p>
           </div>
           <div>
             <label htmlFor="radar-capa" className="block text-sm font-medium text-gray-700 mb-1">Capa (opcional, JPG, PNG ou WebP, até {RADAR_CAPA_IDEAL.maxMB} MB)</label>

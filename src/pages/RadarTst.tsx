@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { fetchAssinatura } from '../services/assinatura';
 import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
 import { fetchRadarPosts, fetchRadarPost, type RadarTstPost, type RadarTstResumo, radarCapaUrl } from '../services/radarTst';
+import { conteudoParaHtml } from '../services/radarHtml';
 import Button from '../components/ui/Button';
 
 const RadarTst: React.FC = () => {
@@ -129,7 +130,7 @@ const RadarTst: React.FC = () => {
             <p className="font-roboto text-sm text-gray-500 mb-4">
               {new Date(aberto.publicado_em).toLocaleDateString('pt-BR')}
             </p>
-            <p className="font-roboto text-gray-700 whitespace-pre-line">{aberto.conteudo}</p>
+            <div className="font-roboto text-gray-700 radar-conteudo" dangerouslySetInnerHTML={{ __html: conteudoParaHtml(aberto.conteudo) }} />
           </article>
         )}
 
