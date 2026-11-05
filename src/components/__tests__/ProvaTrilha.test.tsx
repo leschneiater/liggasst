@@ -118,4 +118,72 @@ describe('ProvaTrilha', () => {
     );
     await tela.findByText('Conclua todas as seções da trilha para liberar a avaliação.');
   });
+
+
+  it('ebook_pendente orienta a leitura e mostra o progresso', async () => {
+    vi.mocked(iniciarProva).mockResolvedValue({
+      success: false,
+      erro: 'ebook_pendente',
+      lockedUntil: null,
+      ebookTotal: 2,
+      ebookLidas: 1,
+    } as never);
+    const tela = render(
+      <MemoryRouter>
+        <ProvaTrilha trailId="tr1" tituloTrilha="NR Básico" onFechar={vi.fn()} />
+      </MemoryRouter>,
+    );
+    await tela.findByText('Antes da nova tentativa, leia o ebook de revisão desta trilha até o final.');
+    expect(tela.getByText('Você leu 1 de 2 partes do ebook.')).toBeTruthy();
+    expect(tela.queryByText('Enviar avaliação')).toBeNull();
+  });
+
+  it('reprovacao com ebook aponta o ebook como requisito da nova tentativa', async () => {
+    mockInicio();
+    vi.mocked(enviarProva).mockResolvedValue({
+      success: true,
+      data: {
+        passed: false,
+        score: 40,
+        passScore: 70,
+        lockedUntil: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+        topicos: ['Conceitos'],
+      },
+    } as never);
+    const tela = render(
+      <MemoryRouter>
+        <ProvaTrilha trailId="tr1" tituloTrilha="NR Básico" temEbook onFechar={vi.fn()} />
+      </MemoryRouter>,
+    );
+    await tela.findByText('1. O que é EPI?');
+    fireEvent.click(tela.getAllByRole('radio')[0]);
+    fireEvent.click(tela.getByText('Enviar avaliação'));
+    await tela.findByText('Você não atingiu a nota mínima');
+    expect(tela.getByText('ebook de revisão', { selector: 'strong' })).toBeTruthy();
+    expect(tela.getByText(/requisito para desbloquear a nova tentativa/)).toBeTruthy();
+  });
+
+  it('reprovacao sem ebook nao fala de ebook', async () => {
+    mockInicio();
+    vi.mocked(enviarProva).mockResolvedValue({
+      success: true,
+      data: {
+        passed: false,
+        score: 40,
+        passScore: 70,
+        lockedUntil: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+        topicos: ['Conceitos'],
+      },
+    } as never);
+    const tela = render(
+      <MemoryRouter>
+        <ProvaTrilha trailId="tr1" tituloTrilha="NR Básico" onFechar={vi.fn()} />
+      </MemoryRouter>,
+    );
+    await tela.findByText('1. O que é EPI?');
+    fireEvent.click(tela.getAllByRole('radio')[0]);
+    fireEvent.click(tela.getByText('Enviar avaliação'));
+    await tela.findByText('Você não atingiu a nota mínima');
+    expect(tela.queryByText(/requisito para desbloquear/)).toBeNull();
+  });
 });

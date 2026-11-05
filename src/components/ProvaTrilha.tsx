@@ -12,7 +12,13 @@ import {
 
 type Fase =
   | { nome: 'carregando' }
-  | { nome: 'erro'; erro: ErroInicioProva; lockedUntil: string | null }
+  | {
+      nome: 'erro';
+      erro: ErroInicioProva;
+      lockedUntil: string | null;
+      ebookTotal: number | null;
+      ebookLidas: number | null;
+    }
   | { nome: 'prova'; attemptId: string; questoes: ProvaQuestao[]; passScore: number }
   | { nome: 'resultado'; resultado: ResultadoProva };
 
@@ -20,6 +26,7 @@ const MENSAGEM_ERRO: Record<ErroInicioProva, string> = {
   indisponivel: 'Esta avaliação não está disponível para a sua conta.',
   secoes_pendentes: 'Conclua todas as seções da trilha para liberar a avaliação.',
   bloqueado: 'Sua última tentativa não atingiu a nota mínima.',
+  ebook_pendente: 'Antes da nova tentativa, leia o ebook de revisão desta trilha até o final.',
   banco_insuficiente: 'A avaliação desta trilha ainda está em preparação. Tente mais tarde.',
   nao_autenticado: 'Sessão expirada. Entre de novo para fazer a avaliação.',
   desconhecido: 'Não foi possível iniciar a avaliação. Tente novamente.',
@@ -30,8 +37,9 @@ const MENSAGEM_ERRO: Record<ErroInicioProva, string> = {
 const ProvaTrilha: React.FC<{
   trailId: string;
   tituloTrilha: string;
+  temEbook?: boolean;
   onFechar: (resultado: ResultadoProva | null) => void;
-}> = ({ trailId, tituloTrilha, onFechar }) => {
+}> = ({ trailId, tituloTrilha, temEbook = false, onFechar }) => {
   const [fase, setFase] = useState<Fase>({ nome: 'carregando' });
   const [respostas, setRespostas] = useState<(number | null)[]>([]);
   const [enviando, setEnviando] = useState(false);
@@ -42,7 +50,13 @@ const ProvaTrilha: React.FC<{
     setFase({ nome: 'carregando' });
     const r = await iniciarProva(trailId);
     if (!r.success || !r.data) {
-      setFase({ nome: 'erro', erro: r.erro ?? 'desconhecido', lockedUntil: r.lockedUntil ?? null });
+      setFase({
+        nome: 'erro',
+        erro: r.erro ?? 'desconhecido',
+        lockedUntil: r.lockedUntil ?? null,
+        ebookTotal: r.ebookTotal ?? null,
+        ebookLidas: r.ebookLidas ?? null,
+      });
       return;
     }
     setRespostas(Array(r.data.questoes.length).fill(null));
@@ -118,6 +132,14 @@ const ProvaTrilha: React.FC<{
                     <strong>{formatarDataLiberacao(fase.lockedUntil)}</strong>.
                   </p>
                 )}
+                {fase.erro === 'ebook_pendente' &&
+                  fase.ebookTotal !== null &&
+                  fase.ebookLidas !== null && (
+                    <p className="font-roboto text-gray-600">
+                      Você leu {fase.ebookLidas} de {fase.ebookTotal}{' '}
+                      {fase.ebookTotal === 1 ? 'parte' : 'partes'} do ebook.
+                    </p>
+                  )}
                 <div className="mt-4">
                   <Button variant="outline" onClick={() => onFechar(null)}>Voltar para a trilha</Button>
                 </div>
@@ -207,6 +229,12 @@ const ProvaTrilha: React.FC<{
                     </p>
                   )}
                 </div>
+                {temEbook && (
+                  <p className="font-roboto text-gray-700 mb-4 text-center">
+                    Leia o <strong>ebook de revisão</strong> desta trilha até o final: ele é
+                    requisito para desbloquear a nova tentativa.
+                  </p>
+                )}
                 {fase.resultado.topicos.length > 0 && (
                   <div>
                     <h4 className="font-poppins font-medium text-gray-900 mb-2">

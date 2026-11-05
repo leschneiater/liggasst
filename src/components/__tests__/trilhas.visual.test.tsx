@@ -61,6 +61,8 @@ vi.mock('../../services/trilhas', () => {
   }),
   concluirSecao: vi.fn(),
   getSecaoTrilhaPdfUrl: vi.fn(),
+  marcarEbookLida: vi.fn().mockResolvedValue({ success: true, total: 2, lidas: 1 }),
+  updateSecao: vi.fn(),
   fetchMeusSelos: vi.fn().mockResolvedValue({ success: true, data: [] }),
   fetchTentativaRecente: vi.fn().mockResolvedValue({ success: true, data: null }),
   iniciarProva: vi.fn(),
@@ -74,6 +76,7 @@ vi.mock('../../services/trilhas', () => {
     data: [
       { id: 's1', trail_id: 'tr2', ordem: 1, titulo: 'Conceitos de GRO', content_type: 'link', conteudo: 'https://exemplo.com/gro' },
       { id: 's2', trail_id: 'tr2', ordem: 2, titulo: 'Inventário de riscos', content_type: 'pdf', conteudo: '22222222-2222-2222-2222-222222222222.pdf' },
+      { id: 'e1', trail_id: 'tr2', ordem: 8, titulo: 'Revisão: o que cai na prova', content_type: 'ebook', conteudo: 'Texto de revisão.' },
     ],
   }),
   fetchQuestoesAdmin: vi.fn().mockResolvedValue({
@@ -276,5 +279,127 @@ describe('preview visual da Etapa 3 (prova)', () => {
     await tela.findByText('Avaliação (prova)');
     await tela.findByText((c) => c.includes('O que é o GRO na NR-1?'));
     salvar('admin-banco-questoes', tela.container.innerHTML);
+  });
+});
+
+describe('preview visual da Etapa 4 (ebook de revisao)', () => {
+  const trilhaCertEbook = {
+    id: 'tr2',
+    titulo: 'NR-1: Gerenciamento de riscos',
+    descricao: 'Trilha com avaliação final e certificado.',
+    audience: 'professional',
+    kind: 'certified',
+    published: true,
+    is_test: false,
+    ordem: 0,
+    exam_question_count: 10,
+    exam_pass_score: 70,
+  };
+  const secoesEbook = [
+    { id: 's1', trail_id: 'tr2', ordem: 1, titulo: 'Conceitos de GRO', content_type: 'link', conteudo: 'https://exemplo.com/gro' },
+    { id: 's2', trail_id: 'tr2', ordem: 2, titulo: 'Inventário de riscos', content_type: 'link', conteudo: 'https://exemplo.com/inv' },
+    { id: 'e1', trail_id: 'tr2', ordem: 8, titulo: 'Revisão: o que cai na prova', content_type: 'ebook', conteudo: 'Os tópicos mais cobrados da avaliação, com exemplos comentados e referências da norma.' },
+    { id: 'e2', trail_id: 'tr2', ordem: 9, titulo: 'Erros comuns dos avaliados', content_type: 'ebook', conteudo: 'Os cinco erros mais frequentes na avaliação e como evitá-los no dia a dia da obra.' },
+  ];
+
+  it('trilha com ebook: cartao de leitura, parte aberta, avaliacao bloqueada', async () => {
+    const trilhasMod = await import('../../services/trilhas');
+    vi.mocked(trilhasMod.fetchTrilhaDetalhe as never).mockResolvedValueOnce({
+      success: true,
+      data: {
+        trilha: trilhaCertEbook,
+        secoes: secoesEbook,
+        concluidas: new Set(['s1', 's2']),
+        ebookLidas: new Set(['e1']),
+      },
+    } as never);
+    vi.mocked(trilhasMod.fetchTentativaRecente as never).mockResolvedValueOnce({
+      success: true,
+      data: {
+        finished_at: '2026-11-04T12:00:00Z',
+        passed: false,
+        score: 50,
+        locked_until: '2026-11-11T12:00:00Z',
+      },
+    } as never);
+    const tela = render(
+      <MemoryRouter initialEntries={['/treinamentos-profissional/trilha/tr2']}>
+        <Routes>
+          <Route path="/treinamentos-profissional/trilha/:id" element={<TrilhaDetalhe />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    await tela.findByText('Ebook de revisão');
+    await tela.findByText('1 de 2 partes lidas');
+    const { fireEvent } = await import('@testing-library/react');
+    fireEvent.click(tela.getAllByText('Ler esta parte')[1]);
+    await tela.findByText(/Os cinco erros mais frequentes/);
+    salvar('membro-trilha-ebook', tela.container.innerHTML);
+  });
+
+  it('inicio bloqueado pedindo a leitura do ebook', async () => {
+    const trilhasMod = await import('../../services/trilhas');
+    vi.mocked(trilhasMod.iniciarProva as never).mockResolvedValue({
+      success: false,
+      erro: 'ebook_pendente',
+      lockedUntil: '2026-11-11T12:00:00Z',
+      ebookTotal: 2,
+      ebookLidas: 1,
+    } as never);
+    const tela = render(
+      <MemoryRouter>
+        <ProvaTrilha trailId="tr2" tituloTrilha="NR-1: Gerenciamento de riscos" onFechar={() => {}} />
+      </MemoryRouter>,
+    );
+    await tela.findByText(/leia o ebook de revisão/);
+    salvar('membro-prova-ebook-pendente', tela.container.innerHTML);
+  });
+
+  it('resultado reprovado apontando o ebook como requisito', async () => {
+    const trilhasMod = await import('../../services/trilhas');
+    vi.mocked(trilhasMod.iniciarProva as never).mockResolvedValue({
+      success: true,
+      data: {
+        attemptId: 'att1',
+        questoes: [
+          { q: 'q1', enunciado: 'O que é o GRO na NR-1?', topico: 'Conceitos de GRO', opcoes: ['Gerenciamento de riscos ocupacionais', 'Grupo de resposta operacional'], resposta: null },
+        ],
+        passScore: 70,
+        retomada: false,
+      },
+    } as never);
+    vi.mocked(trilhasMod.enviarProva as never).mockResolvedValue({
+      success: true,
+      data: {
+        passed: false,
+        score: 0,
+        passScore: 70,
+        lockedUntil: '2026-11-11T12:00:00Z',
+        topicos: ['Conceitos de GRO'],
+      },
+    } as never);
+    const tela = render(
+      <MemoryRouter>
+        <ProvaTrilha trailId="tr2" tituloTrilha="NR-1: Gerenciamento de riscos" temEbook onFechar={() => {}} />
+      </MemoryRouter>,
+    );
+    await tela.findByText('1. O que é o GRO na NR-1?');
+    const { fireEvent } = await import('@testing-library/react');
+    fireEvent.click(tela.getByText('Grupo de resposta operacional'));
+    fireEvent.click(tela.getByText('Enviar avaliação'));
+    await tela.findByText(/requisito para desbloquear a nova tentativa/);
+    salvar('membro-prova-reprovado-ebook', tela.container.innerHTML);
+  });
+
+  it('admin: secao do tipo ebook com editor de texto', async () => {
+    const tela = render(<MemoryRouter><TreinamentosAdmin /></MemoryRouter>);
+    await tela.findByText('NR-1: Gerenciamento de riscos');
+    const { fireEvent } = await import('@testing-library/react');
+    const botoes = tela.getAllByText('Seções');
+    fireEvent.click(botoes[botoes.length - 1]);
+    const sel = await tela.findByLabelText('Tipo de conteúdo');
+    fireEvent.change(sel, { target: { value: 'ebook' } });
+    await tela.findByLabelText(/Texto do ebook/);
+    salvar('admin-trilha-ebook', tela.container.innerHTML);
   });
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { GraduationCap, Plus, Trash2, FileText, Youtube, Link2 } from 'lucide-react';
+import { GraduationCap, Plus, Trash2, FileText, Youtube, Link2, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
@@ -22,6 +22,7 @@ import {
   fetchTrilhasAdmin,
   SecaoTrilha,
   TrilhaAdmin,
+  updateSecao,
   updateTrilha,
   uploadSecaoPdf,
 } from '../../services/trilhas';
@@ -67,9 +68,11 @@ const TrilhasAdminBlock: React.FC = () => {
     titulo: '',
     content_type: 'youtube' as SecaoContentType,
     url: '',
+    texto: '',
   });
   const [pdfSecao, setPdfSecao] = useState<File | null>(null);
   const [salvandoSecao, setSalvandoSecao] = useState(false);
+  const [editandoSecao, setEditandoSecao] = useState<SecaoTrilha | null>(null);
 
   const carregar = async () => {
     setLoading(true);
@@ -142,6 +145,23 @@ const TrilhasAdminBlock: React.FC = () => {
     }
   };
 
+  const iniciarEdicaoSecao = (secao: SecaoTrilha) => {
+    setEditandoSecao(secao);
+    setFormSecao({
+      titulo: secao.titulo,
+      content_type: secao.content_type,
+      url: secao.content_type === 'link' || secao.content_type === 'youtube' ? secao.conteudo : '',
+      texto: secao.content_type === 'ebook' ? secao.conteudo : '',
+    });
+    setPdfSecao(null);
+  };
+
+  const cancelarEdicaoSecao = () => {
+    setEditandoSecao(null);
+    setFormSecao({ titulo: '', content_type: 'youtube', url: '', texto: '' });
+    setPdfSecao(null);
+  };
+
   const salvarSecao = async (trilha: TrilhaAdmin) => {
     const titulo = formSecao.titulo.trim();
     if (titulo.length < 3) {
@@ -150,8 +170,15 @@ const TrilhasAdminBlock: React.FC = () => {
     }
     const tipo = formSecao.content_type;
     const url = formSecao.url.trim();
-    if (tipo === 'pdf') {
-      if (!pdfSecao) {
+    const texto = formSecao.texto.trim();
+    if (tipo === 'ebook') {
+      // Ebook (Etapa 4): o conteudo e o TEXTO escrito pelo curador, lido no app.
+      if (texto.length < 3) {
+        toast.error('Escreva o texto do ebook desta seção.');
+        return;
+      }
+    } else if (tipo === 'pdf') {
+      if (!editandoSecao && !pdfSecao) {
         toast.error('Escolha o arquivo PDF da seção.');
         return;
       }
@@ -166,11 +193,30 @@ const TrilhasAdminBlock: React.FC = () => {
       }
     }
     setSalvandoSecao(true);
+
+    // Edicao: titulo sempre; conteudo conforme o tipo (PDF troca so o titulo;
+    // o arquivo em si continua o mesmo).
+    if (editandoSecao) {
+      const campos: { titulo: string; conteudo?: string } = { titulo };
+      if (tipo === 'ebook') campos.conteudo = texto;
+      if (tipo === 'link' || tipo === 'youtube') campos.conteudo = url;
+      const r = await updateSecao(editandoSecao.id, campos);
+      setSalvandoSecao(false);
+      if (!r.success) {
+        toast.error('Não foi possível salvar a seção. Tente novamente.');
+        return;
+      }
+      cancelarEdicaoSecao();
+      await carregarSecoes(trilha.id);
+      toast.success('Seção atualizada.');
+      return;
+    }
+
     // Para PDF, o id da secao ja nasce definido: conteudo guarda o path
     // <id>.pdf (mesmo bucket privado dos treinamentos), e o upload vem em
     // seguida. Enquanto o PDF nao sobe, a secao abre com erro de arquivo.
     const id = tipo === 'pdf' ? crypto.randomUUID() : undefined;
-    const conteudo = tipo === 'pdf' ? `${id}.pdf` : url;
+    const conteudo = tipo === 'pdf' ? `${id}.pdf` : tipo === 'ebook' ? texto : url;
     const ordem = secoes.length > 0 ? Math.max(...secoes.map((x) => x.ordem)) + 1 : 1;
     const r = await createSecao({
       ...(id ? { id } : {}),
@@ -195,7 +241,7 @@ const TrilhasAdminBlock: React.FC = () => {
       }
     }
     setSalvandoSecao(false);
-    setFormSecao({ titulo: '', content_type: 'youtube', url: '' });
+    setFormSecao({ titulo: '', content_type: 'youtube', url: '', texto: '' });
     setPdfSecao(null);
     await carregarSecoes(trilha.id);
     await carregar();
@@ -327,9 +373,14 @@ const TrilhasAdminBlock: React.FC = () => {
                       <span className="text-sm text-gray-800">
                         {i + 1}. {sec.titulo} <span className="text-gray-500">({ROTULO_CONTENT_TYPE[sec.content_type]})</span>
                       </span>
-                      <Button variant="ghost" size="sm" onClick={() => excluirSecao(t, sec)} aria-label={`Excluir seção ${sec.titulo}`}>
-                        <Trash2 className="w-4 h-4 text-red-600" aria-hidden="true" />
-                      </Button>
+                      <div className="flex items-center space-x-1">
+                        <Button variant="ghost" size="sm" onClick={() => iniciarEdicaoSecao(sec)} aria-label={`Editar seção ${sec.titulo}`}>
+                          <Pencil className="w-4 h-4 text-gray-600" aria-hidden="true" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => excluirSecao(t, sec)} aria-label={`Excluir seção ${sec.titulo}`}>
+                          <Trash2 className="w-4 h-4 text-red-600" aria-hidden="true" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -352,25 +403,46 @@ const TrilhasAdminBlock: React.FC = () => {
                       <select
                         id="secao-tipo"
                         value={formSecao.content_type}
+                        disabled={!!editandoSecao}
                         onChange={(e) => setFormSecao({ ...formSecao, content_type: e.target.value as SecaoContentType })}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
                       >
                         <option value="youtube">Vídeo do YouTube</option>
                         <option value="link">Link externo</option>
                         <option value="pdf">PDF</option>
+                        {t.kind === 'certified' && <option value="ebook">E-book (texto de revisão)</option>}
                       </select>
                     </div>
                   </div>
-                  {formSecao.content_type === 'pdf' ? (
+                  {formSecao.content_type === 'ebook' && (
+                    <div>
+                      <label htmlFor="secao-texto" className="block text-sm font-medium text-gray-700 mb-1">
+                        Texto do ebook (lido dentro do app)
+                      </label>
+                      <textarea
+                        id="secao-texto"
+                        value={formSecao.texto}
+                        onChange={(e) => setFormSecao({ ...formSecao, texto: e.target.value })}
+                        rows={6}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                        placeholder="Escreva o conteúdo de revisão desta parte do ebook..."
+                      />
+                    </div>
+                  )}
+                  {formSecao.content_type !== 'ebook' && (formSecao.content_type === 'pdf' ? (
                     <div>
                       <label htmlFor="secao-pdf" className="block text-sm font-medium text-gray-700 mb-1">PDF (até 10 MB)</label>
-                      <input
-                        id="secao-pdf"
-                        type="file"
-                        accept="application/pdf"
-                        onChange={(e) => setPdfSecao(e.target.files?.[0] ?? null)}
-                        className="w-full text-sm"
-                      />
+                      {editandoSecao ? (
+                        <p className="text-sm text-gray-600">O arquivo PDF não muda na edição; ajuste o título.</p>
+                      ) : (
+                        <input
+                          id="secao-pdf"
+                          type="file"
+                          accept="application/pdf"
+                          onChange={(e) => setPdfSecao(e.target.files?.[0] ?? null)}
+                          className="w-full text-sm"
+                        />
+                      )}
                     </div>
                   ) : (
                     <div>
@@ -386,10 +458,17 @@ const TrilhasAdminBlock: React.FC = () => {
                         placeholder="https://..."
                       />
                     </div>
-                  )}
-                  <Button variant="secondary" size="sm" onClick={() => salvarSecao(t)} disabled={salvandoSecao}>
-                    {salvandoSecao ? 'Salvando...' : 'Adicionar seção'}
-                  </Button>
+                  ))}
+                  <div className="flex items-center space-x-2">
+                    <Button variant="secondary" size="sm" onClick={() => salvarSecao(t)} disabled={salvandoSecao}>
+                      {salvandoSecao ? 'Salvando...' : editandoSecao ? 'Salvar alterações' : 'Adicionar seção'}
+                    </Button>
+                    {editandoSecao && (
+                      <Button variant="ghost" size="sm" onClick={cancelarEdicaoSecao}>
+                        Cancelar edição
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {t.kind === 'certified' && (

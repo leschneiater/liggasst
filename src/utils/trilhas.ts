@@ -57,6 +57,7 @@ export type ErroInicioProva =
   | 'indisponivel'
   | 'secoes_pendentes'
   | 'bloqueado'
+  | 'ebook_pendente'
   | 'banco_insuficiente'
   | 'nao_autenticado'
   | 'desconhecido';
@@ -94,3 +95,26 @@ export const situacaoProva = (tentativa: {
   }
   return { tipo: 'livre' };
 };
+
+// ---------- Etapa 4: ebook de revisao das trilhas 'certified' ----------
+
+// O ebook mora em trail_sections com content_type 'ebook', mas NAO conta
+// como secao de conteudo da trilha (a prova e o selo olham so o conteudo;
+// o servidor espelha isso em trail_exam_iniciar e no gatilho do selo).
+export const secoesConteudo = <T extends { content_type: SecaoContentType }>(secoes: T[]): T[] =>
+  secoes.filter((s) => s.content_type !== 'ebook');
+
+export const secoesEbook = <T extends { content_type: SecaoContentType }>(secoes: T[]): T[] =>
+  secoes.filter((s) => s.content_type === 'ebook');
+
+// Resumo "1 de 3 partes lidas" do ebook de revisao.
+export const resumoEbook = (total: number, lidas: number): string => {
+  if (total <= 0) return 'Sem ebook';
+  const feitas = Math.min(lidas, total);
+  return `${feitas} de ${total} ${total === 1 ? 'parte lida' : 'partes lidas'}`;
+};
+
+// Ebook lido ate o final = todas as secoes de ebook com leitura marcada
+// (espelha a RPC; usado so para feedback visual, a regra vale no servidor).
+export const ebookCompleto = (total: number, lidas: number): boolean =>
+  total > 0 && lidas >= total;

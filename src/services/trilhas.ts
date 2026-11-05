@@ -118,13 +118,22 @@ export const fetchTrilhaDetalhe = async (trailId: string) => {
       .select('section_id');
     if (erroProg) throw erroProg;
 
+    // Etapa 4: leitura do ebook de revisao (tabela propria; RLS devolve so
+    // as linhas do membro logado).
+    const { data: leitura, error: erroLeitura } = await supabase
+      .from('trail_ebook_progress')
+      .select('section_id');
+    if (erroLeitura) throw erroLeitura;
+
     const concluidas = new Set(((progresso ?? []) as { section_id: string }[]).map((p) => p.section_id));
+    const ebookLidas = new Set(((leitura ?? []) as { section_id: string }[]).map((p) => p.section_id));
     return {
       success: true,
       data: {
         trilha: trilha as Trilha,
         secoes: (secoes ?? []) as SecaoTrilha[],
         concluidas,
+        ebookLidas,
       },
     };
   } catch (error) {
@@ -413,6 +422,8 @@ export const iniciarProva = async (trailId: string) => {
       ok: boolean;
       erro?: ErroInicioProva;
       locked_until?: string;
+      ebook_total?: number;
+      ebook_lidas?: number;
       attempt_id?: string;
       questoes?: ProvaQuestao[];
       pass_score?: number;
@@ -423,6 +434,8 @@ export const iniciarProva = async (trailId: string) => {
         success: false,
         erro: (r?.erro ?? 'desconhecido') as ErroInicioProva,
         lockedUntil: r?.locked_until ?? null,
+        ebookTotal: r?.ebook_total ?? null,
+        ebookLidas: r?.ebook_lidas ?? null,
       };
     }
     const inicio: InicioProva = {
@@ -557,5 +570,45 @@ export const deleteQuestao = async (id: string) => {
   } catch (error) {
     console.error('Erro ao excluir questão:', error);
     return { success: false, error };
+  }
+};
+
+// ---------- Etapa 4: ebook de revisao ----------
+
+// Marca uma secao de ebook como lida (servidor valida que e ebook de
+// trilha visivel para o membro; idempotente). Devolve total/lidas.
+export const marcarEbookLida = async (sectionId: string) => {
+  try {
+    const { data, error } = await supabase.rpc('trail_ebook_marcar_lida', {
+      p_section: sectionId,
+    });
+    if (error) throw error;
+    const r = data as { ok: boolean; erro?: string; total?: number; lidas?: number };
+    if (!r?.ok) return { success: false, erro: r?.erro ?? 'desconhecido' };
+    return { success: true, total: r.total ?? 0, lidas: r.lidas ?? 0 };
+  } catch (error) {
+    console.error('Erro ao marcar leitura do ebook:', error);
+    return { success: false, erro: 'desconhecido', error };
+  }
+};
+
+// Edicao de secao pelo admin (Etapa 4: texto do ebook e titulo; demais
+// campos seguem o mesmo update).
+export const updateSecao = async (
+  id: string,
+  campos: Partial<Pick<SecaoTrilha, 'titulo' | 'conteudo'>>,
+) => {
+  try {
+    const { data, error } = await supabase
+      .from('trail_sections')
+      .update(campos)
+      .eq('id', id)
+      .select('id, trail_id, ordem, titulo, content_type, conteudo')
+      .single();
+    if (error) throw error;
+    return { success: true, data: data as SecaoTrilha };
+  } catch (error) {
+    console.error('Erro ao atualizar seção:', error);
+    return { success: false, data: null, error };
   }
 };
