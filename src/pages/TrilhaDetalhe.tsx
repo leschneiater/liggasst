@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Award,
@@ -45,6 +45,7 @@ import ProvaTrilha from '../components/ProvaTrilha';
 // visita. A regra de acesso vale de verdade na RLS e na Edge Function; aqui
 // e experiencia.
 const TrilhaDetalhe: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { currentUser, userType } = useAuth();
   const listaPath = userType === 'company' ? '/treinamentos-empresa' : '/treinamentos-profissional';
@@ -367,10 +368,15 @@ const TrilhaDetalhe: React.FC = () => {
                   <h2 className="font-poppins font-semibold text-gray-900">Avaliação final</h2>
                 </div>
                 {prova.tipo === 'aprovado' && (
-                  <p className="font-roboto text-gray-700">
-                    Você foi aprovado com nota <strong>{prova.score}%</strong>. Seu certificado
-                    será emitido na sua área.
-                  </p>
+                  <>
+                    <p className="font-roboto text-gray-700 mb-4">
+                      Você foi aprovado com nota <strong>{prova.score}%</strong>. Seu certificado
+                      está disponível.
+                    </p>
+                    <Button onClick={() => navigate(`/treinamentos-profissional/certificado/${trilha.id}`)}>
+                      Ver certificado
+                    </Button>
+                  </>
                 )}
                 {prova.tipo === 'bloqueado' && (
                   <>

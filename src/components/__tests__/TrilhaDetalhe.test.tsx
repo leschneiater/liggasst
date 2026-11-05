@@ -213,6 +213,6 @@ describe('TrilhaDetalhe - avaliacao (trilha certified, etapa 3)', () => {
     renderPagina();
     await screen.findByText('Avaliação final');
     expect(await screen.findByText(/Você foi aprovado com nota/)).toBeTruthy();
-    expect(screen.getByText(/certificado será emitido na sua área/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Ver certificado' })).toBeTruthy();
   });
 });
