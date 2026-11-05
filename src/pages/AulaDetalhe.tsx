@@ -4,7 +4,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, FileText, Link2, Lock, AlertTriangle } from 'lucide-react';
-import toast from 'react-hot-toast';
 import Button from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchAssinatura } from '../services/assinatura';
@@ -22,7 +21,7 @@ const AulaDetalhe: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(false);
   const [pago, setPago] = useState<boolean | null>(null);
-  const [abrindoPdf, setAbrindoPdf] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const userId = currentUser?.id;
   useEffect(() => {
@@ -61,17 +60,21 @@ const AulaDetalhe: React.FC = () => {
     };
   }, [userId, id, role]);
 
-  const abrirPdf = async () => {
-    if (!treinamento) return;
-    setAbrindoPdf(true);
-    const r = await getTrainingPdfUrl(treinamento.id);
-    setAbrindoPdf(false);
-    if (r.success && r.signedUrl) {
-      window.open(r.signedUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      toast.error('Não foi possível abrir o PDF. Tente novamente.');
-    }
-  };
+  // PDF a vista (pedido dela 05/11): busca a URL assinada ao abrir a aula e
+  // embute o documento; o link "Abrir em nova aba" fica para quem nao renderiza
+  // PDF embutido (ex.: Chrome do celular).
+  const treinamentoId = treinamento?.id;
+  const temPdf = Boolean(treinamento?.pdf_path);
+  useEffect(() => {
+    if (!treinamentoId || !temPdf) return;
+    let vivo = true;
+    getTrainingPdfUrl(treinamentoId).then((r) => {
+      if (vivo && r.success && r.signedUrl) setPdfUrl(r.signedUrl);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [treinamentoId, temPdf]);
 
   return (
     <div className="min-h-screen bg-neutral-gray py-8">
@@ -136,10 +139,37 @@ const AulaDetalhe: React.FC = () => {
             )}
             {treinamento.pdf_path && (
               <div className="mt-6">
-                <Button variant="secondary" onClick={abrirPdf} disabled={abrindoPdf}>
-                  <FileText className="w-4 h-4 mr-2" aria-hidden="true" />
-                  {abrindoPdf ? 'Abrindo...' : 'Abrir material em PDF'}
-                </Button>
+                <div className="flex items-center space-x-2 mb-2">
+                  <FileText className="w-4 h-4 text-green-deep" aria-hidden="true" />
+                  <h2 className="font-poppins font-semibold text-gray-900">Material em PDF</h2>
+                </div>
+                {pdfUrl ? (
+                  <object
+                    data={pdfUrl}
+                    type="application/pdf"
+                    title="Material em PDF"
+                    className="w-full h-[70vh] rounded-lg border border-gray-200 bg-gray-50"
+                  >
+                    <p className="font-roboto text-sm text-gray-600 p-4">
+                      Seu navegador não mostra o PDF aqui.{' '}
+                      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="text-green-deep hover:underline">
+                        Abrir em nova aba
+                      </a>
+                    </p>
+                  </object>
+                ) : (
+                  <p className="font-roboto text-sm text-gray-500">Carregando PDF...</p>
+                )}
+                {pdfUrl && (
+                  <a
+                    href={pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block font-roboto text-sm text-green-deep hover:underline mt-2"
+                  >
+                    Abrir PDF em nova aba
+                  </a>
+                )}
               </div>
             )}
           </div>

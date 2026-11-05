@@ -1,7 +1,7 @@
 // Pagina da aula (pedido dela 05/11): gate de assinante, video com nocookie,
 // PDF via URL assinada e estado de "nao encontrado".
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AulaDetalhe from '../../pages/AulaDetalhe';
@@ -88,19 +88,18 @@ describe('Pagina da aula', () => {
     expect(screen.getByText('Descrição completa da aula')).toBeInTheDocument();
   });
 
-  it('abre PDF via funcao de URL assinada', async () => {
-    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+  it('PDF fica a vista: busca URL assinada ao abrir e embute o documento', async () => {
     fetchTrainingMembroMock.mockResolvedValue({
       success: true,
       data: treinamento('1', { pdf_path: '1.pdf' }),
     });
     getTrainingPdfUrlMock.mockResolvedValue({ success: true, signedUrl: 'https://assinada.example/1.pdf' });
     renderPagina();
-    const botao = await screen.findByText('Abrir material em PDF');
-    fireEvent.click(botao);
     await waitFor(() => expect(getTrainingPdfUrlMock).toHaveBeenCalledWith('1'));
-    await waitFor(() => expect(openSpy).toHaveBeenCalledWith('https://assinada.example/1.pdf', '_blank', 'noopener,noreferrer'));
-    openSpy.mockRestore();
+    const viewer = await screen.findByTitle('Material em PDF') ;
+    expect(viewer).toBeTruthy();
+    const link = await screen.findByText('Abrir PDF em nova aba');
+    expect(link.getAttribute('href')).toBe('https://assinada.example/1.pdf');
   });
 
   it('treinamento de outro publico ou inexistente mostra nao encontrado', async () => {
