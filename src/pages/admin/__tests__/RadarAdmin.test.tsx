@@ -15,6 +15,9 @@ vi.mock('../../../services/radarVotos', () => ({
 }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('../../../services/radarAdmin', () => ({
+  statusRadarLista: (p: { status: string; publicado_em: string }) =>
+    p.status !== 'publicado' ? 'rascunho' : (new Date(p.publicado_em).getTime() > Date.now() ? 'agendado' : 'publicado'),
+  adminAgendarRadar: vi.fn().mockResolvedValue(true),
   adminListarRadar: (...a: unknown[]) => listar(...a),
   adminCriarRadar: (...a: unknown[]) => criar(...a),
   adminEditarRadar: (...a: unknown[]) => editar(...a),

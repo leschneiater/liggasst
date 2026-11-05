@@ -14,10 +14,14 @@ vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() 
 vi.mock('../../services/radarAdmin', () => ({
   adminListarRadar: vi.fn().mockResolvedValue({ ok: true, itens: [
     { id: 'p1', titulo: 'NR-1 atualizada: o que muda na pratica', resumo: 'Resumo do artigo', conteudo: 'Conteudo do artigo', status: 'publicado', publicado_em: '2026-11-02T00:00:00Z', updated_at: '2026-11-02T00:00:00Z', capa_path: 'capas/exemplo.jpg' },
+    { id: 'p3', titulo: 'EPIs: novo guia de fiscalizacao', resumo: 'Resumo do agendado', conteudo: 'Conteudo', status: 'publicado', publicado_em: '2027-01-10T14:00:00.000Z', updated_at: '2026-11-04T00:00:00Z', capa_path: null },
   ] }),
   adminCriarRadar: vi.fn(),
   adminEditarRadar: vi.fn(),
   adminDefinirStatusRadar: vi.fn(),
+  adminAgendarRadar: vi.fn().mockResolvedValue(true),
+  statusRadarLista: (p: { status: string; publicado_em: string }) =>
+    p.status !== 'publicado' ? 'rascunho' : (new Date(p.publicado_em).getTime() > Date.now() ? 'agendado' : 'publicado'),
   adminExcluirRadar: vi.fn(),
   adminDefinirCapaRadar: vi.fn(),
   uploadRadarCapa: vi.fn(),
@@ -66,8 +70,8 @@ describe('preview visual da capa do Radar TST', () => {
   it('gera HTML do editor do admin com a capa atual', async () => {
     mkdirSync('/tmp/shots', { recursive: true });
     const tela = render(<MemoryRouter><RadarAdmin /></MemoryRouter>);
-    const botaoEditar = await tela.findByText('Editar');
-    fireEvent.click(botaoEditar);
+    const botoesEditar = await tela.findAllByText('Editar');
+    fireEvent.click(botoesEditar[0]);
     await tela.findByText('Remover capa atual');
     salvar('radar-admin-capa', tela.container.innerHTML);
   });
@@ -101,5 +105,15 @@ describe('preview visual da capa do Radar TST', () => {
     const tela = render(<MemoryRouter><RadarAdmin /></MemoryRouter>);
     await tela.findByText('3 sim');
     salvar('radar-admin-votos', tela.container.innerHTML);
+  });
+
+  it('gera HTML do admin com artigo agendado e campo de data', async () => {
+    const tela = render(<MemoryRouter><RadarAdmin /></MemoryRouter>);
+    await tela.findByText(/Agendado para /);
+    const campo = tela.getByLabelText('Data e hora da publicação');
+    fireEvent.change(campo, { target: { value: '2027-01-10T11:00' } });
+    await tela.findByText('Alterar agendamento');
+    await tela.findByText('Cancelar agendamento');
+    salvar('radar-admin-agendado', tela.container.innerHTML);
   });
 });

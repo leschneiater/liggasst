@@ -2,7 +2,7 @@
 // despublicar e excluir artigos. Texto simples (paragrafos). Sem agendamento.
 // Rascunho nunca aparece para assinantes (RLS exige status = publicado).
 import React, { useEffect, useState } from 'react';
-import { RefreshCw, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { RefreshCw, ThumbsUp, ThumbsDown, CalendarClock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
@@ -15,15 +15,18 @@ import { publicStorageUrl } from '../../services/publicUrl';
 const radarCapaUrl = (p: string | null) => (p ? publicStorageUrl('radar-covers', p) : null);
 import {
   adminListarRadar, adminCriarRadar, adminEditarRadar, adminDefinirStatusRadar, adminExcluirRadar,
-  RadarAdminPost, StatusRadar, adminDefinirCapaRadar, uploadRadarCapa } from '../../services/radarAdmin';
+  RadarAdminPost, StatusRadar, StatusRadarLista, statusRadarLista, adminAgendarRadar, adminDefinirCapaRadar, uploadRadarCapa } from '../../services/radarAdmin';
 import { resumoVotosAdmin, type ResumoVotos } from '../../services/radarVotos';
 
-const ROTULO: Record<StatusRadar, string> = { rascunho: 'Rascunho', publicado: 'Publicado' };
+const ROTULO: Record<StatusRadarLista, string> = { rascunho: 'Rascunho', agendado: 'Agendado', publicado: 'Publicado' };
+const fmtAgendamento = (iso: string) =>
+  new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 const VAZIO = { titulo: '', resumo: '', conteudo: '' };
 
 const RadarAdmin: React.FC = () => {
   const [itens, setItens] = useState<RadarAdminPost[]>([]);
   const [votos, setVotos] = useState<Record<string, ResumoVotos>>({});
+  const [agendarEm, setAgendarEm] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [form, setForm] = useState(VAZIO);
@@ -88,6 +91,27 @@ const RadarAdmin: React.FC = () => {
       await carregar();
     } else toast.error('Não foi possível atualizar.');
   };
+  const agendar = async (p: RadarAdminPost) => {
+    const valor = agendarEm[p.id];
+    if (!valor) { toast.error('Escolha a data e a hora para agendar.'); return; }
+    const quando = new Date(valor);
+    if (Number.isNaN(quando.getTime()) || quando.getTime() <= Date.now()) {
+      toast.error('Escolha uma data e hora futuras.');
+      return;
+    }
+    if (await adminAgendarRadar(p.id, quando)) {
+      toast.success(`Agendado para ${fmtAgendamento(quando.toISOString())}.`);
+      await carregar();
+    } else toast.error('Não foi possível agendar.');
+  };
+
+  const cancelarAgendamento = async (p: RadarAdminPost) => {
+    if (await adminDefinirStatusRadar(p.id, 'rascunho')) {
+      toast.success('Agendamento cancelado; o artigo voltou para rascunho.');
+      await carregar();
+    } else toast.error('Não foi possível cancelar o agendamento.');
+  };
+
   const excluir = async (p: RadarAdminPost) => {
     if (!window.confirm('Excluir este artigo? Isso não pode ser desfeito.')) return;
     if (await adminExcluirRadar(p.id)) setItens((l) => l.filter((x) => x.id !== p.id));
@@ -174,11 +198,15 @@ const RadarAdmin: React.FC = () => {
         {erro && <p className="font-roboto text-red-600" role="alert">{erro}</p>}
         {!loading && !erro && itens.length === 0 && <p className="font-roboto text-gray-600">Nenhum artigo cadastrado.</p>}
         <ul className="space-y-4">
-          {itens.map((p) => (
+          {itens.map((p) => {
+            const sl = statusRadarLista(p);
+            return (
             <li key={p.id} className="bg-white rounded-xl border border-gray-100 p-4" data-testid="radar-item">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="font-poppins font-semibold text-soft-black">{p.titulo}</p>
-                <span className="font-roboto text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">{ROTULO[p.status]}</span>
+                <span className={`font-roboto text-xs px-2 py-1 rounded-full ${sl === 'agendado' ? 'bg-green-light text-green-deep' : 'bg-gray-100 text-gray-700'}`}>
+                  {sl === 'agendado' ? `Agendado para ${fmtAgendamento(p.publicado_em)}` : ROTULO[sl]}
+                </span>
               </div>
               <p className="font-roboto text-sm text-gray-600 mt-1">{p.resumo}</p>
               <p className="flex items-center gap-3 font-roboto text-sm text-gray-600 mt-2" data-testid="radar-votos-resumo">
@@ -191,13 +219,35 @@ const RadarAdmin: React.FC = () => {
                   {votos[p.id]?.nao_joia ?? 0} não
                 </span>
               </p>
+              {sl !== 'publicado' && (
+                <div className="flex flex-wrap items-center gap-2 mt-3" data-testid="radar-agendamento">
+                  <CalendarClock size={16} className="text-green-deep" aria-hidden="true" />
+                  <label className="sr-only" htmlFor={`agendar-${p.id}`}>Data e hora da publicação</label>
+                  <input
+                    id={`agendar-${p.id}`}
+                    type="datetime-local"
+                    value={agendarEm[p.id] ?? ''}
+                    onChange={(e) => setAgendarEm((m) => ({ ...m, [p.id]: e.target.value }))}
+                    className="font-roboto text-sm rounded-lg border border-gray-300 px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-deep"
+                  />
+                  <Button size="sm" variant="outline" onClick={() => agendar(p)}>
+                    {sl === 'agendado' ? 'Alterar agendamento' : 'Agendar'}
+                  </Button>
+                  <span className="font-roboto text-xs text-gray-500">horário de Brasília</span>
+                </div>
+              )}
               <div className="flex flex-wrap gap-2 mt-4">
                 <Button size="sm" variant="secondary" onClick={() => editar(p)}>Editar</Button>
-                <Button size="sm" onClick={() => alternar(p)}>{p.status === 'publicado' ? 'Voltar para rascunho' : 'Publicar'}</Button>
+                {sl === 'agendado' ? (
+                  <Button size="sm" onClick={() => cancelarAgendamento(p)}>Cancelar agendamento</Button>
+                ) : (
+                  <Button size="sm" onClick={() => alternar(p)}>{p.status === 'publicado' ? 'Voltar para rascunho' : 'Publicar'}</Button>
+                )}
                 <Button size="sm" variant="secondary" onClick={() => excluir(p)}>Excluir</Button>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
     </div>

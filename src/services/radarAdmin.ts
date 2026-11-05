@@ -3,6 +3,16 @@
 import { supabase } from '../lib/supabase';
 
 export type StatusRadar = 'rascunho' | 'publicado';
+
+// Estado derivado para a LISTA do admin: artigo com status 'publicado' e
+// publicado_em no futuro e um AGENDAMENTO. A RLS dos assinantes
+// (status='publicado' AND publicado_em <= now()) ja esconde esse artigo
+// ate a hora marcada — publicacao automatica sem cron nem job.
+export type StatusRadarLista = 'rascunho' | 'agendado' | 'publicado';
+export function statusRadarLista(p: Pick<RadarAdminPost, 'status' | 'publicado_em'>, agora: Date = new Date()): StatusRadarLista {
+  if (p.status !== 'publicado') return 'rascunho';
+  return new Date(p.publicado_em).getTime() > agora.getTime() ? 'agendado' : 'publicado';
+}
 export interface RadarAdminPost {
   id: string; titulo: string; resumo: string; conteudo: string;
   capa_path: string | null;
@@ -32,6 +42,15 @@ export async function adminDefinirStatusRadar(id: string, status: StatusRadar): 
   const { error } = await supabase.from('radar_posts').update(campos).eq('id', id);
   return !error;
 }
+// Agendar publicacao: status 'publicado' com publicado_em na data
+// escolhida. Assinantes so veem quando a hora chegar (RLS publish-on-read).
+export async function adminAgendarRadar(id: string, quando: Date): Promise<boolean> {
+  const agora = new Date().toISOString();
+  const { error } = await supabase.from('radar_posts')
+    .update({ status: 'publicado', publicado_em: quando.toISOString(), updated_at: agora }).eq('id', id);
+  return !error;
+}
+
 export async function adminExcluirRadar(id: string): Promise<boolean> {
   const { error } = await supabase.from('radar_posts').delete().eq('id', id);
   return !error;
