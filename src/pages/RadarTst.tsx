@@ -207,9 +207,10 @@ const RadarTst: React.FC = () => {
         )}
 
         {abrindo && <p className="font-roboto text-gray-600 mb-2">Abrindo artigo...</p>}
+      </div>
 
-        {!loading && !erro && pago && !aberto && posts !== null && (
-          <>
+      {!loading && !erro && pago && !aberto && posts !== null && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {posts.length > 0 && (
               <div className="relative mb-4">
                 <Search
@@ -237,11 +238,11 @@ const RadarTst: React.FC = () => {
                 Nenhum artigo encontrado para essa pesquisa.
               </p>
             )}
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {postsFiltrados.map((post) => (
                 <article
                   key={post.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 cursor-pointer hover:shadow-md transition-shadow"
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow flex flex-col"
                   onClick={() => abrirArtigo(post.id)}
                   role="button"
                   tabIndex={0}
@@ -254,12 +255,12 @@ const RadarTst: React.FC = () => {
                       className="w-full aspect-[1200/630] object-cover rounded-lg mb-3"
                     />
                   )}
-                  <h2 className="font-poppins font-semibold text-lg text-soft-black">{post.titulo}</h2>
+                  <h2 className="font-poppins font-semibold text-base sm:text-lg text-soft-black">{post.titulo}</h2>
                   <p className="font-roboto text-sm text-gray-500 mb-2">
                     {new Date(post.publicado_em).toLocaleDateString('pt-BR')}
                   </p>
-                  <p className="font-roboto text-gray-700">{post.resumo}</p>
-                  <div className="mt-4">
+                  <p className="font-roboto text-gray-700 line-clamp-3 lg:line-clamp-none">{post.resumo}</p>
+                  <div className="mt-auto pt-4">
                     <Button variant="primary" icon={ArrowRight} iconPosition="right" onClick={(e) => { e.stopPropagation(); abrirArtigo(post.id); }}>
                       Leia mais
                     </Button>
@@ -267,9 +268,8 @@ const RadarTst: React.FC = () => {
                 </article>
               ))}
             </div>
-          </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
