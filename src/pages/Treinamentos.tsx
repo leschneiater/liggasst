@@ -174,6 +174,7 @@ const Treinamentos: React.FC = () => {
                     variant="secondary"
                     onClick={() => abrirPdf(t)}
                     disabled={abrindoPdf === t.id}
+                    className="w-full text-sm sm:text-base px-2 sm:px-4"
                   >
                     <FileText className="w-4 h-4 mr-2" aria-hidden="true" />
                     {abrindoPdf === t.id ? 'Abrindo...' : 'Abrir material em PDF'}
