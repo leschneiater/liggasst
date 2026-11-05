@@ -120,16 +120,16 @@ const Treinamentos: React.FC = () => {
         {pago === true && trilhas.length > 0 && (
           <div className="mb-8">
             <h2 className="font-poppins text-lg font-semibold text-gray-900 mb-3">Trilhas</h2>
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {trilhas.map((t) => (
                 <Link
                   key={t.id}
                   to={`${role === 'company' ? '/treinamentos-empresa' : '/treinamentos-profissional'}/trilha/${t.id}`}
                   className="block bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-green-deep transition-colors"
                 >
-                  <div className="flex items-center justify-between">
+                  <div>
                     <h3 className="font-poppins font-semibold text-gray-900">{t.titulo}</h3>
-                    <span className="text-sm text-gray-500">
+                    <span className="block text-sm text-gray-500 mt-1">
                       {resumoProgresso(t.totalSecoes, t.secoesConcluidas)}
                     </span>
                   </div>
@@ -143,10 +143,10 @@ const Treinamentos: React.FC = () => {
         )}
 
         {pago === true && (
-        <div className="space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {treinamentos.map((t) => (
-            <div key={t.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-              <h2 className="font-poppins text-lg font-semibold text-gray-900">{t.title}</h2>
+            <div key={t.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-5">
+              <h2 className="font-poppins text-base sm:text-lg font-semibold text-gray-900">{t.title}</h2>
               {t.description && (
                 <p className="font-roboto text-gray-600 mt-1 whitespace-pre-line">{t.description}</p>
               )}
