@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
 import { RADAR_CAPA_IDEAL, dimensoesArte, erroProporcaoCapa } from '../../services/adsFormat';
+import { prepararCapa, motivoFalhaCapa } from '../../services/capaImagem';
 import { publicStorageUrl } from '../../services/publicUrl';
 
 const radarCapaUrl = (p: string | null) => (p ? publicStorageUrl('radar-covers', p) : null);
@@ -39,7 +40,7 @@ const RadarAdmin: React.FC = () => {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!valido) { toast.error('Preencha título, resumo e conteúdo.'); return; }
+    if (!valido) { toast.error('Preencha título, headline e conteúdo.'); return; }
     setSalvando(true);
     const campos = { titulo: form.titulo.trim(), resumo: form.resumo.trim(), conteudo: form.conteudo.trim() };
     let artigoId: string | null = null;
@@ -53,9 +54,13 @@ const RadarAdmin: React.FC = () => {
     }
     if (artigoId && capa) {
       try {
-        const path = await uploadRadarCapa(capa);
-        if (!(await adminDefinirCapaRadar(artigoId, path))) throw new Error('capa');
-      } catch { toast.error('Artigo salvo, mas a capa não subiu. Tente editar e enviar de novo.'); setSalvando(false); return; }
+        const arquivo = await prepararCapa(capa);
+        const path = await uploadRadarCapa(arquivo);
+        if (!(await adminDefinirCapaRadar(artigoId, path))) throw new Error('falha ao vincular a capa');
+      } catch (err) {
+        toast.error(`Artigo salvo, mas a capa não subiu (${motivoFalhaCapa(err)}). Tente editar e enviar de novo.`);
+        setSalvando(false); return;
+      }
     }
     if (artigoId) {
       toast.success(editando ? 'Artigo salvo.' : 'Rascunho salvo.');
@@ -96,10 +101,12 @@ const RadarAdmin: React.FC = () => {
           <div>
             <label htmlFor="radar-titulo" className="block text-sm font-medium text-gray-700 mb-1">Título</label>
             <input id="radar-titulo" className={campo} value={form.titulo} maxLength={200} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
+            <p className="text-xs text-gray-500 mt-1">{form.titulo.length}/200</p>
           </div>
           <div>
-            <label htmlFor="radar-resumo" className="block text-sm font-medium text-gray-700 mb-1">Resumo</label>
+            <label htmlFor="radar-resumo" className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
             <textarea id="radar-resumo" rows={2} className={campo} value={form.resumo} maxLength={500} onChange={(e) => setForm({ ...form, resumo: e.target.value })} />
+            <p className="text-xs text-gray-500 mt-1">{form.resumo.length}/500 — frase curta em destaque logo abaixo do título.</p>
           </div>
           <div>
             <label htmlFor="radar-conteudo" className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>

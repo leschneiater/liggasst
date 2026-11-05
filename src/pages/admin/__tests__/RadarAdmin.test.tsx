@@ -40,7 +40,7 @@ describe('RadarAdmin', () => {
     abrir();
     await screen.findByText('Artigo A');
     fireEvent.change(screen.getByLabelText('Título'), { target: { value: 'Titulo novo' } });
-    fireEvent.change(screen.getByLabelText('Resumo'), { target: { value: 'Resumo novo' } });
+    fireEvent.change(screen.getByLabelText('Headline'), { target: { value: 'Resumo novo' } });
     fireEvent.change(screen.getByLabelText('Conteúdo'), { target: { value: 'Conteudo novo com texto' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar rascunho' }));
     await waitFor(() => expect(criar).toHaveBeenCalledWith({ titulo: 'Titulo novo', resumo: 'Resumo novo', conteudo: 'Conteudo novo com texto' }));
