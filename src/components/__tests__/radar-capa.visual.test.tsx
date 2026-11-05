@@ -31,7 +31,7 @@ vi.mock('../../services/radarTst', () => ({
     { id: 'p1', titulo: 'NR-1 atualizada: o que muda na pratica', resumo: 'Entenda os novos prazos do GRO e do PGR para empresas de todos os portes.', publicado_em: '2026-11-02T00:00:00Z', capa_path: 'capas/exemplo.jpg' },
     { id: 'p2', titulo: 'Checklist de SST para pequenas empresas', resumo: 'Um passo a passo simples para manter a conformidade sem complicacao.', publicado_em: '2026-10-28T00:00:00Z', capa_path: null },
   ]),
-  fetchRadarPost: vi.fn().mockResolvedValue({ id: 'p1', titulo: 'NR-1 atualizada: o que muda na pratica', resumo: 'Resumo', conteudo: 'Primeiro paragrafo do artigo.\n\nSegundo paragrafo do artigo.', publicado_em: '2026-11-02T00:00:00Z', capa_path: 'capas/exemplo.jpg' }),
+  fetchRadarPost: vi.fn().mockResolvedValue({ id: 'p1', titulo: 'NR-1 atualizada: o que muda na pratica', resumo: 'Resumo', conteudo: '<h2>Por que a NR-1 mudou</h2><p>Primeiro <strong>paragrafo</strong> do artigo com <em>destaque</em>.</p><h3>O que muda na pratica</h3><p>Segundo paragrafo do artigo.</p><h4>Detalhe fino</h4><ul><li>Item um</li><li>Item dois</li></ul>', publicado_em: '2026-11-02T00:00:00Z', capa_path: 'capas/exemplo.jpg' }),
   radarCapaUrl: (p: string | null) => (p ? `https://cdn.test/${p}` : null),
 }));
 vi.mock('../../contexts/AuthContext', () => ({
@@ -76,7 +76,7 @@ describe('preview visual da capa do Radar TST', () => {
     const tela = render(<MemoryRouter><RadarTst /></MemoryRouter>);
     const card = await tela.findByText('NR-1 atualizada: o que muda na pratica');
     fireEvent.click(card);
-    await tela.findByText(/Primeiro paragrafo do artigo/);
+    await tela.findByText(/Por que a NR-1 mudou/);
     salvar('radar-capa-artigo', tela.container.innerHTML);
   });
 });
