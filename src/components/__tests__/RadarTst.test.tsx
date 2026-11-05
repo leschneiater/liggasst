@@ -11,6 +11,12 @@ vi.mock('../../services/assinatura', () => ({
 }));
 
 const fetchRadarPostsMock = vi.fn();
+vi.mock('../../services/radarVotos', () => ({
+  meuVoto: vi.fn().mockResolvedValue(null),
+  votar: vi.fn().mockResolvedValue(undefined),
+  resumoVotosAdmin: vi.fn().mockResolvedValue({}),
+  proximoVoto: (atual: string | null, clicado: string) => (atual === clicado ? null : clicado),
+}));
 vi.mock('../../services/radarTst', () => ({
   fetchRadarPosts: (...args: unknown[]) => fetchRadarPostsMock(...args),
   radarCapaUrl: (p: string | null) => (p ? `https://cdn.test/${p}` : null),

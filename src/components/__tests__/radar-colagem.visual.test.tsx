@@ -32,6 +32,12 @@ vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() 
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: vi.fn().mockResolvedValue({ plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production' }),
 }));
+vi.mock('../../services/radarVotos', () => ({
+  meuVoto: vi.fn().mockResolvedValue(null),
+  votar: vi.fn().mockResolvedValue(undefined),
+  resumoVotosAdmin: vi.fn().mockResolvedValue({}),
+  proximoVoto: (atual: string | null, clicado: string) => (atual === clicado ? null : clicado),
+}));
 vi.mock('../../services/radarTst', async () => {
   const { colagemParaHtml: colar } = await import('../../services/radarHtml');
   return {

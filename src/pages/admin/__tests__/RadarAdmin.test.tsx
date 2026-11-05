@@ -10,6 +10,9 @@ const status = vi.fn();
 const excluir = vi.fn();
 const editar = vi.fn();
 
+vi.mock('../../../services/radarVotos', () => ({
+  resumoVotosAdmin: vi.fn().mockResolvedValue({}),
+}));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('../../../services/radarAdmin', () => ({
   adminListarRadar: (...a: unknown[]) => listar(...a),

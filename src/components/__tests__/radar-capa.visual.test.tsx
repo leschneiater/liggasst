@@ -26,6 +26,12 @@ vi.mock('../../services/radarAdmin', () => ({
 vi.mock('../../services/assinatura', () => ({
   fetchAssinatura: vi.fn().mockResolvedValue({ plan: 'pro_professional', status: 'active', current_period_end: null, environment: 'production' }),
 }));
+vi.mock('../../services/radarVotos', () => ({
+  meuVoto: vi.fn().mockResolvedValue(null),
+  votar: vi.fn().mockResolvedValue(undefined),
+  resumoVotosAdmin: vi.fn().mockResolvedValue({ p1: { joia: 3, nao_joia: 1 } }),
+  proximoVoto: (atual: string | null, clicado: string) => (atual === clicado ? null : clicado),
+}));
 vi.mock('../../services/radarTst', () => ({
   fetchRadarPosts: vi.fn().mockResolvedValue([
     { id: 'p1', titulo: 'NR-1 atualizada: o que muda na pratica', resumo: 'Entenda os novos prazos do GRO e do PGR para empresas de todos os portes.', publicado_em: '2026-11-02T00:00:00Z', capa_path: 'capas/exemplo.jpg' },
@@ -77,6 +83,23 @@ describe('preview visual da capa do Radar TST', () => {
     const card = await tela.findByText('NR-1 atualizada: o que muda na pratica');
     fireEvent.click(card);
     await tela.findByText(/Por que a NR-1 mudou/);
+    await tela.findByText('Este artigo foi relevante para você?');
     salvar('radar-capa-artigo', tela.container.innerHTML);
+  });
+
+  it('gera HTML do artigo com voto joia ativo', async () => {
+    const tela = render(<MemoryRouter><RadarTst /></MemoryRouter>);
+    const card = await tela.findByText('NR-1 atualizada: o que muda na pratica');
+    fireEvent.click(card);
+    const joia = await tela.findByLabelText('Marcar artigo como relevante (joia)');
+    fireEvent.click(joia);
+    await tela.findByText(/Obrigada! Seu voto ajuda/);
+    salvar('radar-artigo-votado', tela.container.innerHTML);
+  });
+
+  it('gera HTML da lista do admin com o resumo de votos', async () => {
+    const tela = render(<MemoryRouter><RadarAdmin /></MemoryRouter>);
+    await tela.findByText('3 joia');
+    salvar('radar-admin-votos', tela.container.innerHTML);
   });
 });

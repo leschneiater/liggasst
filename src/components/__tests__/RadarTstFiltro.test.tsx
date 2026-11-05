@@ -33,6 +33,12 @@ const postsExemplo = [
 ];
 const fetchRadarPostsMock = vi.fn();
 const fetchRadarPostMock = vi.fn();
+vi.mock('../../services/radarVotos', () => ({
+  meuVoto: vi.fn().mockResolvedValue(null),
+  votar: vi.fn().mockResolvedValue(undefined),
+  resumoVotosAdmin: vi.fn().mockResolvedValue({}),
+  proximoVoto: (atual: string | null, clicado: string) => (atual === clicado ? null : clicado),
+}));
 vi.mock('../../services/radarTst', () => ({
   fetchRadarPosts: (...args: unknown[]) => fetchRadarPostsMock(...args),
   fetchRadarPost: (...args: unknown[]) => fetchRadarPostMock(...args),

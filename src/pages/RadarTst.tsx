@@ -8,11 +8,12 @@
 // vazia mostra estado vazio honesto ate a fonte de conteudo ser decidida.
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Radar, Lock, AlertTriangle, Search, ArrowLeft } from 'lucide-react';
+import { Radar, Lock, AlertTriangle, Search, ArrowLeft, ArrowRight, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchAssinatura } from '../services/assinatura';
 import { assinaturaPagaAtiva } from '../utils/assinaturaAcesso';
 import { fetchRadarPosts, fetchRadarPost, type RadarTstPost, type RadarTstResumo, radarCapaUrl } from '../services/radarTst';
+import { meuVoto, votar, proximoVoto, type VotoRadar } from '../services/radarVotos';
 import { conteudoParaHtml } from '../services/radarHtml';
 import Button from '../components/ui/Button';
 
@@ -25,20 +26,48 @@ const RadarTst: React.FC = () => {
   const [busca, setBusca] = useState('');
   const [aberto, setAberto] = useState<RadarTstPost | null>(null);
   const [abrindo, setAbrindo] = useState(false);
+  const [voto, setVoto] = useState<VotoRadar | null>(null);
+  const [votando, setVotando] = useState(false);
+  const [erroVoto, setErroVoto] = useState(false);
 
   const normaliza = (t: string) =>
     t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   const abrirArtigo = async (id: string) => {
     setAbrindo(true);
+    setVoto(null);
+    setErroVoto(false);
     try {
       const post = await fetchRadarPost(id);
-      if (post) setAberto(post);
-      else setErro(true);
+      if (post) {
+        setAberto(post);
+        // Voto proprio do assinante (leitura falha em silencio: o artigo
+        // continua legivel mesmo se a consulta do voto der erro).
+        meuVoto(id).then(setVoto).catch(() => {});
+      } else {
+        setErro(true);
+      }
     } catch {
       setErro(true);
     } finally {
       setAbrindo(false);
+    }
+  };
+
+  const clicarVoto = async (clicado: VotoRadar) => {
+    if (!aberto || votando) return;
+    const novo = proximoVoto(voto, clicado);
+    const anterior = voto;
+    setVoto(novo);
+    setVotando(true);
+    setErroVoto(false);
+    try {
+      await votar(aberto.id, novo);
+    } catch {
+      setVoto(anterior);
+      setErroVoto(true);
+    } finally {
+      setVotando(false);
     }
   };
 
@@ -131,6 +160,49 @@ const RadarTst: React.FC = () => {
               {new Date(aberto.publicado_em).toLocaleDateString('pt-BR')}
             </p>
             <div className="font-roboto text-gray-700 radar-conteudo" dangerouslySetInnerHTML={{ __html: conteudoParaHtml(aberto.conteudo) }} />
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <p className="font-roboto text-sm text-gray-600 mb-3">Este artigo foi relevante para você?</p>
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  onClick={() => clicarVoto('joia')}
+                  disabled={votando}
+                  aria-pressed={voto === 'joia'}
+                  aria-label="Marcar artigo como relevante (joia)"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg border font-roboto text-sm transition-colors disabled:opacity-50 ${
+                    voto === 'joia'
+                      ? 'bg-green-deep text-white border-green-deep'
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-green-deep hover:text-green-deep'
+                  }`}
+                >
+                  <ThumbsUp size={18} aria-hidden="true" fill={voto === 'joia' ? 'currentColor' : 'none'} />
+                  <span>Joia</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => clicarVoto('nao_joia')}
+                  disabled={votando}
+                  aria-pressed={voto === 'nao_joia'}
+                  aria-label="Marcar artigo como não relevante (não joia)"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg border font-roboto text-sm transition-colors disabled:opacity-50 ${
+                    voto === 'nao_joia'
+                      ? 'bg-red-600 text-white border-red-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-red-600 hover:text-red-600'
+                  }`}
+                >
+                  <ThumbsDown size={18} aria-hidden="true" fill={voto === 'nao_joia' ? 'currentColor' : 'none'} />
+                  <span>Não joia</span>
+                </button>
+              </div>
+              {voto !== null && !erroVoto && (
+                <p className="font-roboto text-sm text-gray-500 mt-2">Obrigada! Seu voto ajuda a medir a relevância do conteúdo.</p>
+              )}
+              {erroVoto && (
+                <p className="font-roboto text-sm text-red-600 mt-2">
+                  Não foi possível registrar seu voto. Tente novamente.
+                </p>
+              )}
+            </div>
           </article>
         )}
 
@@ -187,6 +259,11 @@ const RadarTst: React.FC = () => {
                     {new Date(post.publicado_em).toLocaleDateString('pt-BR')}
                   </p>
                   <p className="font-roboto text-gray-700">{post.resumo}</p>
+                  <div className="mt-4">
+                    <Button variant="primary" icon={ArrowRight} iconPosition="right" onClick={(e) => { e.stopPropagation(); abrirArtigo(post.id); }}>
+                      Leia mais
+                    </Button>
+                  </div>
                 </article>
               ))}
             </div>

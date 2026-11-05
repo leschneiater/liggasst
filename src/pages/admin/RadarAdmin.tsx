@@ -2,7 +2,7 @@
 // despublicar e excluir artigos. Texto simples (paragrafos). Sem agendamento.
 // Rascunho nunca aparece para assinantes (RLS exige status = publicado).
 import React, { useEffect, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ThumbsUp, ThumbsDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/ui/Button';
 import AdminAreaNav from '../../components/Layout/AdminAreaNav';
@@ -16,12 +16,14 @@ const radarCapaUrl = (p: string | null) => (p ? publicStorageUrl('radar-covers',
 import {
   adminListarRadar, adminCriarRadar, adminEditarRadar, adminDefinirStatusRadar, adminExcluirRadar,
   RadarAdminPost, StatusRadar, adminDefinirCapaRadar, uploadRadarCapa } from '../../services/radarAdmin';
+import { resumoVotosAdmin, type ResumoVotos } from '../../services/radarVotos';
 
 const ROTULO: Record<StatusRadar, string> = { rascunho: 'Rascunho', publicado: 'Publicado' };
 const VAZIO = { titulo: '', resumo: '', conteudo: '' };
 
 const RadarAdmin: React.FC = () => {
   const [itens, setItens] = useState<RadarAdminPost[]>([]);
+  const [votos, setVotos] = useState<Record<string, ResumoVotos>>({});
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [form, setForm] = useState(VAZIO);
@@ -33,7 +35,11 @@ const RadarAdmin: React.FC = () => {
   const carregar = async () => {
     setLoading(true); setErro(null);
     const r = await adminListarRadar();
-    if (!r.ok) setErro('Não foi possível carregar os artigos.'); else setItens(r.itens);
+    if (!r.ok) setErro('Não foi possível carregar os artigos.'); else {
+      setItens(r.itens);
+      // Relevancia (joia / nao joia) por artigo; falha nao impede a lista.
+      resumoVotosAdmin(r.itens.map((p) => p.id)).then(setVotos).catch(() => setVotos({}));
+    }
     setLoading(false);
   };
   useEffect(() => { carregar(); }, []);
@@ -175,6 +181,16 @@ const RadarAdmin: React.FC = () => {
                 <span className="font-roboto text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">{ROTULO[p.status]}</span>
               </div>
               <p className="font-roboto text-sm text-gray-600 mt-1">{p.resumo}</p>
+              <p className="flex items-center gap-3 font-roboto text-sm text-gray-600 mt-2" data-testid="radar-votos-resumo">
+                <span className="inline-flex items-center gap-1">
+                  <ThumbsUp size={14} aria-hidden="true" className="text-green-deep" />
+                  {votos[p.id]?.joia ?? 0} joia
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <ThumbsDown size={14} aria-hidden="true" className="text-red-600" />
+                  {votos[p.id]?.nao_joia ?? 0} não joia
+                </span>
+              </p>
               <div className="flex flex-wrap gap-2 mt-4">
                 <Button size="sm" variant="secondary" onClick={() => editar(p)}>Editar</Button>
                 <Button size="sm" onClick={() => alternar(p)}>{p.status === 'publicado' ? 'Voltar para rascunho' : 'Publicar'}</Button>
